@@ -1,6 +1,8 @@
 
 window.addEventListener("load", setup, false);
 
+
+
 var width = 520; // 520
 var height = 520;
 var conteneur = "carte";
@@ -40,6 +42,7 @@ var canvas;
 var currentYear;
 var langue;
 var pathFrontieres;
+var mode;
 
 
 
@@ -64,6 +67,7 @@ function setup()
     currentYear = 0;
     langue = "FR";
     pathFrontieres = [];
+    mode = "2d";
 
 	// si WegGL est supporté
 	if(window.WebGLRenderingContext)
@@ -140,10 +144,10 @@ function dessin2d(error, results)
 					green = Math.floor(green);
 					blue = 70;
 
-					d3.select("#classement").append("p").attr("class", "itemPays")
+					d3.select("#classement").append("li").attr("class", "itemPays")
                         .style("position", "absolute")
                         .attr("id", index[i].iso)
-                        //.on("click", function(){ clickPays(this.id); });
+                        .on("click", function(){ clicPaysClassement(this.id); });
 
 				}
 			}
@@ -172,6 +176,7 @@ function dessin2d(error, results)
 
 function passage3d()
 {
+    mode = "3d";
 
 	// carte greyscale pour texture heightMap
 	svgFond.style("fill", "#fff");
@@ -284,15 +289,13 @@ function displayBorders(scene)
 
             for(var j = 0; j < coor[i].length; j+=2)
             {
-                var x = coor[i][j] - (width/2);
-                var y = coor[i][j+1] * (-1) + (height/2);
-                geometryBorder.vertices.push(new THREE.Vector3(x, y, 0));
+                var position = projectionfor3d([ coor[i][j], coor[i][j+1] ]);
+                geometryBorder.vertices.push(new THREE.Vector3(position[0], position[1], 0));
             }
             
             // dernier point pour fermer la forme
-            var x = coor[i][0] - (width/2);
-            var y = coor[i][1] * (-1) + (height/2);
-            geometryBorder.vertices.push(new THREE.Vector3(x, y, 0));
+            var position = projectionfor3d([ coor[i][0], coor[i][1] ]);
+            geometryBorder.vertices.push(new THREE.Vector3(position[0], position[1], 0));
 
             // ajout dans la scene
             var line = new THREE.Line(geometryBorder, materialBorder);
@@ -432,6 +435,35 @@ function getPath(path)
         }   
     }
     return coor;
+
+}
+
+
+
+function getGeoCoord(x, y)
+{
+
+    var latitude = x;
+    var longitude = y;
+    var traductionCoor = [ 0, 0 ];
+
+    if(latitude != "#N/A" && longitude != "#N/A")
+    {
+
+        var lat = parseFloat(latitude.substring(0, latitude.length-1));
+        var sens = latitude.substring(latitude.length-1, latitude.length);
+        if(sens == "S"){ lat *= -1; }
+
+        var long = parseFloat(longitude.substring(0, longitude.length-1));
+        sens = longitude.substring(longitude.length-1, longitude.length);
+        if(sens == "W"){ long *= -1; }
+
+        coordonneesCapitale = [ long, lat ];
+        var traductionCoor = projection(coordonneesCapitale);        
+
+    }
+
+    return traductionCoor;
 
 }
 
@@ -657,19 +689,19 @@ var Canvas = function()
 
 
 
-    this.moveCamToPays = function(paysId)
+    this.moveCamToPosition = function(position)
     {
 
-        this.angleCamera = 90;
-        this.rayonCamera = projection([ 0, -10 ])[1];
+        //this.angleCamera = 90;
+        //this.rayonCamera = projection([ 0, -10 ])[1];
 
         this.transitionCamera.setup(
             [this.camera.position.x, this.camera.position.y, this.camera.position.z], 
-            [ infosPays[paysId][3][0], infosPays[paysId][3][1]+this.rayonCamera, 2000 ] );
+            [ position[0], position[1]+this.rayonCamera, 400 ] );
         
         this.transitionFocusCamera.setup(
             [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
-            [ infosPays[ paysId][3][0], infosPays[paysId][3][1], 100 ] );
+            [ position[0], position[1], 0 ] );
 
         this.isZoom = true;
 
@@ -699,18 +731,20 @@ var Canvas = function()
 
         if(this.isZoom)
         {
+
             this.angleCamera = 90;
             this.rayonCamera = this.positionInitCam[1];
 
             this.transitionCamera.setup(
                 [ this.camera.position.x, this.camera.position.y, this.camera.position.z ], 
-                [ this.centreCarte[0], this.centreCarte[1]+this.rayonCamera, 2000 ] );
+                [ this.centreCarte[0], this.centreCarte[1]+this.rayonCamera, 800 ] );
             
             this.transitionFocusCamera.setup(
                 [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
-                [ this.centreCarte[0], this.centreCarte[1], 100 ] );
+                [ this.centreCarte[0], this.centreCarte[1], 0 ] );
 
             this.isZoom = false;
+
         }
 
     }
@@ -746,7 +780,11 @@ function onresize()
 
     var newWidth = window.innerWidth;
     var newHeight = window.innerHeight;
-    //canvas.onResize(newWidth, newHeight);
+
+    if(mode == "3d")
+    {
+        canvas.onResize(newWidth, newHeight);
+    }
 
 }
 
@@ -806,6 +844,55 @@ function changementAnnee(sens)
 
 }
 
+
+
+
+function clicPaysClassement(isoPays)
+{
+
+    if(mode == "3d")
+    {
+        for(var i = 0; i < index.length; i++)
+        {
+            if(isoPays == index[i].iso)
+            {
+                var positionPays = projectionfor3d(getGeoCoord(index[i].latitude, index[i].longitude));
+                canvas.moveCamToPosition(positionPays);
+            }
+        }
+
+        
+    }
+    // var id;
+    // var classement = d3.selectAll(".itemPays");
+    // classement.style("color", "black");
+    // for(var i = 0; i < infosPays.length; i++)
+    // {
+    //     if(isoPays == infosPays[i][0])
+    //     {
+    //         id = i;
+    //         d3.selectAll("#"+infosPays[id][0]).style("color", "#0a0");
+    //     }
+    // }
+
+    // 
+
+}
+
+
+
+
+
+
+
+
+function init()
+{
+    if(canvas.isZoom)
+    {
+        canvas.init();
+    }
+}
 
 
 

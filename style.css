@@ -32,6 +32,15 @@ body
 }
 
 
-#classement{
+#classement
+{
 	overflow: scroll;
 }
+
+
+#classement li
+{
+	cursor: pointer;
+}
+
+
