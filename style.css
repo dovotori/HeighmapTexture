@@ -4,8 +4,15 @@ body
 	background-color:#fff;
 	color:#333;
 	font-weight: bold;
-	overflow:hidden;
 
+}
+
+
+#cp, #sources
+{
+	max-width:800px;
+	margin:0 auto;
+	padding:10px 20px;
 }
 
 
@@ -32,6 +39,8 @@ body
 }
 
 
+
+
 #classement
 {
 	overflow: scroll;
@@ -41,6 +50,8 @@ body
 #classement li
 {
 	cursor: pointer;
+	list-style-type:none;
+	margin: 0; padding: 0;
 }
 
 

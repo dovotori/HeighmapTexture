@@ -91,7 +91,7 @@ function setup()
 
 
 
-function dessin2d(error, results)
+function dessin2d( error, results )
 {
 
 	index = results[1];
@@ -162,8 +162,7 @@ function dessin2d(error, results)
 			d3.select(this).style( "stroke", colorCountry );
 
 		})
-
-        
+       
         changementAnnee(0);
 
 }
@@ -176,10 +175,11 @@ function dessin2d(error, results)
 
 function passage3d()
 {
+
     mode = "3d";
 
 	// carte greyscale pour texture heightMap
-	svgFond.style("fill", "#fff");
+	svgFond.style("fill", "#888");
 
 	for(var i = 0; i < index.length; i++)
 	{
@@ -274,8 +274,8 @@ function displayBorders(scene)
 {
 
     var materialBorder = new THREE.LineBasicMaterial({ 
-            color:0x0000ff,
-            opacity: 1,
+            color:0x666666,
+            opacity: 0.4,
             linewidth: 1
         });
 
@@ -330,6 +330,7 @@ function displayRelief( scene, texture )
 
     // heightmap
     //var texture = THREE.ImageUtils.loadTexture('mapInverse.png', null, loaded);
+    var fourchetteHauteur = 60;
 
     // texture effect
     var detailTexture = THREE.ImageUtils.loadTexture("data/textureLisse.jpg", null, loaded);
@@ -339,7 +340,7 @@ function displayRelief( scene, texture )
 
     // HAUTEUR MAX
     uniformsTerrain[ "tDisplacement" ].value = texture;
-    uniformsTerrain[ "uDisplacementScale" ].value = 10;
+    uniformsTerrain[ "uDisplacementScale" ].value = fourchetteHauteur;
 
     // EFFET TEXTURE
     uniformsTerrain[ "tNormal" ].value = detailTexture;
@@ -377,7 +378,7 @@ function displayRelief( scene, texture )
     geometryTerrain.computeTangents();
 
     var terrain = new THREE.Mesh( geometryTerrain, material );
-    terrain.position.set(0, 0, -10);
+    terrain.position.set(0, 0, -fourchetteHauteur/2);
 
     scene.add(terrain);
 
@@ -692,8 +693,8 @@ var Canvas = function()
     this.moveCamToPosition = function(position)
     {
 
-        //this.angleCamera = 90;
-        //this.rayonCamera = projection([ 0, -10 ])[1];
+        this.angleCamera = 90;
+        this.rayonCamera = this.positionInitCam[1];
 
         this.transitionCamera.setup(
             [this.camera.position.x, this.camera.position.y, this.camera.position.z], 
@@ -852,10 +853,14 @@ function clicPaysClassement(isoPays)
 
     if(mode == "3d")
     {
+        var classement = d3.selectAll(".itemPays");
+        classement.style("color", "black");
+
         for(var i = 0; i < index.length; i++)
         {
             if(isoPays == index[i].iso)
             {
+                d3.selectAll("#"+index[i].iso).style("color", "#00f");
                 var positionPays = projectionfor3d(getGeoCoord(index[i].latitude, index[i].longitude));
                 canvas.moveCamToPosition(positionPays);
             }
@@ -863,36 +868,13 @@ function clicPaysClassement(isoPays)
 
         
     }
-    // var id;
-    // var classement = d3.selectAll(".itemPays");
-    // classement.style("color", "black");
-    // for(var i = 0; i < infosPays.length; i++)
-    // {
-    //     if(isoPays == infosPays[i][0])
-    //     {
-    //         id = i;
-    //         d3.selectAll("#"+infosPays[id][0]).style("color", "#0a0");
-    //     }
-    // }
 
-    // 
 
 }
 
 
 
 
-
-
-
-
-function init()
-{
-    if(canvas.isZoom)
-    {
-        canvas.init();
-    }
-}
 
 
 
