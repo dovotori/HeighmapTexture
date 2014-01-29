@@ -38,13 +38,19 @@
 
 			window.addEventListener("load", setup, false);
 
-			var width = 360; // 520
-    		var height = 180;
-    		var scaleValue = 100;
+			var width = 520; // 520
+    		var height = 520;
+    		var scaleValue = 80;
 
 			var projection = d3.geo.mercator()
 			    .scale(scaleValue)
-			    .translate([180*scaleValue, 90*scaleValue]);
+			    .translate([width/2, height/2]);
+
+			var projectionfor3d = function(array){
+				array[0] = array[0]-width/2;
+				array[1] = (array[1]-height/2)*(-1);
+				return array;
+			}
 
 			var svg = d3.select("body").append("svg")
 				.attr("id", "carteSvg")
@@ -66,7 +72,7 @@
 				.style("fill", "rgba(0, 0, 0, 0)"); 
 
 			var index;
-			var canvas1;
+			var canvas;
 
 
 
@@ -81,7 +87,7 @@
 
 			function setup()
 			{
-				// si wegGL est supporté
+				// si WegGL est supporté
 				if(window.WebGLRenderingContext)
 				{
 					document.getElementById("btn_3d").addEventListener("click", passage3d, false);
@@ -211,83 +217,45 @@
 			{
 
 
-				var canvas = document.createElement( "canvas" );
-				var ctx = canvas.getContext('2d');
+				var canvas2d = document.createElement( "canvas" );
+				var ctx = canvas2d.getContext('2d');
 	
-				canvas.width = width;
-				canvas.height = height;
-				canvas.id = "canvas2d";
+				canvas2d.width = width;
+				canvas2d.height = height;
+				canvas2d.id = "canvas2d";
 
-				ctx.drawImage( this, 0, 0, canvas.width, canvas.height );
+				ctx.drawImage( this, 0, 0, canvas2d.width, canvas2d.height );
 
 				// application du blur
-				varBlur(ctx, function(x, y){ return 5; });
-				document.body.appendChild(canvas);
+				varBlur(ctx, function(x, y){ return 10; });
+				document.body.appendChild(canvas2d);
 				
-				dessin3d( canvas );
+				dessin3d( canvas2d );
 
 			}
 
 
 
-			function dessin3d(canvas)
+			function dessin3d(canvas2d )
 			{
 
 				// creation de la texture THREE
-				var textureCarted3js = new THREE.Texture( canvas );
+				var textureCarted3js = new THREE.Texture( canvas2d );
 				textureCarted3js.needsUpdate = true;
 
-				// // SCENE
-				// var scene = new THREE.Scene();
-				// var camera = new THREE.PerspectiveCamera( 45, width/height, 0.1, 10000 );
-				// camera.up = new THREE.Vector3( 0, 0, 1 );
-				// camera.position.set( 400, 400, 400 );
-				// camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
 
-				// renderer = new THREE.WebGLRenderer();
-    //     		renderer.setSize(width, height);
-    //     		renderer.setClearColor("#000000", 1);
+    			canvas = new Canvas();
+    			canvas.setup(width, height);
 
-    //     		scene.add( new THREE.AmbientLight( 0xffffff ) );
-    //     		spot1 = new THREE.DirectionalLight( 0x1111cc, 1 );
-		  //       spot1.position.set( 200, 0, 200 );
-		  //       spot1.intensity = 4.0;
-		  //       scene.add(spot1);
+        		var tailleCarte = projection([ 179, 89 ]);
 
-    //     		canvas3d = renderer.domElement;
-    //     		canvas3d.id = "canvas3d";
-    //     		document.body.appendChild(canvas3d);
-
-    			canvas1 = new Canvas();
-    			canvas1.setup(width, height);
-    			
-    			var largeurCarte = projection([ 9, 18 ]);
-    			console.log(largeurCarte[0]+"  "+largeurCarte[1]);
-
-
-				var geometrie = new THREE.Geometry();
-				geometrie.vertices.push(new THREE.Vector3(0, 0, 0));
-				geometrie.vertices.push(new THREE.Vector3(largeurCarte[0], 0, 0));
-    			var ligne = new THREE.Line(geometrie, new THREE.LineBasicMaterial({ color: 0xff0000 }));
-				canvas1.scene.add(ligne);
-
-				geometrie = new THREE.Geometry();
-				geometrie.vertices.push(new THREE.Vector3(0, 0, 0));
-				geometrie.vertices.push(new THREE.Vector3(0, largeurCarte[1], 0));
-    			ligne = new THREE.Line(geometrie, new THREE.LineBasicMaterial({ color: 0x00ff00 }));
-				canvas1.scene.add(ligne);
-			
-				geometrie = new THREE.Geometry();
-				geometrie.vertices.push(new THREE.Vector3(0, 0, 0));
-				geometrie.vertices.push(new THREE.Vector3(0, 0, 100));
-    			ligne = new THREE.Line(geometrie, new THREE.LineBasicMaterial({ color: 0x0000ff }));
-				canvas1.scene.add(ligne);
 
     			var cube = new THREE.Mesh(new THREE.CubeGeometry(100, 100, 100), new THREE.MeshBasicMaterial({ color : 0xff0000 }));
     			cube.position.set(0, 0, 0)
-    			//canvas1.scene.add(cube);
+    			//canvas.scene.add(cube);
 
-        		displayRelief(canvas1.scene, textureCarted3js);
+        		displayRelief(canvas.scene, textureCarted3js);
+        		displayRepere(canvas.scene);
 
         		// rendu
         		animate();
@@ -295,11 +263,14 @@
 
 			}
 
+
+
 			function animate()
 			{
 				requestAnimationFrame(animate); 
-				canvas1.draw();
+				canvas.draw();
 			}
+
 
 
 			function displayRelief(scene, texture)
@@ -344,7 +315,7 @@
 		        uniformsTerrain[ "uSpecularColor" ].value.setHex(0x000000);	// spec 
 		        uniformsTerrain[ "uAmbientColor" ].value.setHex(0x0000cc);	// ambiant
 
-		        uniformsTerrain[ "uShininess" ].value = 3;  				// shiness
+		        uniformsTerrain[ "uShininess" ].value = 3;  				// shininess
 		        uniformsTerrain[ "uRepeatOverlay" ].value.set(6, 6); 		// light reflection
 
 		        // MATERIAL
@@ -357,7 +328,7 @@
 		            side: THREE.DoubleSide
 		        });
 
-		        var geometryTerrain = new THREE.PlaneGeometry(400, 400, 256, 256);
+		        var geometryTerrain = new THREE.PlaneGeometry(width, height, 256, 256);
 		        geometryTerrain.computeFaceNormals();
 		        geometryTerrain.computeVertexNormals();
 		        geometryTerrain.computeTangents();
@@ -375,7 +346,32 @@
 
 
 
-		    ////////////////////////////////////////////////////////////////////////////////////////
+		    function displayRepere(scene)
+		    {
+		    	var geometrie = new THREE.Geometry();
+				geometrie.vertices.push(new THREE.Vector3(0, 0, 0));
+				geometrie.vertices.push(new THREE.Vector3(100, 0, 0));
+    			var ligne = new THREE.Line(geometrie, new THREE.LineBasicMaterial({ color: 0xff0000 }));
+				scene.add(ligne);
+
+				geometrie = new THREE.Geometry();
+				geometrie.vertices.push(new THREE.Vector3(0, 0, 0));
+				geometrie.vertices.push(new THREE.Vector3(0, 100, 0));
+    			ligne = new THREE.Line(geometrie, new THREE.LineBasicMaterial({ color: 0x00ff00 }));
+				scene.add(ligne);
+			
+				geometrie = new THREE.Geometry();
+				geometrie.vertices.push(new THREE.Vector3(0, 0, 0));
+				geometrie.vertices.push(new THREE.Vector3(0, 0, 100));
+    			ligne = new THREE.Line(geometrie, new THREE.LineBasicMaterial({ color: 0x0000ff }));
+				scene.add(ligne);	
+
+		    }
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////
 //////////// CANVAS ///////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -412,13 +408,12 @@ var Canvas = function()
         var VIEW_ANGLE = 45,
             ASPECT = WIDTH / HEIGHT,
             NEAR = 0.1,
-            FAR = 10000;
-            
+            FAR = 10000;          
 
 
         this.mouseDown = false;
         this.scrollSouris = 100;
-        this.centreCarte = projection([0,0]);
+        this.centreCarte = [0,0];
         this.angleSpot = 0;
         this.xSouris = 0; this.xSourisOld = 0;
         this.ySouris = 0; this.ySourisOld = 0;
@@ -429,22 +424,19 @@ var Canvas = function()
         //this.scene.fog = new THREE.Fog( 0x000000, 1, FAR/8 );
 
         // CAMERA
-        this.isZoom = false;
-        this.angleCamera = 90;
-        this.positionInitCam = projection([ 0, -84 ]);
         this.transitionCamera = new Transition();
         this.transitionFocusCamera = new Transition();
+        this.isZoom = false;
+        this.angleCamera = 90;
+        this.positionInitCam = projectionfor3d(projection([0,89]));
         this.focusCamera = [ this.centreCarte[0], this.centreCarte[1], 100 ];
         this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
-        this.camera.up = new THREE.Vector3( 0, 0, -1 );
+        this.camera.up = new THREE.Vector3( 0, 0, 1 );
 
         this.rayonCamera = this.positionInitCam[1];
-        var centre = this.focusCamera;
-        var x = (Math.cos(this.angleCamera*(Math.PI/180)) * this.rayonCamera) + centre[0];
-        var y = (Math.sin(this.angleCamera*(Math.PI/180)) * this.rayonCamera) + centre[1];
-        this.rayonCamera = this.positionInitCam[1];
-        this.camera.position.set( x, y, 400 );
-        this.camera.lookAt(new THREE.Vector3( this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ));
+
+        this.camera.position.set( this.positionInitCam[0], this.positionInitCam[1], 800 );
+        this.camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
         this.scene.add(this.camera);
 
     
