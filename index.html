@@ -1,663 +1,403 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>Heightmap Texture</title>
+		<title>Reporters sans frontières</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
+		<link rel="stylesheet" href="knacss.css" media="all">
+		<link rel="stylesheet" href="style.css" media="all">
 
-			body {
-				background-color:#999;
-				color:#fff;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
 
-		</style>
+		<!-- GOOGLE ANALYTICS -->
+		<script type="text/javascript">
+
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-2498778-1']);
+		  _gaq.push(['_setDomainName', 'rsf.org']);
+		  _gaq.push(['_trackPageview']);
+
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+
+		</script>
+
 	</head>
 
 	<body>
+		
+		<div id="cp" class="line">
+			<div class="txtcenter">
+				<a href="http://rsf.org">
+					<img class="w150p" src="http://fr.rsf.org/squelettes/img/fr/logo-fr.png" alt="logo RSF"/>
+				</a>
+				<br/>
+				<br/>
+				RSF rend public son rapport :
+			</div>
+		</div>
 
+
+		<div id="control_annees">
+			
+			<button id="btn_precedent" type="button">precedent</button>
+			<span id="current_year">2013</span>
+			<button id="btn_suivant" type="button">suivant</button>
+			
+		</div>
+
+		
 		<div id="control_mode">
 			<button id="btn_2d" type="button">2d</button>
 			<button id="btn_3d" type="button">3d</button>
 		</div>
 
 
-		<script type="text/javascript" src="d3.js"></script>
-		<script type="text/javascript" src="three.js"></script>
-		<script type="text/javascript" src="queue.js"></script>
-		<script type="text/javascript" src="utils.js"></script>
-		<script type="text/javascript" src="blur.js"></script>
-		<script type="text/javascript" src="ShaderTerrain.js"></script>
+		<div id="carte">
+			<div id="conteneurClassement">Classement
+				<div id="classement"></div>
+			</div>
+		</div>
 
 
-		<script>
+		<!--<script type="x-shader/x-vertex" id="vertexShader">
 
-			window.addEventListener("load", setup, false);
+			attribute vec4 tangent;
 
-			var width = 520; // 520
-    		var height = 520;
-    		var scaleValue = 80;
+			uniform vec2 uRepeatBase;
 
-			var projection = d3.geo.mercator()
-			    .scale(scaleValue)
-			    .translate([width/2, height/2]);
+			uniform sampler2D tNormal;
 
-			var projectionfor3d = function(array){
-				array[0] = array[0]-width/2;
-				array[1] = (array[1]-height/2)*(-1);
-				return array;
-			}
+			#ifdef VERTEX_TEXTURES
 
-			var svg = d3.select("body").append("svg")
-				.attr("id", "carteSvg")
-				.attr("width", width)
-				.attr("height", height);
+				uniform sampler2D tDisplacement;
+				uniform float uDisplacementScale;
+				uniform float uDisplacementBias;
 
-			var path = d3.geo.path().projection(projection);
-			var graticule = d3.geo.graticule();
+			#endif
 
-			svg.append("path")
-			    .datum(graticule)
-			    .attr("class", "graticule")
-			    .attr("d", path)
-			    .style("stroke", "#fff")
-			    .style("stroke-width", ".1px");
+			varying vec3 vTangent;
+			varying vec3 vBinormal;
+			varying vec3 vNormal;
+			varying vec2 vUv;
 
-			var svgFond = svg.append("svg:rect").attr("x", 0).attr("y", 0)
-				.attr("width", width).attr("height", height)
-				.style("fill", "rgba(0, 0, 0, 0)"); 
+			varying vec3 vViewPosition;
 
-			var index;
-			var canvas;
+			//THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
+			void main() {
 
+				vNormal = normalize( normalMatrix * normal );
 
+				// tangent and binormal vectors
 
-			function lireCsv(url, callback) {
-				d3.csv(url, function(d){ callback(null, d); });
-			}
-			function lireJson(url, callback) {
-				d3.json(url, function(d){ callback(null, d); });
-			}
+				vTangent = normalize( normalMatrix * tangent.xyz );
 
+				vBinormal = cross( vNormal, vTangent ) * tangent.w;
+				vBinormal = normalize( vBinormal );
 
-			function setup()
-			{
-				// si WegGL est supporté
-				if(window.WebGLRenderingContext)
-				{
-					document.getElementById("btn_3d").addEventListener("click", passage3d, false);
-				} else {
-					alert("wegGL not supported");
-				}
+				// texture coordinates
 
-				queue()
-					.defer(lireJson, "world-countries-clean.json")
-					.defer(lireCsv, "index.csv")
-					.awaitAll(dessin2d);
-				
-			}
+				vUv = uv;
 
+				vec2 uvBase = uv * uRepeatBase;
 
+				// displacement mapping
 
+				#ifdef VERTEX_TEXTURES
 
+					vec3 dv = texture2D( tDisplacement, uvBase ).xyz;
+					float df = uDisplacementScale * dv.x + uDisplacementBias;
+					vec3 displacedPosition = normal * df + position;
 
+					vec4 worldPosition = modelMatrix * vec4( displacedPosition, 1.0 );
+					vec4 mvPosition = modelViewMatrix * vec4( displacedPosition, 1.0 );
 
+				#else
 
+					vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+					vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-			function dessin2d(error, results)
-			{
+				#endif
 
-				index = results[1];
-				var features = results[0].features;
+				gl_Position = projectionMatrix * mvPosition;
 
-				var frontieres = svg.append("svg:g")
-					.selectAll("path")
-	      			.data(features)
-	      			.enter().append("svg:path")
-	      			.attr("id", function(d){ return d.id; })
-	    			.attr("d", function(d){ return path(d); })
-	    			.each(function(d){
+				vViewPosition = -mvPosition.xyz;
 
-	    				var colorCountry;
-	    				var found = false;
+				vec3 normalTex = texture2D( tNormal, uvBase ).xyz * 2.0 - 1.0;
+				vNormal = normalMatrix * normalTex;
 
-	    				for (var i = 0; i < index.length; i++) {
-
-	    					if(d.id == index[i].iso)
-	    					{
-
-	    						found = true;
-	    						var centroid = path.centroid(d);
-	    						var hauteur = index[i].an2013;
-	    						var hauteurMax = index.length;
-
-	    						// définir la couleur
-	    						var red, green, blue;
-								if(hauteur < hauteurMax/3){
-									// de vert à jaune
-									red = map(hauteur, 0, hauteurMax / 3, 0, 255);
-									green = 255;
-							
-								} else if(hauteur < 2 * hauteurMax / 3) {
-									// de jaune à orange
-									red = 255;
-									green = map(hauteur, hauteurMax / 3, 2 * hauteurMax / 3, 255, 127);
-
-								} else if(hauteur <= hauteurMax){
-									// de orange à rouge
-									red = 255;
-									green = map(hauteur, 2 * hauteurMax / 3, hauteurMax, 127, 0);
-
-								}
-	    						
-	    						red = Math.floor(red);
-	    						green = Math.floor(green);
-	    						blue = 70;
-
-	    						
-
-	    					}
-	    				}
-	    				if(found)
-	    				{
-	    					colorCountry = "rgba("+red+","+green+","+blue+", 1)";
-	    				} else {
-	    					colorCountry = "rgba(200, 200, 200, 1)";
-	    				}
-
-	    				d3.select(this).style( "fill", colorCountry )
-						d3.select(this).style( "stroke", colorCountry );
-
-	    			})
-	    	
-
-
-	    	}
-
-
-			function passage3d()
-			{
-
-				// carte greyscale pour texture heightMap
-				svgFond.style("fill", "#fff");
-
-				for(var i = 0; i < index.length; i++)
-				{
-					var pays = svg.select("#"+index[i].iso);
-
-					var hauteur = index[i].an2013;
-	    			var hauteurMax = index.length;
-					var gris = map(hauteur, hauteurMax, 0, 0, 255);
-					gris = Math.floor(gris);
-
-					pays.style("fill", "rgba("+gris+","+gris+","+gris+", 1)" );
-					pays.style( "stroke", "rgba("+gris+","+gris+","+gris+", 1)" );
-				}
-
-
-				var svgImg = document.getElementById("carteSvg");
-
-			    // transforme le svg en image
-			    var xml = new XMLSerializer().serializeToString(svgImg);
-				var data = "data:image/svg+xml;base64," + btoa(xml);
-				
-				var imageTexture = new Image();
-				imageTexture.addEventListener("load", blurImage, false);
-				imageTexture.src = data;
+				// THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			}
-
-
-			function blurImage()
-			{
-
-
-				var canvas2d = document.createElement( "canvas" );
-				var ctx = canvas2d.getContext('2d');
-	
-				canvas2d.width = width;
-				canvas2d.height = height;
-				canvas2d.id = "canvas2d";
-
-				ctx.drawImage( this, 0, 0, canvas2d.width, canvas2d.height );
-
-				// application du blur
-				varBlur(ctx, function(x, y){ return 10; });
-				document.body.appendChild(canvas2d);
-				
-				dessin3d( canvas2d );
-
-			}
-
-
-
-			function dessin3d(canvas2d )
-			{
-
-				// creation de la texture THREE
-				var textureCarted3js = new THREE.Texture( canvas2d );
-				textureCarted3js.needsUpdate = true;
-
-
-    			canvas = new Canvas();
-    			canvas.setup(width, height);
-
-        		var tailleCarte = projection([ 179, 89 ]);
-
-
-    			var cube = new THREE.Mesh(new THREE.CubeGeometry(100, 100, 100), new THREE.MeshBasicMaterial({ color : 0xff0000 }));
-    			cube.position.set(0, 0, 0)
-    			//canvas.scene.add(cube);
-
-        		displayRelief(canvas.scene, textureCarted3js);
-        		displayRepere(canvas.scene);
-
-        		// rendu
-        		animate();
-        		
-
-			}
-
-
-
-			function animate()
-			{
-				requestAnimationFrame(animate); 
-				canvas.draw();
-			}
-
-
-
-			function displayRelief(scene, texture)
-		    {
-
-		        var n = 0;
-		        function loaded() {
-		            n++;
-		            console.log("loaded: " + n);
-
-		            if (n == 3) {
-		                terrain.visible = true;
-		            }
-		        }
-
-
-		        // heightmap
-		        //var texture = THREE.ImageUtils.loadTexture('mapInverse.png', null, loaded);
-
-		        // texture effect
-		        var detailTexture = THREE.ImageUtils.loadTexture("textureLisse.jpg", null, loaded);
-
-		        var terrainShader = THREE.ShaderTerrain[ "terrain" ];
-		        var uniformsTerrain = THREE.UniformsUtils.clone(terrainShader.uniforms);
-
-
-		        // HAUTEUR MAX
-		        uniformsTerrain[ "tDisplacement" ].value = texture;
-		        uniformsTerrain[ "uDisplacementScale" ].value = 10;
-
-		        // EFFET TEXTURE
-		        uniformsTerrain[ "tNormal" ].value = detailTexture;
-		        uniformsTerrain[ "tDiffuse1" ].value = detailTexture;
-		        uniformsTerrain[ "tDetail" ].value = detailTexture;
-
-		        // COULEUR
-		        uniformsTerrain[ "uNormalScale" ].value = 1;
-		        uniformsTerrain[ "enableDiffuse1" ].value = true;
-		        uniformsTerrain[ "enableDiffuse2" ].value = true;
-		        uniformsTerrain[ "enableSpecular" ].value = true;
-		        uniformsTerrain[ "uDiffuseColor" ].value.setHex(0xcccccc);	// diffuse
-		        uniformsTerrain[ "uSpecularColor" ].value.setHex(0x000000);	// spec 
-		        uniformsTerrain[ "uAmbientColor" ].value.setHex(0x0000cc);	// ambiant
-
-		        uniformsTerrain[ "uShininess" ].value = 3;  				// shininess
-		        uniformsTerrain[ "uRepeatOverlay" ].value.set(6, 6); 		// light reflection
-
-		        // MATERIAL
-		        var material = new THREE.ShaderMaterial({
-		            uniforms: uniformsTerrain,
-		            vertexShader: terrainShader.vertexShader,
-		            fragmentShader: terrainShader.fragmentShader,
-		            lights: true,
-		            fog: false,
-		            side: THREE.DoubleSide
-		        });
-
-		        var geometryTerrain = new THREE.PlaneGeometry(width, height, 256, 256);
-		        geometryTerrain.computeFaceNormals();
-		        geometryTerrain.computeVertexNormals();
-		        geometryTerrain.computeTangents();
-
-		        var terrain = new THREE.Mesh(geometryTerrain, material);
-		        terrain.position.set(0, 0, -10);
-
-		        scene.add(terrain);
-
-		        loaded();
-
-		    }
-
-
-
-
-
-		    function displayRepere(scene)
-		    {
-		    	var geometrie = new THREE.Geometry();
-				geometrie.vertices.push(new THREE.Vector3(0, 0, 0));
-				geometrie.vertices.push(new THREE.Vector3(100, 0, 0));
-    			var ligne = new THREE.Line(geometrie, new THREE.LineBasicMaterial({ color: 0xff0000 }));
-				scene.add(ligne);
-
-				geometrie = new THREE.Geometry();
-				geometrie.vertices.push(new THREE.Vector3(0, 0, 0));
-				geometrie.vertices.push(new THREE.Vector3(0, 100, 0));
-    			ligne = new THREE.Line(geometrie, new THREE.LineBasicMaterial({ color: 0x00ff00 }));
-				scene.add(ligne);
-			
-				geometrie = new THREE.Geometry();
-				geometrie.vertices.push(new THREE.Vector3(0, 0, 0));
-				geometrie.vertices.push(new THREE.Vector3(0, 0, 100));
-    			ligne = new THREE.Line(geometrie, new THREE.LineBasicMaterial({ color: 0x0000ff }));
-				scene.add(ligne);	
-
-		    }
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////
-//////////// CANVAS ///////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-
-var Canvas = function()
-{
-
-    this.canvas;
-    this.renderer;
-    this.scene;
-    this.centreCarte;
-
-    this.xSouris, this.xSourisOld;
-    this.ySouris, this.ySourisOld;
-    this.mouseDown;
-    this.scrollSouris; 
-    
-    this.spot1; this.spot2;
-    this.angleSpot;
-
-    this.isZoom;
-
-    this.camera;
-    this.angleCamera;
-    this.rayonCamera;
-    this.positionInitCam;
-    this.focusCamera;
-    this.transitionCamera;
-    this.transitionFocusCamera;
-
-
-    this.setup = function(WIDTH, HEIGHT)
-    {
-
-        var VIEW_ANGLE = 45,
-            ASPECT = WIDTH / HEIGHT,
-            NEAR = 0.1,
-            FAR = 10000;          
-
-
-        this.mouseDown = false;
-        this.scrollSouris = 100;
-        this.centreCarte = [0,0];
-        this.angleSpot = 0;
-        this.xSouris = 0; this.xSourisOld = 0;
-        this.ySouris = 0; this.ySourisOld = 0;
-
-
-        // SCENE
-        this.scene = new THREE.Scene();
-        //this.scene.fog = new THREE.Fog( 0x000000, 1, FAR/8 );
-
-        // CAMERA
-        this.transitionCamera = new Transition();
-        this.transitionFocusCamera = new Transition();
-        this.isZoom = false;
-        this.angleCamera = 90;
-        this.positionInitCam = projectionfor3d(projection([0,89]));
-        this.focusCamera = [ this.centreCarte[0], this.centreCarte[1], 100 ];
-        this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
-        this.camera.up = new THREE.Vector3( 0, 0, 1 );
-
-        this.rayonCamera = this.positionInitCam[1];
-
-        this.camera.position.set( this.positionInitCam[0], this.positionInitCam[1], 800 );
-        this.camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
-        this.scene.add(this.camera);
-
-    
-        // RENDERER
-        this.renderer = new THREE.WebGLRenderer();
-        this.renderer.setSize(WIDTH, HEIGHT);
-        this.renderer.setClearColor("#000000", 1);
-
-
-        // LIGHT
-        this.scene.add( new THREE.AmbientLight( 0x888888 ) );
-
-        this.spot1 = new THREE.DirectionalLight( 0x1111cc, 1 );
-        this.spot1.position.set( 200, 0, 200 );
-        this.spot1.intensity = 1.0;
-        this.scene.add(this.spot1);
-
-        this.spot2 = new THREE.DirectionalLight( 0xffffff, 0.4 );
-        this.spot2.position.set( 200, 0, 200 );
-        this.spot2.intensity = 1.0;
-        this.scene.add(this.spot2);
-
-
-        this.canvas = this.renderer.domElement;
-        document.body.appendChild(this.canvas);
-        
-
-
-        var clone = this;
-        this.canvas.addEventListener("mousemove", function(event){ clone.onMouseMove(event); }, false);
-        this.canvas.addEventListener("mousedown", function(event){ clone.onMouseDown(event); }, false);
-        this.canvas.addEventListener("mouseup", function(event){ clone.onMouseUp(event); }, false);
-        this.canvas.addEventListener("mouseout", function(event){ clone.onMouseUp(event); }, false); // releve le clic si tu sort du canvas
-        //this.canvas.addEventListener("mousewheel", function(event){ clone.onMouseScroll(event); }, false);
-        //this.canvas.addEventListener("DOMMouseScroll", function(event){ clone.onMouseScroll(event); }, false);
-
-    }
-    
-    
-
-    this.draw = function()
-    {
-     
-        // transition pour la position de la camera
-        if(!this.transitionCamera.isFinished)
-        {
-            var currentPos = this.transitionCamera.execute3d();
-            this.camera.position.set(currentPos[0], currentPos[1], currentPos[2]);
-        }
-
-        // transition pour le focus de la camera
-        if(!this.transitionFocusCamera.isFinished)
-        {
-            var currentPos = this.transitionFocusCamera.execute3d();
-            this.focusCamera[0] = currentPos[0];
-            this.focusCamera[1] = currentPos[1];
-            this.focusCamera[2] = currentPos[2];
-            this.camera.lookAt(new THREE.Vector3(this.focusCamera[0], this.focusCamera[1], this.focusCamera[2]));
-        } else {
-            this.camera.lookAt(new THREE.Vector3(this.focusCamera[0], this.focusCamera[1], this.focusCamera[2]));
-        }
-
-        // rendu
-        this.renderer.render(this.scene, this.camera);
-
-    }
-    
-
-    
-    this.onMouseMove = function(event)
-    {
-        
-        if(this.mouseDown)
-        {
-            this.xSouris = event.clientX;
-            this.ySouris = event.clientY;
-
-            this.positionCamera();
-
-            this.xSourisOld = this.xSouris;
-            this.ySourisOld = this.ySouris;
-        }
-        return false;
-
-    }
-
-
-
-    this.onMouseScroll = function(event) 
-    {
-
-        var event = window.event || event;
-        var delta = Math.max(-1, Math.min(1, (event.wheelDelta || -event.detail)));
-
-        this.scrollSouris += delta;
-        this.scrollSouris = Math.min(this.scrollSouris, 70);
-        this.scrollSouris = Math.max(this.scrollSouris, 40);
-        
-        this.positionCamera();
-        return false;
-    
-    }
-
-
-
-    this.onMouseDown = function(event)
-    {
-        this.mouseDown = true;
-        this.xSouris = event.clientX;
-        this.xSourisOld = this.xSouris;
-        this.ySouris = event.clientY;
-        this.ySourisOld = this.ySouris;
-    }
-
-
-
-    this.onMouseUp = function(event)
-    {
-        this.mouseDown = false;
-    }
-
-
-
-
-    this.positionCamera = function()
-    {
-
-        // ROTATION HORIZONTALE
-        //this.angleCamera = map(this.xSouris, 0, largeurFenetre, 0, 180);
-        this.angleCamera += (this.xSouris - this.xSourisOld) * 0.1;
-
-        var x = (Math.cos(this.angleCamera*(Math.PI/180)) * this.rayonCamera) + this.focusCamera[0];
-        var y = (Math.sin(this.angleCamera*(Math.PI/180)) * this.rayonCamera) + this.focusCamera[1];
-        
-        this.camera.position.x = x;
-        this.camera.position.y = y;
-        this.camera.lookAt( new THREE.Vector3(this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ) );
-
-        // ROTATION VERTICALE
-        var dragY = (this.ySouris - this.ySourisOld);
-        if((this.rayonCamera > 60 && dragY < 0) || (this.rayonCamera < 500 && dragY > 0) )
-        {
-            this.rayonCamera += dragY;
-        }
-    }
-
-
-
-    this.moveCamToPays = function(paysId)
-    {
-
-        this.angleCamera = 90;
-        this.rayonCamera = projection([ 0, -10 ])[1];
-
-        this.transitionCamera.setup(
-            [this.camera.position.x, this.camera.position.y, this.camera.position.z], 
-            [ infosPays[paysId][3][0], infosPays[paysId][3][1]+this.rayonCamera, 2000 ] );
-        
-        this.transitionFocusCamera.setup(
-            [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
-            [ infosPays[ paysId][3][0], infosPays[paysId][3][1], 100 ] );
-
-        this.isZoom = true;
-
-    }
-
-    
-
-    this.positionSpot = function()
-    {
-
-        this.angleSpot++;
-        var rayon = 1000;
-        var centre = this.centreCarte;
-
-        var x = (Math.cos(this.angleSpot*(Math.PI/180)) * rayon)+centre[0];
-        var y = (Math.sin(this.angleSpot*(Math.PI/180)) * rayon)+centre[1];
-
-        this.spot2.position.x = x;
-        this.spot2.position.y = y;
-        this.repereCube.position.x = x;
-        this.repereCube.position.y = y;
-
-    }
-
-
-
-    this.init = function()
-    {
-
-        if(this.isZoom)
-        {
-            this.angleCamera = 90;
-            this.rayonCamera = this.positionInitCam[1];
-
-            this.transitionCamera.setup(
-                [ this.camera.position.x, this.camera.position.y, this.camera.position.z ], 
-                [ this.centreCarte[0], this.centreCarte[1]+this.rayonCamera, 2000 ] );
-            
-            this.transitionFocusCamera.setup(
-                [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
-                [ this.centreCarte[0], this.centreCarte[1], 100 ] );
-
-            this.isZoom = false;
-        }
-
-    }
-
-
-    this.onResize = function(newWidth, newHeight)
-    {
-        this.renderer.setSize(newWidth, newHeight);
-    }
-
-
-}
-
-
-
 
 		</script>
+
+
+
+
+
+
+		<script type="x-shader/x-fragment" id="fragmentShader">
+
+
+			uniform vec3 uAmbientColor;
+			uniform vec3 uDiffuseColor;
+			uniform vec3 uSpecularColor;
+			uniform float uShininess;
+			uniform float uOpacity;
+
+			uniform bool enableDiffuse1;
+			uniform bool enableDiffuse2;
+			uniform bool enableSpecular;
+
+			uniform sampler2D tDiffuse1;
+			uniform sampler2D tDiffuse2;
+			uniform sampler2D tDetail;
+			uniform sampler2D tNormal;
+			uniform sampler2D tSpecular;
+			uniform sampler2D tDisplacement;
+
+			uniform float uNormalScale;
+
+			uniform vec2 uRepeatOverlay;
+			uniform vec2 uRepeatBase;
+
+			uniform vec2 uOffset;
+
+			varying vec3 vTangent;
+			varying vec3 vBinormal;
+			varying vec3 vNormal;
+			varying vec2 vUv;
+
+			uniform vec3 ambientLightColor;
+
+			#if MAX_DIR_LIGHTS > 0
+
+				uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];
+				uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];
+
+			#endif
+
+			#if MAX_HEMI_LIGHTS > 0
+
+				uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];
+				uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];
+				uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];
+
+			#endif
+
+			#if MAX_POINT_LIGHTS > 0
+
+				uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];
+				uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];
+				uniform float pointLightDistance[ MAX_POINT_LIGHTS ];
+
+			#endif
+
+			varying vec3 vViewPosition;
+
+			// THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
+			// THREE.ShaderChunk[ "fog_pars_fragment" ],
+
+			void main() {
+
+				gl_FragColor = vec4( vec3( 1.0 ), uOpacity );
+
+				vec3 specularTex = vec3( 1.0 );
+
+				vec2 uvOverlay = uRepeatOverlay * vUv + uOffset;
+				vec2 uvBase = uRepeatBase * vUv;
+
+				vec3 normalTex = texture2D( tDetail, uvOverlay ).xyz * 2.0 - 1.0;
+				normalTex.xy *= uNormalScale;
+				normalTex = normalize( normalTex );
+
+				if( enableDiffuse1 && enableDiffuse2 ) {
+
+					vec4 colDiffuse1 = texture2D( tDiffuse1, uvOverlay );
+					vec4 colDiffuse2 = texture2D( tDiffuse2, uvOverlay );
+
+					#ifdef GAMMA_INPUT
+
+						colDiffuse1.xyz *= colDiffuse1.xyz;
+						colDiffuse2.xyz *= colDiffuse2.xyz;
+
+					#endif
+
+					gl_FragColor = gl_FragColor * mix ( colDiffuse1, colDiffuse2, 1.0 - texture2D( tDisplacement, uvBase ) );
+
+				 } else if( enableDiffuse1 ) {
+
+					gl_FragColor = gl_FragColor * texture2D( tDiffuse1, uvOverlay );
+
+				} else if( enableDiffuse2 ) {
+
+					gl_FragColor = gl_FragColor * texture2D( tDiffuse2, uvOverlay );
+
+				}
+
+				if( enableSpecular )
+					specularTex = texture2D( tSpecular, uvOverlay ).xyz;
+
+				mat3 tsb = mat3( vTangent, vBinormal, vNormal );
+				vec3 finalNormal = tsb * normalTex;
+
+				vec3 normal = normalize( finalNormal );
+				vec3 viewPosition = normalize( vViewPosition );
+
+				// point lights
+
+				#if MAX_POINT_LIGHTS > 0
+
+					vec3 pointDiffuse = vec3( 0.0 );
+					vec3 pointSpecular = vec3( 0.0 );
+
+					for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
+
+						vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );
+						vec3 lVector = lPosition.xyz + vViewPosition.xyz;
+
+						float lDistance = 1.0;
+						if ( pointLightDistance[ i ] > 0.0 )
+							lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );
+
+						lVector = normalize( lVector );
+
+						vec3 pointHalfVector = normalize( lVector + viewPosition );
+						float pointDistance = lDistance;
+
+						float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );
+						float pointDiffuseWeight = max( dot( normal, lVector ), 0.0 );
+
+						float pointSpecularWeight = specularTex.r * max( pow( pointDotNormalHalf, uShininess ), 0.0 );
+
+						pointDiffuse += pointDistance * pointLightColor[ i ] * uDiffuseColor * pointDiffuseWeight;
+						pointSpecular += pointDistance * pointLightColor[ i ] * uSpecularColor * pointSpecularWeight * pointDiffuseWeight;
+
+					}
+
+				#endif
+
+				// directional lights
+
+				#if MAX_DIR_LIGHTS > 0
+
+					vec3 dirDiffuse = vec3( 0.0 );
+					vec3 dirSpecular = vec3( 0.0 );
+
+					for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {
+
+						vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );
+
+						vec3 dirVector = normalize( lDirection.xyz );
+						vec3 dirHalfVector = normalize( dirVector + viewPosition );
+
+						float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );
+						float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );
+
+						float dirSpecularWeight = specularTex.r * max( pow( dirDotNormalHalf, uShininess ), 0.0 );
+
+						dirDiffuse += directionalLightColor[ i ] * uDiffuseColor * dirDiffuseWeight;
+						dirSpecular += directionalLightColor[ i ] * uSpecularColor * dirSpecularWeight * dirDiffuseWeight;
+
+					}
+
+				#endif
+
+				// hemisphere lights
+
+				#if MAX_HEMI_LIGHTS > 0
+
+					vec3 hemiDiffuse  = vec3( 0.0 );
+					vec3 hemiSpecular = vec3( 0.0 );
+
+					for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
+
+						vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );
+						vec3 lVector = normalize( lDirection.xyz );
+
+						// diffuse
+
+						float dotProduct = dot( normal, lVector );
+						float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;
+
+						hemiDiffuse += uDiffuseColor * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );
+
+						// specular (sky light)
+
+						float hemiSpecularWeight = 0.0;
+
+						vec3 hemiHalfVectorSky = normalize( lVector + viewPosition );
+						float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;
+						hemiSpecularWeight += specularTex.r * max( pow( hemiDotNormalHalfSky, uShininess ), 0.0 );
+
+						// specular (ground light)
+
+						vec3 lVectorGround = -lVector;
+
+						vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );
+						float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;
+						hemiSpecularWeight += specularTex.r * max( pow( hemiDotNormalHalfGround, uShininess ), 0.0 );
+
+						hemiSpecular += uSpecularColor * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight ) * hemiSpecularWeight * hemiDiffuseWeight;
+
+					}
+
+				#endif
+
+				// all lights contribution summation
+
+				vec3 totalDiffuse = vec3( 0.0 );
+				vec3 totalSpecular = vec3( 0.0 );
+
+				#if MAX_DIR_LIGHTS > 0
+
+					totalDiffuse += dirDiffuse;
+					totalSpecular += dirSpecular;
+
+				#endif
+
+				#if MAX_HEMI_LIGHTS > 0
+
+					totalDiffuse += hemiDiffuse;
+					totalSpecular += hemiSpecular;
+
+				#endif
+
+				#if MAX_POINT_LIGHTS > 0
+
+					totalDiffuse += pointDiffuse;
+					totalSpecular += pointSpecular;
+
+				#endif
+
+				//gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor) + totalSpecular;
+				gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor + totalSpecular );
+
+				// THREE.ShaderChunk[ "shadowmap_fragment" ],
+				// THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
+				// THREE.ShaderChunk[ "fog_fragment" ]
+
+			}
+
+
+		</script>-->
+
+
+		
+
+		
+		<script type="text/javascript" src="http://rsf.org/squelettes/lib/js/jquery-1.4.2.min.js"></script>
+		<script type="text/javascript" src="js/d3.js"></script>
+		<script type="text/javascript" src="js/three.js"></script>
+		<script type="text/javascript" src="js/queue.js"></script>
+		<script type="text/javascript" src="js/utils.js"></script>
+		<script type="text/javascript" src="js/blur.js"></script>
+		<script type="text/javascript" src="js/ShaderTerrain.js"></script>
+		<script type="text/javascript" src="js/main.js"></script>
 
 	</body>
 </html>
