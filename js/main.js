@@ -39,6 +39,7 @@ var index;
 var canvas;
 var currentYear;
 var langue;
+var pathFrontieres;
 
 
 
@@ -62,6 +63,7 @@ function setup()
 
     currentYear = 0;
     langue = "FR";
+    pathFrontieres = [];
 
 	// si WegGL est supporté
 	if(window.WebGLRenderingContext)
@@ -97,10 +99,13 @@ function dessin2d(error, results)
 		.enter().append("svg:path")
 		.attr("id", function(d){ return d.id; })
 		.attr("d", function(d){ return path(d); })
-		.each(function(d){
+		.each(function(d, i){
 
 			var colorCountry;
 			var found = false;
+
+            // calcul des frontieres pour la 3d
+            pathFrontieres[i] = getPath(path(d));
 
 			for (var i = 0; i < index.length; i++) {
 
@@ -160,6 +165,11 @@ function dessin2d(error, results)
 }
 
 
+
+
+
+
+
 function passage3d()
 {
 
@@ -193,9 +203,9 @@ function passage3d()
 }
 
 
+
 function blurImage()
 {
-
 
 	var canvas2d = document.createElement( "canvas" );
 	var ctx = canvas2d.getContext('2d');
@@ -216,7 +226,7 @@ function blurImage()
 
 
 
-function dessin3d(canvas2d )
+function dessin3d( canvas2d )
 {
 
 	// creation de la texture THREE
@@ -227,20 +237,14 @@ function dessin3d(canvas2d )
 	canvas = new Canvas();
 	canvas.setup(width, height);
 
-	var tailleCarte = projection([ 179, 89 ]);
 
-
-	var cube = new THREE.Mesh(new THREE.CubeGeometry(100, 100, 100), new THREE.MeshBasicMaterial({ color : 0xff0000 }));
-	cube.position.set(0, 0, 0)
-	//canvas.scene.add(cube);
-
+    displayBorders(canvas.scene);
 	displayRelief(canvas.scene, textureCarted3js);
 	displayRepere(canvas.scene);
 
 	// rendu
 	animate();
 	
-
 }
 
 
@@ -253,7 +257,61 @@ function animate()
 
 
 
-function displayRelief(scene, texture)
+
+
+
+
+
+
+
+
+function displayBorders(scene)
+{
+
+    var materialBorder = new THREE.LineBasicMaterial({ 
+            color:0x0000ff,
+            opacity: 1,
+            linewidth: 1
+        });
+
+    for(var k = 0; k < pathFrontieres.length; k++)
+    {
+        var coor = pathFrontieres[k];
+
+        for(var i = 0; i < coor.length; i++)
+        {
+            var geometryBorder = new THREE.Geometry();
+
+            for(var j = 0; j < coor[i].length; j+=2)
+            {
+                var x = coor[i][j] - (width/2);
+                var y = coor[i][j+1] * (-1) + (height/2);
+                geometryBorder.vertices.push(new THREE.Vector3(x, y, 0));
+            }
+            
+            // dernier point pour fermer la forme
+            var x = coor[i][0] - (width/2);
+            var y = coor[i][1] * (-1) + (height/2);
+            geometryBorder.vertices.push(new THREE.Vector3(x, y, 0));
+
+            // ajout dans la scene
+            var line = new THREE.Line(geometryBorder, materialBorder);
+            line.position.set(0, 0, 20);       
+            scene.add(line);
+
+        }
+    }
+    pathFrontieres = null;
+}
+
+
+
+
+
+
+
+
+function displayRelief( scene, texture )
 {
 
     var n = 0;
@@ -298,9 +356,6 @@ function displayRelief(scene, texture)
     uniformsTerrain[ "uRepeatOverlay" ].value.set(6, 6); 		// light reflection
 
 
-
-
-
     // MATERIAL
     var material = new THREE.ShaderMaterial({
         uniforms: uniformsTerrain,
@@ -310,7 +365,6 @@ function displayRelief(scene, texture)
         fog: false,
         side: THREE.DoubleSide
     });
-
 
 
 
@@ -354,6 +408,36 @@ function displayRepere(scene)
 	scene.add(ligne);	
 
 }
+
+
+
+
+function getPath(path)
+{
+
+    var chaine = path.replace(/Z/g,""); 
+    chaine = chaine.replace(/[L,]/g," ");
+    var pathFragment = chaine.split("M");
+    var coor = [];
+
+
+    for(var i = 1; i < pathFragment.length; i++) // on commence a un car le split fait une premiere partie vide
+    {
+        var coordonnees = pathFragment[i].split(" ");
+        coor[i-1] = [];
+
+        for(var j = 0; j < coordonnees.length; j++) 
+        {
+            coor[i-1][j] = parseFloat(coordonnees[j]);
+        }   
+    }
+    return coor;
+
+}
+
+
+
+
 
 
 
@@ -448,8 +532,7 @@ var Canvas = function()
 
 
         this.canvas = this.renderer.domElement;
-        document.getElementById(conteneur).appendChild(this.canvas);
-        
+        document.getElementById(conteneur).appendChild(this.canvas);       
 
 
         var clone = this;
@@ -531,11 +614,13 @@ var Canvas = function()
 
     this.onMouseDown = function(event)
     {
+
         this.mouseDown = true;
         this.xSouris = event.clientX;
         this.xSourisOld = this.xSouris;
         this.ySouris = event.clientY;
         this.ySourisOld = this.ySouris;
+
     }
 
 
@@ -567,6 +652,7 @@ var Canvas = function()
         {
             this.rayonCamera += dragY;
         }
+
     }
 
 
@@ -632,7 +718,9 @@ var Canvas = function()
 
     this.onResize = function(newWidth, newHeight)
     {
+
         this.renderer.setSize(newWidth, newHeight);
+    
     }
 
 
@@ -706,7 +794,6 @@ function changementAnnee(sens)
         var nomPays = "";
         if(langue == "FR"){ nomPays = index[i].nom; } else { nomPays = index[i].name; }
 
-        console.log(top+" : "+positionPays);
 
         var classement = d3.select("#classement");
         classement.select("#"+index[i].iso)
