@@ -25,12 +25,12 @@ var svg = d3.select("#"+conteneur).append("svg")
 var path = d3.geo.path().projection(projection);
 var graticule = d3.geo.graticule();
 
-svg.append("path")
-    .datum(graticule)
-    .attr("class", "graticule")
-    .attr("d", path)
-    .style("stroke", "#fff")
-    .style("stroke-width", ".1px");
+// svg.append("path")
+//     .datum(graticule)
+//     .attr("class", "graticule")
+//     .attr("d", path)
+//     .style("stroke", "#fff")
+//     .style("stroke-width", ".1px");
 
 var svgFond = svg.append("svg:rect").attr("x", 0).attr("y", 0)
 	.attr("width", width).attr("height", height)
@@ -67,8 +67,9 @@ function setup()
     currentYear = 0;
     langue = "FR";
     pathFrontieres = [];
-    mode = "2d";
+    mode = "";
 
+    document.getElementById("btn_2d").addEventListener("click", passage2d, false);
 	// si WegGL est supporté
 	if(window.WebGLRenderingContext)
 	{
@@ -171,40 +172,58 @@ function dessin2d( error, results )
 
 
 
+function passage2d()
+{
+    document.body.setAttribute("class", "mode2d");
+
+    if(mode == "3d")
+    {
+        mode = "2d";
+    }
+}
+
+
+
+
+
+
 
 
 function passage3d()
 {
+    document.body.setAttribute("class", "mode3d");
 
-    mode = "3d";
+    if(mode == "")
+    {
+        mode = "3d";     
 
-	// carte greyscale pour texture heightMap
-	svgFond.style("fill", "#888");
+    	// carte greyscale pour texture heightMap
+    	svgFond.style("fill", "rgba(0,0,0,1)");
 
-	for(var i = 0; i < index.length; i++)
-	{
-		var pays = svg.select("#"+index[i].iso);
+    	for(var i = 0; i < index.length; i++)
+    	{
+    		var pays = svg.select("#"+index[i].iso);
 
-		var hauteur = index[i].an2013;
-		var hauteurMax = index.length;
-		var gris = map(hauteur, hauteurMax, 0, 0, 255);
-		gris = Math.floor(gris);
+    		var hauteur = index[i].an2013;
+    		var hauteurMax = index.length;
+    		var gris = map(hauteur, hauteurMax, 0, 0, 255);
+    		gris = Math.floor(gris);
 
-		pays.style("fill", "rgba("+gris+","+gris+","+gris+", 1)" );
-		pays.style( "stroke", "rgba("+gris+","+gris+","+gris+", 1)" );
-	}
+    		pays.style("fill", "rgba("+gris+","+gris+","+gris+", 1)" );
+    		pays.style( "stroke", "rgba("+gris+","+gris+","+gris+", 1)" );
+    	}
 
 
-	var svgImg = document.getElementById("carteSvg");
+    	var svgImg = document.getElementById("carteSvg");
 
-    // transforme le svg en image
-    var xml = new XMLSerializer().serializeToString(svgImg);
-	var data = "data:image/svg+xml;base64," + btoa(xml);
-	
-	var imageTexture = new Image();
-	imageTexture.addEventListener("load", blurImage, false);
-	imageTexture.src = data;
-
+        // transforme le svg en image
+        var xml = new XMLSerializer().serializeToString(svgImg);
+    	var data = "data:image/svg+xml;base64," + btoa(xml);
+    	
+    	var imageTexture = new Image();
+    	imageTexture.addEventListener("load", blurImage, false);
+    	imageTexture.src = data;
+    }
 }
 
 
@@ -222,8 +241,8 @@ function blurImage()
 	ctx.drawImage( this, 0, 0, canvas2d.width, canvas2d.height );
 
 	// application du blur
-	varBlur(ctx, function(x, y){ return 10; });
-	document.getElementById(conteneur).appendChild(canvas2d);
+	varBlur(ctx, function(x, y){ return 6.9; });
+	//document.getElementById(conteneur).appendChild(canvas2d);
 	
 	dessin3d( canvas2d );
 
@@ -245,7 +264,7 @@ function dessin3d( canvas2d )
 
     displayBorders(canvas.scene);
 	displayRelief(canvas.scene, textureCarted3js);
-	displayRepere(canvas.scene);
+	//displayRepere(canvas.scene);
 
 	// rendu
 	animate();
@@ -274,8 +293,8 @@ function displayBorders(scene)
 {
 
     var materialBorder = new THREE.LineBasicMaterial({ 
-            color:0x666666,
-            opacity: 0.4,
+            color:0xffffff,
+            opacity: 1,
             linewidth: 1
         });
 
@@ -305,6 +324,7 @@ function displayBorders(scene)
         }
     }
     pathFrontieres = null;
+
 }
 
 
@@ -330,7 +350,7 @@ function displayRelief( scene, texture )
 
     // heightmap
     //var texture = THREE.ImageUtils.loadTexture('mapInverse.png', null, loaded);
-    var fourchetteHauteur = 60;
+    var fourchetteHauteur = 180;
 
     // texture effect
     var detailTexture = THREE.ImageUtils.loadTexture("data/textureLisse.jpg", null, loaded);
@@ -352,12 +372,12 @@ function displayRelief( scene, texture )
     uniformsTerrain[ "enableDiffuse1" ].value = true;
     uniformsTerrain[ "enableDiffuse2" ].value = true;
     uniformsTerrain[ "enableSpecular" ].value = true;
-    uniformsTerrain[ "uDiffuseColor" ].value.setHex(0xcccccc);	// diffuse
-    uniformsTerrain[ "uSpecularColor" ].value.setHex(0x000000);	// spec 
-    uniformsTerrain[ "uAmbientColor" ].value.setHex(0x0000cc);	// ambiant
+    uniformsTerrain[ "uDiffuseColor" ].value.setHex(0x888888);	// diffuse
+    uniformsTerrain[ "uSpecularColor" ].value.setHex(0xffffff);	// spec // pas de repercution
+    uniformsTerrain[ "uAmbientColor" ].value.setHex(0x888888);	// ambiant
 
     uniformsTerrain[ "uShininess" ].value = 3;  				// shininess
-    uniformsTerrain[ "uRepeatOverlay" ].value.set(6, 6); 		// light reflection
+    uniformsTerrain[ "uRepeatOverlay" ].value.set(3, 3); 		// light reflection
 
 
     // MATERIAL
@@ -378,7 +398,7 @@ function displayRelief( scene, texture )
     geometryTerrain.computeTangents();
 
     var terrain = new THREE.Mesh( geometryTerrain, material );
-    terrain.position.set(0, 0, -fourchetteHauteur/2);
+    terrain.position.set(0, 0, -fourchetteHauteur);
 
     scene.add(terrain);
 
@@ -438,6 +458,7 @@ function getPath(path)
     return coor;
 
 }
+
 
 
 
@@ -516,8 +537,8 @@ var Canvas = function()
 
 
         this.mouseDown = false;
-        this.scrollSouris = 100;
-        this.centreCarte = [0,0];
+        this.scrollSouris = false;
+        this.centreCarte = [ 0, 0 ];
         this.angleSpot = 0;
         this.xSouris = 0; this.xSourisOld = 0;
         this.ySouris = 0; this.ySourisOld = 0;
@@ -525,13 +546,15 @@ var Canvas = function()
 
         // SCENE
         this.scene = new THREE.Scene();
-        //this.scene.fog = new THREE.Fog( 0x000000, 1, FAR/8 );
+        //this.scene.fog = new THREE.Fog( 0x000000, 1, FAR );
 
         // CAMERA
         this.transitionCamera = new Transition();
         this.transitionFocusCamera = new Transition();
         this.isZoom = false;
-        this.angleCamera = 90;
+        this.angleCamera = [];
+        this.angleCamera[0] = 90;
+        this.angleCamera[1] = 90;
         this.positionInitCam = projectionfor3d(projection([0, -89]));
         this.focusCamera = [ this.centreCarte[0], this.centreCarte[1], 100 ];
         this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
@@ -546,25 +569,24 @@ var Canvas = function()
     
         // RENDERER
         this.renderer = new THREE.WebGLRenderer();
-        this.renderer.setSize(WIDTH, HEIGHT);
+        this.renderer.setSize(window.innerWidth, 4*window.innerWidth/6);
         this.renderer.setClearColor("#000000", 1);
 
 
         // LIGHT
-        this.scene.add( new THREE.AmbientLight( 0x888888 ) );
+        this.scene.add( new THREE.AmbientLight( 0xffffff ) );
 
-        this.spot1 = new THREE.DirectionalLight( 0x1111cc, 1 );
-        this.spot1.position.set( 200, 0, 200 );
-        this.spot1.intensity = 1.0;
+        this.spot1 = new THREE.DirectionalLight( 0xff0000, 2 );
+        this.spot1.position.set( 0.5, 1, 0 );
         this.scene.add(this.spot1);
 
-        this.spot2 = new THREE.DirectionalLight( 0xffffff, 0.4 );
-        this.spot2.position.set( 200, 0, 200 );
-        this.spot2.intensity = 1.0;
+        this.spot2 = new THREE.DirectionalLight( 0x00ff00, 2 );
+        this.spot2.position.set( -0.5, 1, 0 );
         this.scene.add(this.spot2);
 
 
         this.canvas = this.renderer.domElement;
+        this.canvas.id = "canvas3d";
         document.getElementById(conteneur).appendChild(this.canvas);       
 
 
@@ -573,8 +595,8 @@ var Canvas = function()
         this.canvas.addEventListener("mousedown", function(event){ clone.onMouseDown(event); }, false);
         this.canvas.addEventListener("mouseup", function(event){ clone.onMouseUp(event); }, false);
         this.canvas.addEventListener("mouseout", function(event){ clone.onMouseUp(event); }, false); // releve le clic si tu sort du canvas
-        //this.canvas.addEventListener("mousewheel", function(event){ clone.onMouseScroll(event); }, false);
-        //this.canvas.addEventListener("DOMMouseScroll", function(event){ clone.onMouseScroll(event); }, false);
+        this.canvas.addEventListener("click", function(event){ clone.onClick(event); }, false);
+
 
     }
     
@@ -588,7 +610,7 @@ var Canvas = function()
         {
             var currentPos = this.transitionCamera.execute3d();
             this.camera.position.set(currentPos[0], currentPos[1], currentPos[2]);
-        }
+        } 
 
         // transition pour le focus de la camera
         if(!this.transitionFocusCamera.isFinished)
@@ -605,6 +627,7 @@ var Canvas = function()
         // rendu
         this.renderer.render(this.scene, this.camera);
 
+        
     }
     
 
@@ -621,27 +644,15 @@ var Canvas = function()
 
             this.xSourisOld = this.xSouris;
             this.ySourisOld = this.ySouris;
+
+            this.scrollSouris = true;
+
         }
         return false;
 
     }
 
 
-
-    this.onMouseScroll = function(event) 
-    {
-
-        var event = window.event || event;
-        var delta = Math.max(-1, Math.min(1, (event.wheelDelta || -event.detail)));
-
-        this.scrollSouris += delta;
-        this.scrollSouris = Math.min(this.scrollSouris, 70);
-        this.scrollSouris = Math.max(this.scrollSouris, 40);
-        
-        this.positionCamera();
-        return false;
-    
-    }
 
 
 
@@ -660,9 +671,46 @@ var Canvas = function()
 
     this.onMouseUp = function(event)
     {
+        
         this.mouseDown = false;
+
     }
 
+
+
+    this.onClick = function(event)
+    {
+        
+        if(this.scrollSouris == false)
+        {
+            this.initCam();
+        } else {
+            this.scrollSouris = false;
+        }
+
+    }
+
+
+    this.initCam = function()
+    {
+
+        if(this.isZoom)
+        {
+            this.angleCamera[0] = 90;
+            this.rayonCamera = this.positionInitCam[1];
+
+            this.transitionCamera.setup(
+                [ this.camera.position.x, this.camera.position.y, this.camera.position.z ], 
+                [ this.centreCarte[0], this.centreCarte[1]+this.rayonCamera, 800 ] );
+            
+            this.transitionFocusCamera.setup(
+                [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
+                [ this.centreCarte[0], this.centreCarte[1], 100 ] );
+
+            this.isZoom = false;
+        }
+
+    }
 
 
 
@@ -670,21 +718,22 @@ var Canvas = function()
     {
 
         // ROTATION HORIZONTALE
-        this.angleCamera += (this.xSouris - this.xSourisOld) * 0.1;
+        this.angleCamera[0] += (this.xSouris - this.xSourisOld) * 0.1;
 
-        var x = (Math.cos(this.angleCamera*(Math.PI/180)) * this.rayonCamera) + this.focusCamera[0];
-        var y = (Math.sin(this.angleCamera*(Math.PI/180)) * this.rayonCamera) + this.focusCamera[1];
+
+
+        var x = ( Math.cos(this.angleCamera[0]*(Math.PI/180)) * this.rayonCamera ) + this.focusCamera[0]; // angle * rayon + decalage
+        var y = ( Math.sin(this.angleCamera[0]*(Math.PI/180)) * this.rayonCamera ) + this.focusCamera[1];
         
         this.camera.position.x = x;
         this.camera.position.y = y;
-        this.camera.lookAt( new THREE.Vector3(this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ) );
 
         // ROTATION VERTICALE
-        var dragY = (this.ySouris - this.ySourisOld);
-        if((this.rayonCamera > 60 && dragY < 0) || (this.rayonCamera < 500 && dragY > 0) )
-        {
-            this.rayonCamera += dragY;
-        }
+        // this.angleCamera[1] += (this.ySouris - this.ySourisOld);
+        // var z = ( Math.cos(this.angleCamera[1]*(Math.PI/180)) * this.rayonCamera ) + this.focusCamera[1];
+        // this.camera.position.z = z;
+
+        this.camera.lookAt( new THREE.Vector3( this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ) );
 
     }
 
@@ -693,7 +742,7 @@ var Canvas = function()
     this.moveCamToPosition = function(position)
     {
 
-        this.angleCamera = 90;
+        this.angleCamera[0] = 90;
         this.rayonCamera = this.positionInitCam[1];
 
         this.transitionCamera.setup(
@@ -710,51 +759,14 @@ var Canvas = function()
 
     
 
-    this.positionSpot = function()
-    {
-
-        this.angleSpot++;
-        var rayon = 1000;
-        var centre = this.centreCarte;
-
-        var x = (Math.cos(this.angleSpot*(Math.PI/180)) * rayon)+centre[0];
-        var y = (Math.sin(this.angleSpot*(Math.PI/180)) * rayon)+centre[1];
-
-        this.spot2.position.x = x;
-        this.spot2.position.y = y;
-
-    }
 
 
-
-    this.init = function()
-    {
-
-        if(this.isZoom)
-        {
-
-            this.angleCamera = 90;
-            this.rayonCamera = this.positionInitCam[1];
-
-            this.transitionCamera.setup(
-                [ this.camera.position.x, this.camera.position.y, this.camera.position.z ], 
-                [ this.centreCarte[0], this.centreCarte[1]+this.rayonCamera, 800 ] );
-            
-            this.transitionFocusCamera.setup(
-                [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
-                [ this.centreCarte[0], this.centreCarte[1], 0 ] );
-
-            this.isZoom = false;
-
-        }
-
-    }
 
 
     this.onResize = function(newWidth, newHeight)
     {
 
-        this.renderer.setSize(newWidth, newHeight);
+        this.renderer.setSize(newWidth, 4*newHeight/6);
     
     }
 
@@ -784,10 +796,12 @@ function onresize()
 
     if(mode == "3d")
     {
-        canvas.onResize(newWidth, newHeight);
+        canvas.onResize(newWidth, newWidth);
     }
 
 }
+
+
 
 
 function changementAnnee(sens)

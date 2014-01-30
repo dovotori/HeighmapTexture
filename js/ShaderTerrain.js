@@ -85,6 +85,7 @@ THREE.ShaderTerrain = {
 			"varying vec3 vBinormal;",
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
+			"varying vec3 p;",
 
 			"uniform vec3 ambientLightColor;",
 
@@ -116,7 +117,20 @@ THREE.ShaderTerrain = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 
+
+			"float random(vec3 scale,float seed){",
+			    "return fract(sin(dot(gl_FragCoord.xyz+seed,scale)) * 43758.5453 + seed);",
+			"}",
+
+			"float map(float valeur, float minRef, float maxRef, float minDest, float maxDest){",
+				"return minDest + (valeur - minRef) * (maxDest - minDest) / (maxRef - minRef);",
+			"}",
+
+
 			"void main() {",
+
+
+
 
 				"gl_FragColor = vec4( vec3( 1.0 ), uOpacity );",
 
@@ -124,6 +138,7 @@ THREE.ShaderTerrain = {
 
 				"vec2 uvOverlay = uRepeatOverlay * vUv + uOffset;",
 				"vec2 uvBase = uRepeatBase * vUv;",
+
 
 				"vec3 normalTex = texture2D( tDetail, uvOverlay ).xyz * 2.0 - 1.0;",
 				"normalTex.xy *= uNormalScale;",
@@ -288,8 +303,52 @@ THREE.ShaderTerrain = {
 
 				"#endif",
 
-				//"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor) + totalSpecular;",
-				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor + totalSpecular );",
+				
+
+				
+
+
+				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor) + totalSpecular;",
+				
+				// HAUTEUR DES PIXELS
+				"vec4 texture = texture2D( tDisplacement, uvBase );",
+				"float hauteur = texture.z;",
+				
+				"if( hauteur > 0.001 ){",
+				"gl_FragColor.x = map( gl_FragColor.x, 0.0, 1.0, 0.1, 1.0 );",
+				"gl_FragColor.y = map( gl_FragColor.y, 0.0, 1.0, 0.1, 1.0 );",
+				"gl_FragColor.z = map( gl_FragColor.z, 0.0, 1.0, 0.1, 1.0 );",
+				"}",
+
+				// "float modulo = mod( hauteur, 0.25 );",
+				// "if( modulo > 0.0 && modulo < 0.01 )",
+				// "{ gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0); }",
+
+
+
+
+				/*
+				// GRATICULE
+				"float espace = 10.0; float epaisseur = 0.4;",
+				"float moduloX = mod( p.x, espace );",
+				"if( moduloX > 0.0 && moduloX < epaisseur ) {",
+					"gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );",
+				"}",
+
+				"float moduloY = mod( p.y, espace );",
+				"if( moduloY > 0.0 && moduloY < epaisseur ) {",
+					"gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );",
+				"}",*/
+
+
+
+				//"if( p.x > 0.5){ gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); }",
+
+				//"float x = texture2D( tDisplacement, uvBase ).x;",
+				//"gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );",
+				//"if( gl_FragCoord.x > 400.0 ){ gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 ); }",
+
+
 
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
@@ -319,12 +378,15 @@ THREE.ShaderTerrain = {
 			"varying vec3 vBinormal;",
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
+			"varying vec3 p;",
 
 			"varying vec3 vViewPosition;",
 
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 			"void main() {",
+
+				"p = position.xyz;",
 
 				"vNormal = normalize( normalMatrix * normal );",
 
