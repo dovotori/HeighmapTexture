@@ -213,7 +213,6 @@ function passage3d()
     		pays.style( "stroke", "rgba("+gris+","+gris+","+gris+", 1)" );
     	}
 
-
     	var svgImg = document.getElementById("carteSvg");
 
         // transforme le svg en image
@@ -223,6 +222,7 @@ function passage3d()
     	var imageTexture = new Image();
     	imageTexture.addEventListener("load", blurImage, false);
     	imageTexture.src = data;
+
     }
 }
 
@@ -292,6 +292,7 @@ function animate()
 function displayBorders(scene)
 {
 
+
     var materialBorder = new THREE.LineBasicMaterial({ 
             color:0xffffff,
             opacity: 1,
@@ -325,6 +326,7 @@ function displayBorders(scene)
     }
     pathFrontieres = null;
 
+
 }
 
 
@@ -337,6 +339,7 @@ function displayBorders(scene)
 function displayRelief( scene, texture )
 {
 
+
     var n = 0;
     function loaded() {
         n++;
@@ -348,7 +351,7 @@ function displayRelief( scene, texture )
     }
 
 
-    // heightmap
+    // HEIGHTMAP
     //var texture = THREE.ImageUtils.loadTexture('mapInverse.png', null, loaded);
     var fourchetteHauteur = 180;
 
@@ -357,6 +360,12 @@ function displayRelief( scene, texture )
 
     var terrainShader = THREE.ShaderTerrain[ "terrain" ];
     var uniformsTerrain = THREE.UniformsUtils.clone(terrainShader.uniforms);
+
+    // SQUARE TEXTURE
+    var wireTexture = new THREE.ImageUtils.loadTexture( 'data/square.png' );
+    wireTexture.wrapS = wireTexture.wrapT = THREE.RepeatWrapping; 
+    wireTexture.repeat.set( 40, 40 );
+    uniformsTerrain[ "textureSquare" ].value = wireTexture;
 
     // HAUTEUR MAX
     uniformsTerrain[ "tDisplacement" ].value = texture;
@@ -382,27 +391,36 @@ function displayRelief( scene, texture )
 
     // MATERIAL
     var material = new THREE.ShaderMaterial({
+
         uniforms: uniformsTerrain,
         vertexShader: terrainShader.vertexShader,
         fragmentShader: terrainShader.fragmentShader,
         lights: true,
         fog: false,
         side: THREE.DoubleSide
+
     });
 
 
+    var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000088, wireframe: true, side:THREE.DoubleSide } ); 
+    var floor = new THREE.Mesh(geometryTerrain, wireframeMaterial);
+    floor.position.z = -200;
+    scene.add(floor);
+    
 
-    var geometryTerrain = new THREE.PlaneGeometry(width, height, 256, 256);
-    geometryTerrain.computeFaceNormals();
+    var geometryTerrain = new THREE.PlaneGeometry(width, height, 128, 128);
+    var floor = new THREE.Mesh( geometryTerrain, wireframeMaterial );
+    //geometryTerrain.computeFaceNormals();
     geometryTerrain.computeVertexNormals();
     geometryTerrain.computeTangents();
 
+
     var terrain = new THREE.Mesh( geometryTerrain, material );
     terrain.position.set(0, 0, -fourchetteHauteur);
-
     scene.add(terrain);
 
     loaded();
+
 
 }
 
@@ -546,7 +564,8 @@ var Canvas = function()
 
         // SCENE
         this.scene = new THREE.Scene();
-        //this.scene.fog = new THREE.Fog( 0x000000, 1, FAR );
+        //this.scene.fog = new THREE.Fog( 0x000000, 1, FAR/8 );
+
 
         // CAMERA
         this.transitionCamera = new Transition();
@@ -604,7 +623,8 @@ var Canvas = function()
 
     this.draw = function()
     {
-     
+  
+
         // transition pour la position de la camera
         if(!this.transitionCamera.isFinished)
         {
@@ -879,10 +899,8 @@ function clicPaysClassement(isoPays)
                 canvas.moveCamToPosition(positionPays);
             }
         }
-
         
     }
-
 
 }
 

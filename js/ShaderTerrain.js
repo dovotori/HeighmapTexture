@@ -28,6 +28,7 @@ THREE.ShaderTerrain = {
 			"enableSpecular"  : { type: "i", value: 0 },
 			"enableReflection": { type: "i", value: 0 },
 
+			"textureSquare": { type: "t", value: null },
 			"tDiffuse1"	   : { type: "t", value: null },
 			"tDiffuse2"	   : { type: "t", value: null },
 			"tDetail"	   : { type: "t", value: null },
@@ -67,6 +68,7 @@ THREE.ShaderTerrain = {
 			"uniform bool enableDiffuse2;",
 			"uniform bool enableSpecular;",
 
+			"uniform sampler2D textureSquare;",
 			"uniform sampler2D tDiffuse1;",
 			"uniform sampler2D tDiffuse2;",
 			"uniform sampler2D tDetail;",
@@ -88,6 +90,7 @@ THREE.ShaderTerrain = {
 			"varying vec3 p;",
 
 			"uniform vec3 ambientLightColor;",
+
 
 			"#if MAX_DIR_LIGHTS > 0",
 
@@ -128,8 +131,6 @@ THREE.ShaderTerrain = {
 
 
 			"void main() {",
-
-
 
 
 				"gl_FragColor = vec4( vec3( 1.0 ), uOpacity );",
@@ -305,49 +306,59 @@ THREE.ShaderTerrain = {
 
 				
 
-				
+
+				// "gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor ) + totalSpecular;",
 
 
-				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor) + totalSpecular;",
-				
+				// WIRE FRAME
+				// "vec4 wireFrame = texture2D( textureSquare, uvBase );",
+				// "gl_FragColor.xyz = gl_FragColor.xyz * wireFrame.xyz;",				
+				"vec2 Tile = vec2(0.01, 0.01);",
+				"vec2 Shift = vec2(0.1, 0.1);",
+				"vec2 xy = vec2( map( p.x, 0.0, 520.0, 0.0, 1.0 ), map( p.y, 0.0, 520.0, 0.0, 1.0 ) );",
+				"vec2 phase = fract(xy / Tile) + Shift;",
+				"if (phase.x > 1.0)",
+				"phase.x = phase.x - 1.0;",
+				"if (phase.y > 1.0)",
+				"phase.y = phase.y - 1.0;",
+				"vec4 outColor = texture2D( textureSquare, phase );",
+				"if (outColor.a == 0.0){ discard; }",
+				//"gl_FragColor = gl_FragColor * outColor;",
+
+
 				// HAUTEUR DES PIXELS
 				"vec4 texture = texture2D( tDisplacement, uvBase );",
 				"float hauteur = texture.z;",
-				
-				"if( hauteur > 0.001 ){",
-				"gl_FragColor.x = map( gl_FragColor.x, 0.0, 1.0, 0.1, 1.0 );",
-				"gl_FragColor.y = map( gl_FragColor.y, 0.0, 1.0, 0.1, 1.0 );",
-				"gl_FragColor.z = map( gl_FragColor.z, 0.0, 1.0, 0.1, 1.0 );",
+
+				// DU JAUNE AU ROUGE
+				"gl_FragColor.xyz = ( gl_FragColor.xyz * 2.0 ) * vec3( 1.0, map( hauteur, 0.0, 1.0, 0.01, 0.50 ), map( hauteur, 0.0, 1.0, 0.01, 0.50 ) );",
+
+				// // MER NOIRE
+				"if( hauteur < 0.001 ){",
+					"gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );",
 				"}",
 
+				// // GRATICULE
 				// "float modulo = mod( hauteur, 0.25 );",
 				// "if( modulo > 0.0 && modulo < 0.01 )",
 				// "{ gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0); }",
+				
+				// "float espace = 10.0; float epaisseur = 0.4;",
+				// "float moduloX = mod( p.x, espace );",
+				// "if( moduloX > 0.0 && moduloX < epaisseur ) {",
+				// 	"gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );",
+				// "}",
 
-
-
-
-				/*
-				// GRATICULE
-				"float espace = 10.0; float epaisseur = 0.4;",
-				"float moduloX = mod( p.x, espace );",
-				"if( moduloX > 0.0 && moduloX < epaisseur ) {",
-					"gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );",
-				"}",
-
-				"float moduloY = mod( p.y, espace );",
-				"if( moduloY > 0.0 && moduloY < epaisseur ) {",
-					"gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );",
-				"}",*/
-
-
+				// "float moduloY = mod( p.y, espace );",
+				// "if( moduloY > 0.0 && moduloY < epaisseur ) {",
+				// 	"gl_FragColor = vec4( 0.0, 0.0, 0.0, 0.4 );",
+				// "}",
 
 				//"if( p.x > 0.5){ gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); }",
 
 				//"float x = texture2D( tDisplacement, uvBase ).x;",
 				//"gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );",
 				//"if( gl_FragCoord.x > 400.0 ){ gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 ); }",
-
 
 
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
