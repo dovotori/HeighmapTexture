@@ -7,7 +7,12 @@ var width = 520;    // 520
 var height = 520;
 var conteneur = "carte";
 
-var projection = d3.geo.mercator()
+var projection = d3.geo
+        .ginzburg5()
+        //.azimuthalEqualArea()
+        //.mercator()
+        //.conicEquidistant()
+        //.orthographic()
     .scale(80)
     .translate([width/2, height/2]);
 
@@ -22,7 +27,8 @@ var svg = d3.select("#"+conteneur).append("svg")
 	.attr("width", width)
 	.attr("height", height);
 
-var path = d3.geo.path().projection(projection);
+var path = d3.geo.path().projection(projection);  
+
 var graticule = d3.geo.graticule();
 
 // svg.append("path")
@@ -69,7 +75,7 @@ function setup()
     pathFrontieres = [];
     mode = "";
     uniformsTerrain = [];
-    
+
 
     // gestion boutons
     document.getElementById("btn_precedent").addEventListener("click", function(){ changementAnnee(1); }, false);
@@ -229,18 +235,30 @@ function passage3d()
 
     	redessinerCarteSvg();
 
-    	var svgImg = document.getElementById("carteSvg");
-
-        // transforme le svg en image
-        var xml = new XMLSerializer().serializeToString(svgImg);
-    	var data = "data:image/svg+xml;base64," + btoa(xml);
     	
-    	var imageTexture = new Image();
-    	imageTexture.addEventListener("load", blurImage, false);
-    	imageTexture.src = data;
 
     }
 }
+
+
+
+
+
+function createTextureFromSvg()
+{
+
+    var svgImg = document.getElementById("carteSvg");
+
+    // transforme le svg en image
+    var xml = new XMLSerializer().serializeToString(svgImg);
+    var data = "data:image/svg+xml;base64," + btoa(xml);
+    
+    var imageTexture = new Image();
+    imageTexture.addEventListener("load", blurImage, false);
+    imageTexture.src = data;
+
+}
+
 
 
 
