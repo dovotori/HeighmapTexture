@@ -331,7 +331,7 @@ THREE.ShaderTerrain = {
 				"float hauteur = texture.z;",
 
 				// DU JAUNE AU ROUGE
-				"gl_FragColor.xyz = ( gl_FragColor.xyz * 2.0 ) * vec3( 1.0, map( hauteur, 0.0, 1.0, 0.01, 0.50 ), map( hauteur, 0.0, 1.0, 0.01, 0.50 ) );",
+				//"gl_FragColor.xyz = ( gl_FragColor.xyz * 2.0 ) * vec3( 1.0, map( hauteur, 0.0, 1.0, 0.01, 0.50 ), map( hauteur, 0.0, 1.0, 0.01, 0.50 ) );",
 
 				// // MER NOIRE
 				"if( hauteur < 0.001 ){",

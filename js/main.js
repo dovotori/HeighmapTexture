@@ -3,7 +3,7 @@ window.addEventListener("load", setup, false);
 
 
 
-var width = 520; // 520
+var width = 520;    // 520
 var height = 520;
 var conteneur = "carte";
 
@@ -36,13 +36,13 @@ var svgFond = svg.append("svg:rect").attr("x", 0).attr("y", 0)
 	.attr("width", width).attr("height", height)
 	.style("fill", "rgba(0, 0, 0, 0)"); 
 
-
 var index;
 var canvas;
 var currentYear;
 var langue;
 var pathFrontieres;
 var mode;
+var uniformsTerrain;
 
 
 
@@ -68,14 +68,20 @@ function setup()
     langue = "FR";
     pathFrontieres = [];
     mode = "";
+    uniformsTerrain = [];
+    
 
+    // gestion boutons
+    document.getElementById("btn_precedent").addEventListener("click", function(){ changementAnnee(1); }, false);
+    document.getElementById("btn_suivant").addEventListener("click", function(){ changementAnnee(-1); }, false);
     document.getElementById("btn_2d").addEventListener("click", passage2d, false);
+
 	// si WegGL est supporté
 	if(window.WebGLRenderingContext)
 	{
 		document.getElementById("btn_3d").addEventListener("click", passage3d, false);
 	} else {
-		alert("wegGL not supported");
+		alert("webGL not supported");
 	}
 
 	queue()
@@ -84,8 +90,6 @@ function setup()
 		.awaitAll(dessin2d);
 	
 }
-
-
 
 
 
@@ -104,10 +108,8 @@ function dessin2d( error, results )
 		.enter().append("svg:path")
 		.attr("id", function(d){ return d.id; })
 		.attr("d", function(d){ return path(d); })
+        .style("fill", "rgba(200, 200, 200, 1)")
 		.each(function(d, i){
-
-			var colorCountry;
-			var found = false;
 
             // calcul des frontieres pour la 3d
             pathFrontieres[i] = getPath(path(d));
@@ -117,34 +119,6 @@ function dessin2d( error, results )
 				if(d.id == index[i].iso)
 				{
 
-					found = true;
-					var centroid = path.centroid(d);
-					var hauteur = index[i].an2013;
-					var hauteurMax = index.length;
-
-					// définir la couleur
-					var red, green, blue;
-					if(hauteur < hauteurMax/3){
-						// de vert à jaune
-						red = map(hauteur, 0, hauteurMax / 3, 0, 255);
-						green = 255;
-				
-					} else if(hauteur < 2 * hauteurMax / 3) {
-						// de jaune à orange
-						red = 255;
-						green = map(hauteur, hauteurMax / 3, 2 * hauteurMax / 3, 255, 127);
-
-					} else if(hauteur <= hauteurMax){
-						// de orange à rouge
-						red = 255;
-						green = map(hauteur, 2 * hauteurMax / 3, hauteurMax, 127, 0);
-
-					}
-					
-					red = Math.floor(red);
-					green = Math.floor(green);
-					blue = 70;
-
 					d3.select("#classement").append("li").attr("class", "itemPays")
                         .style("position", "absolute")
                         .attr("id", index[i].iso)
@@ -152,19 +126,68 @@ function dessin2d( error, results )
 
 				}
 			}
-			if(found)
-			{
-				colorCountry = "rgba("+red+","+green+","+blue+", 1)";
-			} else {
-				colorCountry = "rgba(200, 200, 200, 1)";
-			}
-
-			d3.select(this).style( "fill", colorCountry )
-			d3.select(this).style( "stroke", colorCountry );
 
 		})
        
         changementAnnee(0);
+
+}
+
+
+
+
+
+function redessinerCarteSvg()
+{
+
+    for(var i = 0; i < index.length; i++)
+    {
+        var pays = svg.select("#"+index[i].iso);
+
+        var hauteur = 0;
+        switch(currentYear)
+        {
+            case 0: hauteur = index[i].an2013;  break;
+            case 1: hauteur = index[i].an2012;  break;
+        }
+
+        var hauteurMax = index.length;
+        var red, green, blue;
+
+        if(mode == "3d")
+        {
+            var gris = map(hauteur, hauteurMax, 0, 0, 255);
+            gris = Math.floor(gris);
+            red = green = blue = gris; 
+
+        } else {
+
+            if(hauteur < hauteurMax / 3){
+                // de vert à jaune
+                red = map(hauteur, 0, hauteurMax / 3, 0, 255);
+                green = 255;
+        
+            } else if(hauteur < 2 * hauteurMax / 3) {
+                // de jaune à orange
+                red = 255;
+                green = map(hauteur, hauteurMax / 3, 2 * hauteurMax / 3, 255, 127);
+
+            } else if(hauteur <= hauteurMax){
+                // de orange à rouge
+                red = 255;
+                green = map(hauteur, 2 * hauteurMax / 3, hauteurMax, 127, 0);
+
+            }
+            
+            red = Math.floor(red);
+            green = Math.floor(green);
+            blue = 70;
+
+        }
+
+        pays.style("fill", "rgba("+red+","+green+","+blue+", 1)" );
+        pays.style( "stroke", "rgba("+red+","+green+","+blue+", 1)" );
+    }
 
 }
 
@@ -178,7 +201,11 @@ function passage2d()
 
     if(mode == "3d")
     {
+        // fond de la carte svg transparent
+        svgFond.style("fill", "rgba(0,0,0,0)");
+
         mode = "2d";
+        redessinerCarteSvg();
     }
 }
 
@@ -197,21 +224,10 @@ function passage3d()
     {
         mode = "3d";     
 
-    	// carte greyscale pour texture heightMap
+    	// fond de la carte svg noir
     	svgFond.style("fill", "rgba(0,0,0,1)");
 
-    	for(var i = 0; i < index.length; i++)
-    	{
-    		var pays = svg.select("#"+index[i].iso);
-
-    		var hauteur = index[i].an2013;
-    		var hauteurMax = index.length;
-    		var gris = map(hauteur, hauteurMax, 0, 0, 255);
-    		gris = Math.floor(gris);
-
-    		pays.style("fill", "rgba("+gris+","+gris+","+gris+", 1)" );
-    		pays.style( "stroke", "rgba("+gris+","+gris+","+gris+", 1)" );
-    	}
+    	redessinerCarteSvg();
 
     	var svgImg = document.getElementById("carteSvg");
 
@@ -275,8 +291,10 @@ function dessin3d( canvas2d )
 
 function animate()
 {
+
 	requestAnimationFrame(animate); 
 	canvas.draw();
+
 }
 
 
@@ -359,7 +377,7 @@ function displayRelief( scene, texture )
     var detailTexture = THREE.ImageUtils.loadTexture("data/textureLisse.jpg", null, loaded);
 
     var terrainShader = THREE.ShaderTerrain[ "terrain" ];
-    var uniformsTerrain = THREE.UniformsUtils.clone(terrainShader.uniforms);
+    uniformsTerrain = THREE.UniformsUtils.clone(terrainShader.uniforms);
 
     // SQUARE TEXTURE
     var wireTexture = new THREE.ImageUtils.loadTexture( 'data/square.png' );
@@ -826,7 +844,7 @@ function onresize()
 
 function changementAnnee(sens)
 {
-
+    
     if(sens > 0 && currentYear < 1)
     {
         currentYear++;
@@ -848,17 +866,18 @@ function changementAnnee(sens)
         var top = 0;
         switch(currentYear)
         {
-            case 0: top = index[i].an2013;  break;
-            case 1: top = index[i].an2012;  break;
+            case 0: top = parseInt(index[i].an2013);  break;
+            case 1: top = parseInt(index[i].an2012);  break;
         }
 
         var positionPays = top;
 
+        // régler égalités
         for(var j = 0; j < already.length; j++)
         {
             if(top == already[j])
             {
-                top += espaceEntreDeux;
+                top += 1;
             }
         }
         already.push(top);
@@ -875,6 +894,8 @@ function changementAnnee(sens)
             .text("#"+positionPays+" "+nomPays);
 
     }
+
+    redessinerCarteSvg();
 
 
 }
@@ -894,9 +915,11 @@ function clicPaysClassement(isoPays)
         {
             if(isoPays == index[i].iso)
             {
+
                 d3.selectAll("#"+index[i].iso).style("color", "#00f");
                 var positionPays = projectionfor3d(getGeoCoord(index[i].latitude, index[i].longitude));
                 canvas.moveCamToPosition(positionPays);
+            
             }
         }
         
