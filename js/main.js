@@ -11,11 +11,6 @@ var projection = d3.geo.mercator()
     .scale(80)
     .translate([width/2, height/2]);
 
-var projectionfor3d = function(array){
-	array[0] = array[0]-width/2;
-	array[1] = (array[1]-height/2)*(-1);
-	return array;
-}
 
 var svg = d3.select("#"+conteneur).append("svg")
 	.attr("id", "carteSvg")
@@ -39,11 +34,12 @@ var svgFond = svg.append("svg:rect").attr("x", 0).attr("y", 0)
 
 var index;
 var canvas;
+var d2d;
+var d3d;
 var currentYear;
 var langue;
 var pathFrontieres;
 var mode;
-var uniformsTerrain;
 
 
 
@@ -68,27 +64,39 @@ function setup()
     currentYear = 0;
     langue = "FR";
     pathFrontieres = [];
-    mode = "";
+    mode = "2d";
     uniformsTerrain = [];
 
 
-    // gestion boutons
+    // gestion boutons 2D
     document.getElementById("btn_precedent").addEventListener("click", function(){ changementAnnee(1); }, false);
     document.getElementById("btn_suivant").addEventListener("click", function(){ changementAnnee(-1); }, false);
     document.getElementById("btn_2d").addEventListener("click", passage2d, false);
 
+
+    d2d = new Dessin2D();
+    d2d.setup();
+
+
 	// si WegGL est supporté
 	if(window.WebGLRenderingContext)
 	{
+        // 3D
 		document.getElementById("btn_3d").addEventListener("click", function(){ passage3d(); }, false);
+        canvas = new Canvas();
+        canvas.setup(width, height);
+
+        d3d = new Dessin3D();
+        d3d.setup();
+
+        animate();
+
 	} else {
-		alert("webGL not supported");
+		alert("WebGL not supported, 3d mode not supported");
 	}
 
-	queue()
-		.defer(lireJson, "data/world-countries-clean.json")
-		.defer(lireCsv, "data/index.csv")
-		.awaitAll(dessin2d);
+
+	
 	
 }
 
@@ -97,45 +105,469 @@ function setup()
 
 
 
-function dessin2d( error, results )
+function animate()
 {
-
-	index = results[1];
-	var features = results[0].features;
-
-	var frontieres = svg.append("svg:g")
-		.selectAll("path")
-		.data(features)
-		.enter().append("svg:path")
-		.attr("id", function(d){ return d.id; })
-		.attr("d", function(d){ return path(d); })
-        .style("fill", "rgba(200, 200, 200, 1)")
-		.each(function(d, i){
-
-            // calcul des frontieres pour la 3d
-            pathFrontieres[i] = getPath(path(d));
-
-			for (var i = 0; i < index.length; i++) {
-
-				if(d.id == index[i].iso)
-				{
-
-					d3.select("#classement").append("li").attr("class", "itemPays")
-                        .style("position", "absolute")
-                        .attr("id", index[i].iso)
-                        .on("click", function(){ clicPaysClassement(this.id); });
-
-				}
-			}
-
-		})
-       
-        changementAnnee(0);
+    requestAnimationFrame(animate); 
+    
+    if(mode == "3d")
+    {
+       canvas.draw();
+    }
 
 }
 
 
 
+
+
+
+
+
+//////////////////////////////////////////////////////////
+////////////// DESSIN 2D ////////////////////////////////
+////////////////////////////////////////////////////////
+
+
+
+var Dessin2D = function()
+{
+
+
+    this.setup = function()
+    {
+        queue()
+            .defer(lireJson, "data/world-countries-clean.json")
+            .defer(lireCsv, "data/index.csv")
+            .awaitAll(this.draw);
+    }
+
+
+
+
+    this.draw = function(error, results){
+
+        index = results[1];
+        var features = results[0].features;
+
+        var frontieres = svg.append("svg:g")
+            .selectAll("path")
+            .data(features)
+            .enter().append("svg:path")
+            .attr("id", function(d){ return d.id; })
+            .attr("d", function(d){ return path(d); })
+            .style("fill", "rgba(200, 200, 200, 1)")
+            .each(function(d, i){
+
+                // calcul des frontieres pour la 3d
+                pathFrontieres[i] = getPath(path(d));
+
+                for (var i = 0; i < index.length; i++) {
+
+                    if(d.id == index[i].iso)
+                    {
+
+                        d3.select("#classement").append("li").attr("class", "itemPays")
+                            .style("position", "absolute")
+                            .attr("id", index[i].iso)
+                            .on("click", function(){ clicPaysClassement(this.id); });
+
+                    }
+                }
+
+            })
+       
+        changementAnnee(0);
+
+        d2d.setup3d();
+    }
+
+
+
+    this.setup3d = function()
+    {
+
+        d3d.draw(canvas.scene); 
+
+    }
+
+}
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////
+////////////// DESSIN 3D ////////////////////////////////
+////////////////////////////////////////////////////////
+
+
+var Dessin3D = function()
+{
+
+    this.uniformsTerrain;
+
+
+    this.setup = function(){}
+
+
+    this.draw = function( scene )
+    {
+       this.displayBorders( scene ); 
+       this.displayRelief( scene ); 
+       //this.displayRepere( scene );
+
+    }
+
+
+    this.update = function( texture )
+    {
+
+        this.uniformsTerrain[ "tDisplacement" ].value = texture;
+
+    }
+
+
+    this.displayBorders = function( scene )
+    {
+
+
+        var materialBorder = new THREE.LineBasicMaterial({ 
+                color:0xffffff,
+                opacity: 1,
+                linewidth: 1
+            });
+
+        for(var k = 0; k < pathFrontieres.length; k++)
+        {
+            var coor = pathFrontieres[k];
+
+            for(var i = 0; i < coor.length; i++)
+            {
+                var geometryBorder = new THREE.Geometry();
+
+                for(var j = 0; j < coor[i].length; j+=2)
+                {
+                    var position = projectionfor3d([ coor[i][j], coor[i][j+1] ]);
+                    geometryBorder.vertices.push(new THREE.Vector3(position[0], position[1], 0));
+                }
+                
+                // dernier point pour fermer la forme
+                var position = projectionfor3d([ coor[i][0], coor[i][1] ]);
+                geometryBorder.vertices.push(new THREE.Vector3(position[0], position[1], 0));
+
+                // ajout dans la scene
+                var line = new THREE.Line(geometryBorder, materialBorder);
+                line.position.set(0, 0, 20);       
+                scene.add(line);
+
+            }
+        }
+        pathFrontieres = null;
+
+
+    }
+
+
+
+
+    this.displayRelief = function( scene )
+    {
+
+
+        var n = 0;
+        function loaded() {
+            n++;
+            console.log("loaded: " + n);
+
+            if (n == 3) {
+                terrain.visible = true;
+            }
+        }
+
+
+        // HEIGHTMAP
+        //var texture = THREE.ImageUtils.loadTexture('mapInverse.png', null, loaded);
+        var fourchetteHauteur = 180;
+
+        // texture effect
+        var detailTexture = THREE.ImageUtils.loadTexture("data/textureLisse.jpg", null, loaded);
+
+        var terrainShader = THREE.ShaderTerrain[ "terrain" ];
+        this.uniformsTerrain = THREE.UniformsUtils.clone(terrainShader.uniforms);
+
+        // SQUARE TEXTURE
+        var wireTexture = new THREE.ImageUtils.loadTexture( 'data/square.png' );
+        wireTexture.wrapS = wireTexture.wrapT = THREE.RepeatWrapping; 
+        wireTexture.repeat.set( 40, 40 );
+        this.uniformsTerrain[ "textureSquare" ].value = wireTexture;
+
+        // HAUTEUR MAX
+        this.uniformsTerrain[ "uDisplacementScale" ].value = fourchetteHauteur;
+
+        // EFFET TEXTURE
+        this.uniformsTerrain[ "tNormal" ].value = detailTexture;
+        this.uniformsTerrain[ "tDiffuse1" ].value = detailTexture;
+        this.uniformsTerrain[ "tDetail" ].value = detailTexture;
+
+        // COULEUR
+        this.uniformsTerrain[ "uNormalScale" ].value = 1;
+        this.uniformsTerrain[ "enableDiffuse1" ].value = true;
+        this.uniformsTerrain[ "enableDiffuse2" ].value = true;
+        this.uniformsTerrain[ "enableSpecular" ].value = true;
+        this.uniformsTerrain[ "uDiffuseColor" ].value.setHex(0x888888);  // diffuse
+        this.uniformsTerrain[ "uSpecularColor" ].value.setHex(0xffffff); // spec // pas de repercution
+        this.uniformsTerrain[ "uAmbientColor" ].value.setHex(0x888888);  // ambiant
+
+        this.uniformsTerrain[ "uShininess" ].value = 3;                  // shininess
+        this.uniformsTerrain[ "uRepeatOverlay" ].value.set(3, 3);        // light reflection
+
+
+        // MATERIAL
+        var material = new THREE.ShaderMaterial({
+
+            uniforms: this.uniformsTerrain,
+            vertexShader: terrainShader.vertexShader,
+            fragmentShader: terrainShader.fragmentShader,
+            lights: true,
+            fog: false,
+            side: THREE.DoubleSide
+
+        });
+
+
+        var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000088, wireframe: true, side:THREE.DoubleSide } ); 
+        var floor = new THREE.Mesh(geometryTerrain, wireframeMaterial);
+        floor.position.z = -200;
+        scene.add(floor);
+        
+
+        var geometryTerrain = new THREE.PlaneGeometry(width, height, 128, 128);
+        var floor = new THREE.Mesh( geometryTerrain, wireframeMaterial );
+        //geometryTerrain.computeFaceNormals();
+        geometryTerrain.computeVertexNormals();
+        geometryTerrain.computeTangents();
+
+
+        var terrain = new THREE.Mesh( geometryTerrain, material );
+        terrain.position.set(0, 0, -fourchetteHauteur);
+        scene.add(terrain);
+
+        loaded();
+
+
+    }
+
+
+
+
+
+    this.displayRepere = function(scene)
+    {
+
+        var geometrie = new THREE.Geometry();
+        geometrie.vertices.push(new THREE.Vector3(0, 0, 0));
+        geometrie.vertices.push(new THREE.Vector3(100, 0, 0));
+        var ligne = new THREE.Line(geometrie, new THREE.LineBasicMaterial({ color: 0xff0000 }));
+        scene.add(ligne);
+
+        geometrie = new THREE.Geometry();
+        geometrie.vertices.push(new THREE.Vector3(0, 0, 0));
+        geometrie.vertices.push(new THREE.Vector3(0, 100, 0));
+        ligne = new THREE.Line(geometrie, new THREE.LineBasicMaterial({ color: 0x00ff00 }));
+        scene.add(ligne);
+
+        geometrie = new THREE.Geometry();
+        geometrie.vertices.push(new THREE.Vector3(0, 0, 0));
+        geometrie.vertices.push(new THREE.Vector3(0, 0, 100));
+        ligne = new THREE.Line(geometrie, new THREE.LineBasicMaterial({ color: 0x0000ff }));
+        scene.add(ligne);   
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////
+////////////// PASSAGE MODE /////////////////////////////
+////////////////////////////////////////////////////////
+
+function passage2d()
+{
+
+    document.body.setAttribute("class", "mode2d");
+
+    if(mode == "3d")
+    {
+        // fond de la carte svg transparent
+        svgFond.style("fill", "rgba(0,0,0,0)");
+
+        mode = "2d";
+        redessinerCarteSvg();
+    }
+
+}
+
+
+
+function passage3d()
+{
+
+    document.body.setAttribute("class", "mode3d");
+
+
+    if(mode == "2d")
+    {
+        mode = "3d";     
+
+        // fond de la carte svg noir
+        svgFond.style("fill", "rgba(0,0,0,1)");
+
+        redessinerCarteSvg();
+        createTextureFromSvg();
+        
+    }
+
+}
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////
+///////////// CHANGEMENT ANNEE /////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+function changementAnnee(sens)
+{
+    
+    if(sens > 0 && currentYear < 1)
+    {
+        currentYear++;
+    } else if(sens < 0 && currentYear >= 1){
+        currentYear--;
+    }
+
+
+    var displayYear = document.getElementById("current_year");
+    displayYear.innerHTML = 2013-currentYear;
+
+    var already = [];
+
+
+    for(var i = 0; i < index.length; i++)
+    {
+
+        var espaceEntreDeux = 20;
+        var top = 0;
+        switch(currentYear)
+        {
+            case 0: top = parseInt(index[i].an2013);  break;
+            case 1: top = parseInt(index[i].an2012);  break;
+        }
+
+        var positionPays = top;
+
+        // régler égalités
+        for(var j = 0; j < already.length; j++)
+        {
+            if(top == already[j])
+            {
+                top += 1;
+            }
+        }
+        already.push(top);
+        top *= espaceEntreDeux;
+
+        var nomPays = "";
+        if(langue == "FR"){ nomPays = index[i].nom; } else { nomPays = index[i].name; }
+
+
+        var classement = d3.select("#classement");
+        classement.select("#"+index[i].iso)
+            .transition().duration(700)
+            .style("top", top+"px")
+            .text("#"+positionPays+" "+nomPays);
+
+    }
+
+    redessinerCarteSvg();
+
+
+}
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//////////////////// CLIC PAYS /////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+function clicPaysClassement(isoPays)
+{
+
+    if(mode == "3d")
+    {
+        var classement = d3.selectAll(".itemPays");
+        classement.style("color", "black");
+
+        for(var i = 0; i < index.length; i++)
+        {
+            if(isoPays == index[i].iso)
+            {
+
+                d3.selectAll("#"+index[i].iso).style("color", "#00f");
+                var positionPays = projectionfor3d(getGeoCoord(index[i].latitude, index[i].longitude));
+                canvas.moveCamToPosition(positionPays);
+            
+            }
+        }
+        
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////
+////////////// UTILS ////////////////////////////////////
+////////////////////////////////////////////////////////
 
 
 function redessinerCarteSvg()
@@ -188,54 +620,11 @@ function redessinerCarteSvg()
 
         pays.style("fill", "rgba("+red+","+green+","+blue+", 1)" );
         pays.style( "stroke", "rgba("+red+","+green+","+blue+", 1)" );
+
     }
 
 }
 
-
-
-
-
-function passage2d()
-{
-    document.body.setAttribute("class", "mode2d");
-
-    if(mode == "3d")
-    {
-        // fond de la carte svg transparent
-        svgFond.style("fill", "rgba(0,0,0,0)");
-
-        mode = "2d";
-        redessinerCarteSvg();
-    }
-}
-
-
-
-
-
-
-
-
-function passage3d()
-{
-
-    document.body.setAttribute("class", "mode3d");
-
-
-    if(mode == "")
-    {
-        mode = "3d";     
-
-    	// fond de la carte svg noir
-    	svgFond.style("fill", "rgba(0,0,0,1)");
-
-    	redessinerCarteSvg();
-        createTextureFromSvg();
-    	
-
-    }
-}
 
 
 
@@ -259,6 +648,8 @@ function createTextureFromSvg()
 
 
 
+
+
 function blurImage()
 {
 
@@ -275,214 +666,15 @@ function blurImage()
 	varBlur(ctx, function(x, y){ return 6.9; });
 	//document.getElementById(conteneur).appendChild(canvas2d);
 	
-	dessin3d( canvas2d );
-
-}
-
-
-
-function dessin3d( canvas2d )
-{
-
-	// creation de la texture THREE
-	var textureCarted3js = new THREE.Texture( canvas2d );
-	textureCarted3js.needsUpdate = true;
-
-
-	canvas = new Canvas();
-	canvas.setup(width, height);
-
-
-    displayBorders(canvas.scene);
-	displayRelief(canvas.scene, textureCarted3js);
-	//displayRepere(canvas.scene);
-
-	// rendu
-	animate();
-	
-}
-
-
-
-function animate()
-{
-
-	requestAnimationFrame(animate); 
-	canvas.draw();
-
-}
-
-
-
-
-
-
-
-
-
-
-
-function displayBorders(scene)
-{
-
-
-    var materialBorder = new THREE.LineBasicMaterial({ 
-            color:0xffffff,
-            opacity: 1,
-            linewidth: 1
-        });
-
-    for(var k = 0; k < pathFrontieres.length; k++)
-    {
-        var coor = pathFrontieres[k];
-
-        for(var i = 0; i < coor.length; i++)
-        {
-            var geometryBorder = new THREE.Geometry();
-
-            for(var j = 0; j < coor[i].length; j+=2)
-            {
-                var position = projectionfor3d([ coor[i][j], coor[i][j+1] ]);
-                geometryBorder.vertices.push(new THREE.Vector3(position[0], position[1], 0));
-            }
-            
-            // dernier point pour fermer la forme
-            var position = projectionfor3d([ coor[i][0], coor[i][1] ]);
-            geometryBorder.vertices.push(new THREE.Vector3(position[0], position[1], 0));
-
-            // ajout dans la scene
-            var line = new THREE.Line(geometryBorder, materialBorder);
-            line.position.set(0, 0, 20);       
-            scene.add(line);
-
-        }
-    }
-    pathFrontieres = null;
-
-
-}
-
-
-
-
-
-
-
-
-function displayRelief( scene, texture )
-{
-
-
-    var n = 0;
-    function loaded() {
-        n++;
-        console.log("loaded: " + n);
-
-        if (n == 3) {
-            terrain.visible = true;
-        }
-    }
-
-
-    // HEIGHTMAP
-    //var texture = THREE.ImageUtils.loadTexture('mapInverse.png', null, loaded);
-    var fourchetteHauteur = 180;
-
-    // texture effect
-    var detailTexture = THREE.ImageUtils.loadTexture("data/textureLisse.jpg", null, loaded);
-
-    var terrainShader = THREE.ShaderTerrain[ "terrain" ];
-    uniformsTerrain = THREE.UniformsUtils.clone(terrainShader.uniforms);
-
-    // SQUARE TEXTURE
-    var wireTexture = new THREE.ImageUtils.loadTexture( 'data/square.png' );
-    wireTexture.wrapS = wireTexture.wrapT = THREE.RepeatWrapping; 
-    wireTexture.repeat.set( 40, 40 );
-    uniformsTerrain[ "textureSquare" ].value = wireTexture;
-
-    // HAUTEUR MAX
-    uniformsTerrain[ "tDisplacement" ].value = texture;
-    uniformsTerrain[ "uDisplacementScale" ].value = fourchetteHauteur;
-
-    // EFFET TEXTURE
-    uniformsTerrain[ "tNormal" ].value = detailTexture;
-    uniformsTerrain[ "tDiffuse1" ].value = detailTexture;
-    uniformsTerrain[ "tDetail" ].value = detailTexture;
-
-    // COULEUR
-    uniformsTerrain[ "uNormalScale" ].value = 1;
-    uniformsTerrain[ "enableDiffuse1" ].value = true;
-    uniformsTerrain[ "enableDiffuse2" ].value = true;
-    uniformsTerrain[ "enableSpecular" ].value = true;
-    uniformsTerrain[ "uDiffuseColor" ].value.setHex(0x888888);	// diffuse
-    uniformsTerrain[ "uSpecularColor" ].value.setHex(0xffffff);	// spec // pas de repercution
-    uniformsTerrain[ "uAmbientColor" ].value.setHex(0x888888);	// ambiant
-
-    uniformsTerrain[ "uShininess" ].value = 3;  				// shininess
-    uniformsTerrain[ "uRepeatOverlay" ].value.set(3, 3); 		// light reflection
-
-
-    // MATERIAL
-    var material = new THREE.ShaderMaterial({
-
-        uniforms: uniformsTerrain,
-        vertexShader: terrainShader.vertexShader,
-        fragmentShader: terrainShader.fragmentShader,
-        lights: true,
-        fog: false,
-        side: THREE.DoubleSide
-
-    });
-
-
-    var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000088, wireframe: true, side:THREE.DoubleSide } ); 
-    var floor = new THREE.Mesh(geometryTerrain, wireframeMaterial);
-    floor.position.z = -200;
-    scene.add(floor);
+    // creation de la texture THREE
+    var textureCarted3js = new THREE.Texture( canvas2d );
+    textureCarted3js.needsUpdate = true;
     
-
-    var geometryTerrain = new THREE.PlaneGeometry(width, height, 128, 128);
-    var floor = new THREE.Mesh( geometryTerrain, wireframeMaterial );
-    //geometryTerrain.computeFaceNormals();
-    geometryTerrain.computeVertexNormals();
-    geometryTerrain.computeTangents();
-
-
-    var terrain = new THREE.Mesh( geometryTerrain, material );
-    terrain.position.set(0, 0, -fourchetteHauteur);
-    scene.add(terrain);
-
-    loaded();
+    d3d.update( textureCarted3js );
 
 
 }
 
-
-
-
-
-function displayRepere(scene)
-{
-
-	var geometrie = new THREE.Geometry();
-	geometrie.vertices.push(new THREE.Vector3(0, 0, 0));
-	geometrie.vertices.push(new THREE.Vector3(100, 0, 0));
-	var ligne = new THREE.Line(geometrie, new THREE.LineBasicMaterial({ color: 0xff0000 }));
-	scene.add(ligne);
-
-	geometrie = new THREE.Geometry();
-	geometrie.vertices.push(new THREE.Vector3(0, 0, 0));
-	geometrie.vertices.push(new THREE.Vector3(0, 100, 0));
-	ligne = new THREE.Line(geometrie, new THREE.LineBasicMaterial({ color: 0x00ff00 }));
-	scene.add(ligne);
-
-	geometrie = new THREE.Geometry();
-	geometrie.vertices.push(new THREE.Vector3(0, 0, 0));
-	geometrie.vertices.push(new THREE.Vector3(0, 0, 100));
-	ligne = new THREE.Line(geometrie, new THREE.LineBasicMaterial({ color: 0x0000ff }));
-	scene.add(ligne);	
-
-}
 
 
 
@@ -539,6 +731,20 @@ function getGeoCoord(x, y)
     return traductionCoor;
 
 }
+
+
+
+function projectionfor3d(array)
+{
+
+    array[0] = array[0]-width/2;
+    array[1] = (array[1]-height/2)*(-1);
+    return array;
+
+}
+
+
+
 
 
 
@@ -835,7 +1041,7 @@ var Canvas = function()
 
 
 /////////////////////////////////////////////////////////////////////////////////
-///////////// INTERACTION //////////////////////////////////////////////////////
+/////////////////////// RESIZE /////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -850,94 +1056,6 @@ function onresize()
     if(mode == "3d")
     {
         canvas.onResize(newWidth, newWidth);
-    }
-
-}
-
-
-
-
-function changementAnnee(sens)
-{
-    
-    if(sens > 0 && currentYear < 1)
-    {
-        currentYear++;
-    } else if(sens < 0 && currentYear >= 1){
-        currentYear--;
-    }
-
-
-    var displayYear = document.getElementById("current_year");
-    displayYear.innerHTML = 2013-currentYear;
-
-    var already = [];
-
-
-    for(var i = 0; i < index.length; i++)
-    {
-
-        var espaceEntreDeux = 20;
-        var top = 0;
-        switch(currentYear)
-        {
-            case 0: top = parseInt(index[i].an2013);  break;
-            case 1: top = parseInt(index[i].an2012);  break;
-        }
-
-        var positionPays = top;
-
-        // régler égalités
-        for(var j = 0; j < already.length; j++)
-        {
-            if(top == already[j])
-            {
-                top += 1;
-            }
-        }
-        already.push(top);
-        top *= espaceEntreDeux;
-
-        var nomPays = "";
-        if(langue == "FR"){ nomPays = index[i].nom; } else { nomPays = index[i].name; }
-
-
-        var classement = d3.select("#classement");
-        classement.select("#"+index[i].iso)
-            .transition().duration(700)
-            .style("top", top+"px")
-            .text("#"+positionPays+" "+nomPays);
-
-    }
-
-    redessinerCarteSvg();
-
-
-}
-
-
-
-
-function clicPaysClassement(isoPays)
-{
-
-    if(mode == "3d")
-    {
-        var classement = d3.selectAll(".itemPays");
-        classement.style("color", "black");
-
-        for(var i = 0; i < index.length; i++)
-        {
-            if(isoPays == index[i].iso)
-            {
-
-                d3.selectAll("#"+index[i].iso).style("color", "#00f");
-                var positionPays = projectionfor3d(getGeoCoord(index[i].latitude, index[i].longitude));
-                canvas.moveCamToPosition(positionPays);
-            
-            }
-        }
-        
     }
 
 }
