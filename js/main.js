@@ -81,6 +81,7 @@ function setup()
 	// si WegGL est supporté
 	if(window.WebGLRenderingContext)
 	{
+
         // 3D
 		document.getElementById("btn_3d").addEventListener("click", function(){ passage3d(); }, false);
         canvas = new Canvas();
@@ -135,6 +136,7 @@ var Dessin2D = function()
 
     this.setup = function()
     {
+
         queue()
             .defer(lireJson, "data/world-countries-clean.json")
             .defer(lireCsv, "data/index.csv")
@@ -178,6 +180,7 @@ var Dessin2D = function()
        
         changementAnnee(0);
         d2d.setup3d();
+
     }
 
 
@@ -296,9 +299,6 @@ var Dessin2D = function()
     }
 
 
-
-    
-
 }
 
 
@@ -334,6 +334,7 @@ var Dessin3D = function()
     {
 
         this.uniformsTerrain[ "tDisplacement" ].value = texture;
+        document.getElementById("loader").style.display = "none";
 
     }
 
@@ -546,6 +547,7 @@ function passage3d()
 
     if(mode == "2d")
     {
+        document.getElementById("loader").style.display = "block";
         mode = "3d";     
 
         // fond de la carte svg noir
@@ -564,13 +566,16 @@ function passage3d()
 
 
 
+
+
+
 /////////////////////////////////////////////////////////////////////////////////
 ///////////// CHANGEMENT ANNEE /////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 function changementAnnee(sens)
 {
-    
+     
     if(sens > 0 && currentYear < 1)
     {
         currentYear++;
@@ -623,14 +628,20 @@ function changementAnnee(sens)
 
     d2d.redrawSvg();
 
-
     if(mode == "3d")
     {
+        document.getElementById("loader").style.display = "block";
         setTimeout( function(){ d2d.createTextureFromSvg(); }, 700 ); 
     }
     
 
 }
+
+
+
+
+
+
 
 
 
@@ -663,11 +674,6 @@ function clicPaysClassement(isoPays)
     }
 
 }
-
-
-
-
-
 
 
 
@@ -793,6 +799,7 @@ var Canvas = function()
     this.setup = function(WIDTH, HEIGHT)
     {
 
+
         var VIEW_ANGLE = 45,
             ASPECT = WIDTH / HEIGHT,
             NEAR = 0.1,
@@ -830,11 +837,12 @@ var Canvas = function()
         this.camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
         this.scene.add(this.camera);
 
-    
+
         // RENDERER
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setSize(window.innerWidth, 4*window.innerWidth/6);
         this.renderer.setClearColor("#000000", 1);
+
 
 
         // LIGHT
@@ -848,11 +856,9 @@ var Canvas = function()
         this.spot2.position.set( -0.5, 1, 0 );
         this.scene.add(this.spot2);
 
-
         this.canvas = this.renderer.domElement;
         this.canvas.id = "canvas3d";
-        document.getElementById(conteneur).appendChild(this.canvas);       
-
+        document.getElementById(conteneur).appendChild(this.canvas);   
 
         var clone = this;
         this.canvas.addEventListener("mousemove", function(event){ clone.onMouseMove(event); }, false);

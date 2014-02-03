@@ -40,6 +40,18 @@ body
 }
 
 
+#loader
+{
+	position: absolute;
+	top: 2%;
+	left: 50%;
+	display: none;
+}
+
+
+
+
+
 
 .mode2d #carteSvg
 {
@@ -50,7 +62,6 @@ body
 {
 	display: none;
 }
-
 
 .mode3d #carteSvg
 {
