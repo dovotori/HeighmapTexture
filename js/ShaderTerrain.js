@@ -28,7 +28,9 @@ THREE.ShaderTerrain = {
 			"enableSpecular"  : { type: "i", value: 0 },
 			"enableReflection": { type: "i", value: 0 },
 
+			"animLerp": { type: "f", value: 0.0 },
 			"textureSquare": { type: "t", value: null },
+
 			"tDiffuse1"	   : { type: "t", value: null },
 			"tDiffuse2"	   : { type: "t", value: null },
 			"tDetail"	   : { type: "t", value: null },
@@ -330,8 +332,13 @@ THREE.ShaderTerrain = {
 				"vec4 texture = texture2D( tDisplacement, uvBase );",
 				"float hauteur = texture.z;",
 
-				// DU JAUNE AU ROUGE
-				"gl_FragColor.xyz = ( gl_FragColor.xyz * 1.2 ) * vec3( 1.0, map( hauteur, 0.0, 1.0, 0.01, 0.6 ), map( hauteur, 0.0, 1.0, 0.01, 0.6 ) );",
+				// D'UNE COULEUR A L'AUTRE
+				"vec3 colorFond = vec3(0.7, 0.2, 0.1);",
+				"vec3 colorHaut = vec3(0.9, 0.9, 0.9);",
+				//"gl_FragColor.xyz = ( gl_FragColor.xyz ) * vec3( 1.0, map( hauteur, 0.0, 1.0, 0.01, 0.6 ), map( hauteur, 0.0, 1.0, 0.01, 0.6 ) );",
+				"gl_FragColor.x = map( gl_FragColor.x, 0.0, 1.0, colorFond.x, colorHaut.x );",
+				"gl_FragColor.y = map( gl_FragColor.y, 0.0, 1.0, colorFond.y, colorHaut.y );",
+				"gl_FragColor.z = map( gl_FragColor.z, 0.0, 1.0, colorFond.z, colorHaut.z );",
 
 				// // MER NOIRE
 				"if( hauteur < 0.001 ){",
@@ -376,6 +383,8 @@ THREE.ShaderTerrain = {
 			"uniform vec2 uRepeatBase;",
 
 			"uniform sampler2D tNormal;",
+
+			"uniform float animLerp;",
 
 			"#ifdef VERTEX_TEXTURES",
 
@@ -432,7 +441,11 @@ THREE.ShaderTerrain = {
 
 				"#endif",
 
-				"gl_Position = projectionMatrix * mvPosition;",
+
+				// ANIMATION
+				"gl_Position = projectionMatrix * modelViewMatrix * vec4( p.x, p.y, displacedPosition.z * animLerp, 1.0 );",
+				
+				//"gl_Position = projectionMatrix * mvPosition;",
 
 				"vViewPosition = -mvPosition.xyz;",
 

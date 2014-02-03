@@ -1,9 +1,10 @@
 
+
 window.addEventListener("load", setup, false);
 
 
 
-var width = 520;    // 520
+var width = 520;
 var height = 520;
 var conteneur = "carte";
 
@@ -113,6 +114,7 @@ function animate()
     if(mode == "3d")
     {
        canvas.draw();
+       d3d.update();
     }
 
 }
@@ -128,10 +130,9 @@ function animate()
 ////////////// DESSIN 2D ////////////////////////////////
 ////////////////////////////////////////////////////////
 
-
-
 var Dessin2D = function()
 {
+
 
 
     this.setup = function()
@@ -189,7 +190,7 @@ var Dessin2D = function()
     {
 
         d3d.draw(canvas.scene);
-
+        onresize();
 
     }
 
@@ -294,7 +295,25 @@ var Dessin2D = function()
         var textureCarted3js = new THREE.Texture( canvas2d );
         textureCarted3js.needsUpdate = true;
         
-        d3d.update( textureCarted3js );
+        d3d.updateTexture( textureCarted3js );
+
+    }
+
+
+
+
+    this.resize = function(newWidth, newHeight, scale)
+    {
+
+        projection
+            .translate( [ newWidth/2, newHeight/2 ] )
+            .scale(scale);
+
+        svg
+            .attr("width", newWidth)
+            .attr("height", newHeight);
+
+        svg.selectAll("path").attr('d', path);
 
     }
 
@@ -315,25 +334,46 @@ var Dessin2D = function()
 var Dessin3D = function()
 {
 
+
     this.uniformsTerrain;
+    this.lerp;
+    this.newTexture;
+    this.oldTexture;
 
 
-    this.setup = function(){}
+    this.setup = function()
+    {
+        this.lerp = 0.0;
+    }
 
 
     this.draw = function( scene )
     {
-       this.displayBorders( scene ); 
-       this.displayRelief( scene ); 
-       //this.displayRepere( scene );
+
+        this.displayBorders( scene ); 
+        this.displayRelief( scene ); 
+        //this.displayRepere( scene );
 
     }
 
 
-    this.update = function( texture )
+    this.update = function()
     {
+        if(this.lerp < 1.0)
+        {
+            this.uniformsTerrain[ "animLerp" ].value = this.lerp;
+            this.lerp += 0.02;
+        }
+    }
 
-        this.uniformsTerrain[ "tDisplacement" ].value = texture;
+
+
+    this.updateTexture = function( texture )
+    {
+        this.lerp = 0.0;
+        this.oldTexture = this.newTexture;
+        this.newTexture = texture;
+        this.uniformsTerrain[ "tDisplacement" ].value = this.newTexture;
         document.getElementById("loader").style.display = "none";
 
     }
@@ -344,10 +384,10 @@ var Dessin3D = function()
 
 
         var materialBorder = new THREE.LineBasicMaterial({ 
-                color:0xffffff,
-                opacity: 1,
-                linewidth: 1
-            });
+            color:0xffffff,
+            opacity: 1,
+            linewidth: 1
+        });
 
         for(var k = 0; k < pathFrontieres.length; k++)
         {
@@ -391,47 +431,42 @@ var Dessin3D = function()
             n++;
             console.log("loaded: " + n);
 
-            if (n == 3) {
+            if (n == 2) {
                 terrain.visible = true;
             }
         }
 
 
-        // HEIGHTMAP
-        //var texture = THREE.ImageUtils.loadTexture('mapInverse.png', null, loaded);
         var fourchetteHauteur = 180;
 
-        // texture effect
+        // TEXTURE EFFECT
         var detailTexture = THREE.ImageUtils.loadTexture("data/textureLisse.jpg", null, loaded);
-
-        var terrainShader = THREE.ShaderTerrain[ "terrain" ];
-        this.uniformsTerrain = THREE.UniformsUtils.clone(terrainShader.uniforms);
 
         // SQUARE TEXTURE
         var wireTexture = new THREE.ImageUtils.loadTexture( 'data/square.png' );
         wireTexture.wrapS = wireTexture.wrapT = THREE.RepeatWrapping; 
         wireTexture.repeat.set( 40, 40 );
-        this.uniformsTerrain[ "textureSquare" ].value = wireTexture;
 
-        // HAUTEUR MAX
-        this.uniformsTerrain[ "uDisplacementScale" ].value = fourchetteHauteur;
+        var terrainShader = THREE.ShaderTerrain[ "terrain" ];
 
-        // EFFET TEXTURE
+        this.uniformsTerrain = THREE.UniformsUtils.clone(terrainShader.uniforms);
+
+        this.uniformsTerrain[ "animLerp" ].value = this.lerp;                         // animation lerp
+        this.uniformsTerrain[ "textureSquare" ].value = wireTexture;            // texture pour le cadrillage
+        this.uniformsTerrain[ "uDisplacementScale" ].value = fourchetteHauteur; // hauteur max
         this.uniformsTerrain[ "tNormal" ].value = detailTexture;
         this.uniformsTerrain[ "tDiffuse1" ].value = detailTexture;
         this.uniformsTerrain[ "tDetail" ].value = detailTexture;
-
-        // COULEUR
         this.uniformsTerrain[ "uNormalScale" ].value = 1;
         this.uniformsTerrain[ "enableDiffuse1" ].value = true;
         this.uniformsTerrain[ "enableDiffuse2" ].value = true;
         this.uniformsTerrain[ "enableSpecular" ].value = true;
-        this.uniformsTerrain[ "uDiffuseColor" ].value.setHex(0x888888);  // diffuse
-        this.uniformsTerrain[ "uSpecularColor" ].value.setHex(0xffffff); // spec // pas de repercution
-        this.uniformsTerrain[ "uAmbientColor" ].value.setHex(0x888888);  // ambiant
+        this.uniformsTerrain[ "uDiffuseColor" ].value.setHex(0x888888);         // diffuse
+        this.uniformsTerrain[ "uSpecularColor" ].value.setHex(0xffffff);        // spec // pas de repercution
+        this.uniformsTerrain[ "uAmbientColor" ].value.setHex(0x888888);         // ambiant
+        this.uniformsTerrain[ "uShininess" ].value = 3;                         // shininess
+        this.uniformsTerrain[ "uRepeatOverlay" ].value.set(3, 3);               // light reflection
 
-        this.uniformsTerrain[ "uShininess" ].value = 3;                  // shininess
-        this.uniformsTerrain[ "uRepeatOverlay" ].value.set(3, 3);        // light reflection
 
 
         // MATERIAL
@@ -445,16 +480,9 @@ var Dessin3D = function()
             side: THREE.DoubleSide
 
         });
-
-
-        var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000088, wireframe: true, side:THREE.DoubleSide } ); 
-        var floor = new THREE.Mesh(geometryTerrain, wireframeMaterial);
-        floor.position.z = -200;
-        scene.add(floor);
         
 
-        var geometryTerrain = new THREE.PlaneGeometry(width, height, 128, 128);
-        var floor = new THREE.Mesh( geometryTerrain, wireframeMaterial );
+        var geometryTerrain = new THREE.PlaneGeometry(width, height, 128, 128 );
         //geometryTerrain.computeFaceNormals();
         geometryTerrain.computeVertexNormals();
         geometryTerrain.computeTangents();
@@ -528,11 +556,14 @@ function passage2d()
 
     if(mode == "3d")
     {
+        mode = "2d";
+        onresize();
+
         // fond de la carte svg transparent
         svgFond.style("fill", "rgba(0,0,0,0)");
-
-        mode = "2d";
+        
         d2d.redrawSvg();
+
     }
 
 }
@@ -547,8 +578,11 @@ function passage3d()
 
     if(mode == "2d")
     {
-        document.getElementById("loader").style.display = "block";
-        mode = "3d";     
+
+        mode = "3d"; 
+        d2d.resize(520, 520, 80);
+
+        document.getElementById("loader").style.display = "block";    
 
         // fond de la carte svg noir
         svgFond.style("fill", "rgba(0,0,0,1)");
@@ -1067,7 +1101,13 @@ function onresize()
 
     if(mode == "3d")
     {
+
         canvas.onResize(newWidth, newWidth);
+
+    } else {
+
+        d2d.resize(newWidth, newHeight, newWidth/12);     
+
     }
 
 }
