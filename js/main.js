@@ -177,7 +177,6 @@ var Dessin2D = function()
             })
        
         changementAnnee(0);
-
         d2d.setup3d();
     }
 
@@ -186,9 +185,119 @@ var Dessin2D = function()
     this.setup3d = function()
     {
 
-        d3d.draw(canvas.scene); 
+        d3d.draw(canvas.scene);
+
 
     }
+
+
+
+    this.redrawSvg = function()
+    {
+        
+        for(var i = 0; i < index.length; i++)
+        {
+            var pays = svg.select("#"+index[i].iso);
+
+            var hauteur = 0;
+            switch(currentYear)
+            {
+                case 0: hauteur = index[i].an2013;  break;
+                case 1: hauteur = index[i].an2012;  break;
+            }
+
+            var hauteurMax = index.length;
+            var red, green, blue;
+
+            if(mode == "3d")
+            {
+                var gris = map(hauteur, hauteurMax, 0, 0, 255);
+                gris = Math.floor(gris);
+                red = green = blue = gris; 
+
+            } else {
+
+                if(hauteur < hauteurMax / 3){
+                    // de vert à jaune
+                    red = map(hauteur, 0, hauteurMax / 3, 0, 255);
+                    green = 255;
+            
+                } else if(hauteur < 2 * hauteurMax / 3) {
+                    // de jaune à orange
+                    red = 255;
+                    green = map(hauteur, hauteurMax / 3, 2 * hauteurMax / 3, 255, 127);
+
+                } else if(hauteur <= hauteurMax){
+                    // de orange à rouge
+                    red = 255;
+                    green = map(hauteur, 2 * hauteurMax / 3, hauteurMax, 127, 0);
+
+                }
+                
+                red = Math.floor(red);
+                green = Math.floor(green);
+                blue = 70;
+
+            }
+
+            pays.style("fill", "rgba("+red+","+green+","+blue+", 1)" );
+            pays.style( "stroke", "rgba("+red+","+green+","+blue+", 1)" );
+
+        }
+
+    }
+
+
+
+
+
+    this.createTextureFromSvg = function()
+    {
+
+        var svgImg = document.getElementById("carteSvg");
+
+        // transforme le svg en image
+        var xml = new XMLSerializer().serializeToString(svgImg);
+        var data = "data:image/svg+xml;base64," + btoa(xml);
+        
+        var imageTexture = new Image();
+        var clone = this;
+        imageTexture.addEventListener("load", clone.blurImage, false);
+        imageTexture.src = data;
+
+    }
+
+
+
+
+
+    this.blurImage = function()
+    {
+
+        var canvas2d = document.createElement( "canvas" );
+        var ctx = canvas2d.getContext('2d');
+
+        canvas2d.width = width;
+        canvas2d.height = height;
+        canvas2d.id = "canvas2d";
+
+        ctx.drawImage( this, 0, 0, canvas2d.width, canvas2d.height );
+
+        // application du blur
+        varBlur(ctx, function(x, y){ return 6.9; });
+        //document.getElementById(conteneur).appendChild(canvas2d);
+        
+        // creation de la texture THREE
+        var textureCarted3js = new THREE.Texture( canvas2d );
+        textureCarted3js.needsUpdate = true;
+        
+        d3d.update( textureCarted3js );
+
+    }
+
+
+
+    
 
 }
 
@@ -422,7 +531,7 @@ function passage2d()
         svgFond.style("fill", "rgba(0,0,0,0)");
 
         mode = "2d";
-        redessinerCarteSvg();
+        d2d.redrawSvg();
     }
 
 }
@@ -442,8 +551,8 @@ function passage3d()
         // fond de la carte svg noir
         svgFond.style("fill", "rgba(0,0,0,1)");
 
-        redessinerCarteSvg();
-        createTextureFromSvg();
+        d2d.redrawSvg();
+        d2d.createTextureFromSvg();
         
     }
 
@@ -512,8 +621,14 @@ function changementAnnee(sens)
 
     }
 
-    redessinerCarteSvg();
+    d2d.redrawSvg();
 
+
+    if(mode == "3d")
+    {
+        setTimeout( function(){ d2d.createTextureFromSvg(); }, 700 ); 
+    }
+    
 
 }
 
@@ -568,115 +683,6 @@ function clicPaysClassement(isoPays)
 //////////////////////////////////////////////////////////
 ////////////// UTILS ////////////////////////////////////
 ////////////////////////////////////////////////////////
-
-
-function redessinerCarteSvg()
-{
-    
-    for(var i = 0; i < index.length; i++)
-    {
-        var pays = svg.select("#"+index[i].iso);
-
-        var hauteur = 0;
-        switch(currentYear)
-        {
-            case 0: hauteur = index[i].an2013;  break;
-            case 1: hauteur = index[i].an2012;  break;
-        }
-
-        var hauteurMax = index.length;
-        var red, green, blue;
-
-        if(mode == "3d")
-        {
-            var gris = map(hauteur, hauteurMax, 0, 0, 255);
-            gris = Math.floor(gris);
-            red = green = blue = gris; 
-
-        } else {
-
-            if(hauteur < hauteurMax / 3){
-                // de vert à jaune
-                red = map(hauteur, 0, hauteurMax / 3, 0, 255);
-                green = 255;
-        
-            } else if(hauteur < 2 * hauteurMax / 3) {
-                // de jaune à orange
-                red = 255;
-                green = map(hauteur, hauteurMax / 3, 2 * hauteurMax / 3, 255, 127);
-
-            } else if(hauteur <= hauteurMax){
-                // de orange à rouge
-                red = 255;
-                green = map(hauteur, 2 * hauteurMax / 3, hauteurMax, 127, 0);
-
-            }
-            
-            red = Math.floor(red);
-            green = Math.floor(green);
-            blue = 70;
-
-        }
-
-        pays.style("fill", "rgba("+red+","+green+","+blue+", 1)" );
-        pays.style( "stroke", "rgba("+red+","+green+","+blue+", 1)" );
-
-    }
-
-}
-
-
-
-
-
-
-function createTextureFromSvg()
-{
-
-    var svgImg = document.getElementById("carteSvg");
-
-    // transforme le svg en image
-    var xml = new XMLSerializer().serializeToString(svgImg);
-    var data = "data:image/svg+xml;base64," + btoa(xml);
-    
-    var imageTexture = new Image();
-    imageTexture.addEventListener("load", blurImage, false);
-    imageTexture.src = data;
-
-}
-
-
-
-
-
-
-function blurImage()
-{
-
-	var canvas2d = document.createElement( "canvas" );
-	var ctx = canvas2d.getContext('2d');
-
-	canvas2d.width = width;
-	canvas2d.height = height;
-	canvas2d.id = "canvas2d";
-
-	ctx.drawImage( this, 0, 0, canvas2d.width, canvas2d.height );
-
-	// application du blur
-	varBlur(ctx, function(x, y){ return 6.9; });
-	//document.getElementById(conteneur).appendChild(canvas2d);
-	
-    // creation de la texture THREE
-    var textureCarted3js = new THREE.Texture( canvas2d );
-    textureCarted3js.needsUpdate = true;
-    
-    d3d.update( textureCarted3js );
-
-
-}
-
-
-
 
 
 function getPath(path)
