@@ -875,7 +875,7 @@ var Canvas = function()
         // RENDERER
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setSize(window.innerWidth, 4*window.innerWidth/6);
-        this.renderer.setClearColor("#000000", 1);
+        this.renderer.setClearColor("#666666", 1);
 
 
 
@@ -998,6 +998,9 @@ var Canvas = function()
 
     this.initCam = function()
     {
+
+        var classement = d3.selectAll(".itemPays");
+        classement.style("color", "black");
 
         if(this.isZoom)
         {
