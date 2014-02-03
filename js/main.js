@@ -7,12 +7,7 @@ var width = 520;    // 520
 var height = 520;
 var conteneur = "carte";
 
-var projection = d3.geo
-        .ginzburg5()
-        //.azimuthalEqualArea()
-        //.mercator()
-        //.conicEquidistant()
-        //.orthographic()
+var projection = d3.geo.mercator()
     .scale(80)
     .translate([width/2, height/2]);
 
@@ -85,7 +80,7 @@ function setup()
 	// si WegGL est supporté
 	if(window.WebGLRenderingContext)
 	{
-		document.getElementById("btn_3d").addEventListener("click", passage3d, false);
+		document.getElementById("btn_3d").addEventListener("click", function(){ passage3d(); }, false);
 	} else {
 		alert("webGL not supported");
 	}
@@ -145,7 +140,7 @@ function dessin2d( error, results )
 
 function redessinerCarteSvg()
 {
-
+    
     for(var i = 0; i < index.length; i++)
     {
         var pays = svg.select("#"+index[i].iso);
@@ -224,7 +219,9 @@ function passage2d()
 
 function passage3d()
 {
+
     document.body.setAttribute("class", "mode3d");
+
 
     if(mode == "")
     {
@@ -234,7 +231,7 @@ function passage3d()
     	svgFond.style("fill", "rgba(0,0,0,1)");
 
     	redessinerCarteSvg();
-
+        createTextureFromSvg();
     	
 
     }
