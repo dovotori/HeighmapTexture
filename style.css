@@ -29,12 +29,11 @@ body
 {
 	
 	position: absolute;
-	left: 2%; top: 10px;
-	padding: 10px;
+	left: 2%; top: 0%;
 	background-color: #ccc;
 	text-align: left;
 	width: 300px;
-	height: 110%;
+	height: 100%;
 	overflow: scroll;
 
 }
@@ -47,7 +46,6 @@ body
 	left: 50%;
 	display: none;
 }
-
 
 
 
@@ -90,5 +88,34 @@ body
 	list-style-type:none;
 	margin: 0; padding: 0;
 }
+
+
+
+
+#control_annees
+{
+	margin: 2%;
+	text-align: center;
+}
+
+
+#btn_precedent 
+{
+	margin-right: 2%;
+}
+
+#btn_suivant
+{
+	margin-left: 2%;
+}
+
+
+
+#control_mode
+{
+	position: absolute;
+	top: 2%; right: 2%;
+}
+
 
 

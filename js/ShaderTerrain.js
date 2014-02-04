@@ -449,9 +449,9 @@ THREE.ShaderTerrain = {
 
 
 				// ANIMATION
-				"gl_Position = projectionMatrix * modelViewMatrix * vec4( p.x, p.y, displacedPosition.z * animLerp, 1.0 );",
+				// "gl_Position = projectionMatrix * modelViewMatrix * vec4( p.x, p.y, displacedPosition.z * animLerp, 1.0 );",
 				
-				//"gl_Position = projectionMatrix * mvPosition;",
+				"gl_Position = projectionMatrix * mvPosition;",
 
 				"vViewPosition = -mvPosition.xyz;",
 

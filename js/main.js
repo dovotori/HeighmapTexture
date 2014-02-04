@@ -443,7 +443,7 @@ var Dessin3D = function()
         }
 
 
-        var fourchetteHauteur = 180;
+        var fourchetteHauteur = 100;
 
         // TEXTURE EFFECT
         var detailTexture = THREE.ImageUtils.loadTexture("data/textureLisse.jpg", null, loaded);
@@ -848,6 +848,7 @@ var Canvas = function()
     this.transitionFocusCamera;
 
 
+
     this.setup = function(WIDTH, HEIGHT)
     {
 
@@ -875,8 +876,8 @@ var Canvas = function()
         this.transitionFocusCamera = new Transition();
         this.isZoom = false;
         this.angleCamera = [];
-        this.angleCamera[0] = 90;
-        this.angleCamera[1] = 90;
+        this.angleCamera[0] = 0;
+        this.angleCamera[1] = 0;
         this.positionInitCam = [0,0,800];
         this.focusCamera = [ 0,0,0 ];
         this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
@@ -884,7 +885,10 @@ var Canvas = function()
 
         this.rayonCamera = this.positionInitCam[2];
 
-        this.camera.position.set( this.positionInitCam[0], this.positionInitCam[1], this.positionInitCam[2] );
+        //this.camera.position.set( this.positionInitCam[0], this.positionInitCam[1], this.positionInitCam[2] );
+        this.camera.position.x = this.rayonCamera * Math.sin( this.angleCamera[1] * Math.PI / 360 ) * Math.cos( this.angleCamera[0] * Math.PI / 360 );
+        this.camera.position.y = this.rayonCamera * Math.sin( this.angleCamera[0] * Math.PI / 360 );
+        this.camera.position.z = this.rayonCamera * Math.cos( this.angleCamera[1] * Math.PI / 360 ) * Math.cos( this.angleCamera[0] * Math.PI / 360 );
         this.camera.lookAt(new THREE.Vector3( this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ));
         this.scene.add(this.camera);
 
@@ -1042,31 +1046,40 @@ var Canvas = function()
 
     this.positionCamera = function()
     {
-
+        
         // ANGLES
-        this.angleCamera[0] += (this.xSouris - this.xSourisOld) * 0.1;
+        this.angleCamera[0] += (this.xSouris - this.xSourisOld);
         this.angleCamera[1] += (this.ySouris - this.ySourisOld);
 
 
+        /*
         // CONDITIONS ANGLES
         var limiteAngle = [ 20, 160 ];
-        if(this.angleCamera[0] > limiteAngle[1]){ this.angleCamera[0] = limiteAngle[1]; }
-        if(this.angleCamera[0] < limiteAngle[0]){ this.angleCamera[0] = limiteAngle[0]; }
+        // if(this.angleCamera[0] > limiteAngle[1]){ this.angleCamera[0] = limiteAngle[1]; }
+        // if(this.angleCamera[0] < limiteAngle[0]){ this.angleCamera[0] = limiteAngle[0]; }
 
         if(this.angleCamera[1] > limiteAngle[1]){ this.angleCamera[1] = limiteAngle[1]; }
         if(this.angleCamera[1] < limiteAngle[0]){ this.angleCamera[1] = limiteAngle[0]; }
 
 
-        this.camera.position.x = Math.cos(this.angleCamera[0]*(Math.PI/180)) * this.rayonCamera;
-        this.camera.position.y = Math.cos(this.angleCamera[1]*(Math.PI/180)) * this.rayonCamera;
-        this.camera.position.z = Math.sin(this.angleCamera[0]*(Math.PI/180)) * Math.sin(this.angleCamera[1]*(Math.PI/180)) * this.rayonCamera;
-
-
-        // var x = ( Math.cos(this.angleCamera[0]*(Math.PI/180)) * this.rayonCamera ) + this.focusCamera[0];    // angle * rayon + decalage
-        // var y = ( Math.sin(this.angleCamera[0]*(Math.PI/180)) * this.rayonCamera ) + this.focusCamera[1]; 
-    
+        // IO
+        // this.camera.position.x = Math.cos(this.angleCamera[0]*(Math.PI/180)) * this.rayonCamera;
+        // this.camera.position.y = Math.cos(this.angleCamera[1]*(Math.PI/180)) * this.rayonCamera;
+        // this.camera.position.z = Math.sin(this.angleCamera[0]*(Math.PI/180)) * Math.sin(this.angleCamera[1]*(Math.PI/180)) * this.rayonCamera;
 
         this.camera.lookAt( new THREE.Vector3( this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ) );
+        */
+
+        if(this.angleCamera[0] > 120){ this.angleCamera[0] = 120; }
+        if(this.angleCamera[0] < -120){ this.angleCamera[0] = -120; }
+
+        if(this.angleCamera[1] > 180){ this.angleCamera[1] = 180; }
+        if(this.angleCamera[1] < -180){ this.angleCamera[1] = -180; }
+
+        this.camera.position.x = this.rayonCamera * Math.sin( this.angleCamera[0] * Math.PI / 360 ) * Math.cos( this.angleCamera[1] * Math.PI / 360 );
+        this.camera.position.y = this.rayonCamera * Math.sin( this.angleCamera[1] * Math.PI / 360 );
+        this.camera.position.z = this.rayonCamera * Math.cos( this.angleCamera[0] * Math.PI / 360 ) * Math.cos( this.angleCamera[1] * Math.PI / 360 );
+        this.camera.updateMatrix();
 
 
     }
@@ -1101,7 +1114,7 @@ var Canvas = function()
     this.onResize = function(newWidth, newHeight)
     {
 
-        this.renderer.setSize(newWidth, 4*newHeight/6);
+        this.renderer.setSize(newWidth, 4*newWidth/6);
     
     }
 
@@ -1132,7 +1145,7 @@ function onresize()
     if(mode == "3d")
     {
 
-        canvas.onResize(newWidth, newWidth);
+        canvas.onResize(newWidth, newHeight);
 
     } else {
 
