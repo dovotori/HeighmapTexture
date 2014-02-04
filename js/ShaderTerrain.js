@@ -348,7 +348,7 @@ THREE.ShaderTerrain = {
 
 				// // MER NOIRE
 				"if( hauteur < 0.001 ){",
-					"gl_FragColor = vec4( 0.4, 0.4, 0.4, 1.0 );",
+					"gl_FragColor = vec4( 20.0/255.0, 50.0/255.0, 100.0/255.0, 1.0 );",
 				"}",
 
 				// // GRATICULE
@@ -372,6 +372,11 @@ THREE.ShaderTerrain = {
 				//"float x = texture2D( tDisplacement, uvBase ).x;",
 				//"gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );",
 				//"if( gl_FragCoord.x > 400.0 ){ gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 ); }",
+
+
+
+				// // TRAVAIL FOND
+				"if( gl_FragCoord.y < 100.0 ){ gl_FragColor *= vec4( map(gl_FragCoord.y, 0.0, 100.0, 0.0, 1.0) ); }",
 
 
 				THREE.ShaderChunk[ "shadowmap_fragment" ],

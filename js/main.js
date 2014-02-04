@@ -66,7 +66,6 @@ function setup()
     langue = "FR";
     pathFrontieres = [];
     mode = "2d";
-    uniformsTerrain = [];
 
 
     // gestion boutons 2D
@@ -531,6 +530,12 @@ var Dessin3D = function()
     }
 
 
+
+
+
+
+
+
 }
 
 
@@ -848,6 +853,11 @@ var Canvas = function()
     this.transitionFocusCamera;
 
 
+    this.background;
+    this.backgroundScene;
+    this.backgroundCam;
+
+
 
     this.setup = function(WIDTH, HEIGHT)
     {
@@ -878,7 +888,7 @@ var Canvas = function()
         this.angleCamera = [];
         this.angleCamera[0] = 0;
         this.angleCamera[1] = 0;
-        this.positionInitCam = [0,0,800];
+        this.positionInitCam = [0, 0, 800];
         this.focusCamera = [ 0,0,0 ];
         this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
         this.camera.up = new THREE.Vector3( 0, 1, 0 );
@@ -896,7 +906,7 @@ var Canvas = function()
         // RENDERER
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setSize(window.innerWidth, 4*window.innerWidth/6);
-        this.renderer.setClearColor("#666666", 1);
+        this.renderer.setClearColor("rgb(20, 50, 100)", 1);
 
 
 
@@ -915,12 +925,19 @@ var Canvas = function()
         this.canvas.id = "canvas3d";
         document.getElementById(conteneur).appendChild(this.canvas);   
 
+
+
+        // INTERACTION
         var clone = this;
         this.canvas.addEventListener("mousemove", function(event){ clone.onMouseMove(event); }, false);
         this.canvas.addEventListener("mousedown", function(event){ clone.onMouseDown(event); }, false);
         this.canvas.addEventListener("mouseup", function(event){ clone.onMouseUp(event); }, false);
         this.canvas.addEventListener("mouseout", function(event){ clone.onMouseUp(event); }, false); // releve le clic si tu sort du canvas
         this.canvas.addEventListener("click", function(event){ clone.onClick(event); }, false);
+
+
+        // BACKGROUND
+        this.setupBackground();
 
 
     }
@@ -949,6 +966,9 @@ var Canvas = function()
         } else {
             this.camera.lookAt(new THREE.Vector3(this.focusCamera[0], this.focusCamera[1], this.focusCamera[2]));
         }
+
+        // background
+        this.drawBackground();
 
         // rendu
         this.renderer.render(this.scene, this.camera);
@@ -1025,8 +1045,8 @@ var Canvas = function()
 
         if(this.isZoom)
         {
-            this.angleCamera[0] = 90;
-            this.angleCamera[1] = 90;
+            this.angleCamera[0] = 0;
+            this.angleCamera[1] = 0;
             this.rayonCamera = this.positionInitCam[2];
 
             this.transitionCamera.setup(
@@ -1089,8 +1109,8 @@ var Canvas = function()
     this.moveCamToPosition = function(position)
     {
 
-        this.angleCamera[0] = 90;
-        this.angleCamera[1] = 90;
+        this.angleCamera[0] = 0;
+        this.angleCamera[1] = 0;
         this.rayonCamera = this.positionInitCam[2];
 
         this.transitionCamera.setup(
@@ -1114,9 +1134,58 @@ var Canvas = function()
     this.onResize = function(newWidth, newHeight)
     {
 
-        this.renderer.setSize(newWidth, 4*newWidth/6);
+        this.renderer.setSize(newHeight, newHeight);
     
     }
+
+
+
+
+    this.setupBackground = function()
+    {
+
+        var attributes = {};
+
+        var uniforms = {
+
+            noise:  { type:'f', value: 0.04 },
+
+        };
+
+        var shaderMaterial = new THREE.ShaderMaterial({
+            uniforms: uniforms,
+            attributes: attributes,
+            vertexShader:   document.getElementById("background_vertexshader").textContent,
+            fragmentShader: document.getElementById("background_fragmentshader").textContent
+        });
+
+        this.background = new THREE.Mesh(
+            new THREE.PlaneGeometry(2, 2, 0),
+            shaderMaterial
+        );
+
+        this.background.material.depthTest = false;
+        this.background.material.depthWrite = false;
+
+        this.backgroundScene = new THREE.Scene();
+        this.backgroundCam = new THREE.Camera();
+        this.backgroundScene.add(this.backgroundCam);
+        this.backgroundScene.add(this.background);
+
+    }
+
+
+
+
+    this.drawBackground = function()
+    { 
+
+        this.renderer.autoClear = false;
+        this.renderer.clear();
+        this.renderer.render(this.backgroundScene, this.backgroundCam);
+
+    }
+
 
 
 }
