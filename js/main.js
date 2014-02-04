@@ -169,6 +169,7 @@ var Dessin2D = function()
                     if(d.id == index[i].iso)
                     {
 
+                        // Remplir la liste du classement
                         d3.select("#classement").append("li").attr("class", "itemPays")
                             .style("position", "absolute")
                             .attr("id", index[i].iso)
@@ -341,10 +342,12 @@ var Dessin3D = function()
     this.oldTexture;
 
 
+
     this.setup = function()
     {
         this.lerp = 0.0;
     }
+
 
 
     this.draw = function( scene )
@@ -355,6 +358,7 @@ var Dessin3D = function()
         //this.displayRepere( scene );
 
     }
+
 
 
     this.update = function()
@@ -370,6 +374,7 @@ var Dessin3D = function()
 
     this.updateTexture = function( texture )
     {
+
         this.lerp = 0.0;
         this.oldTexture = this.newTexture;
         this.newTexture = texture;
@@ -377,6 +382,7 @@ var Dessin3D = function()
         document.getElementById("loader").style.display = "none";
 
     }
+
 
 
     this.displayBorders = function( scene )
@@ -609,7 +615,8 @@ function passage3d()
 
 function changementAnnee(sens)
 {
-     
+
+
     if(sens > 0 && currentYear < 1)
     {
         currentYear++;
@@ -622,6 +629,7 @@ function changementAnnee(sens)
     displayYear.innerHTML = 2013-currentYear;
 
     var already = [];
+    var classement = d3.select("#classement");
 
 
     for(var i = 0; i < index.length; i++)
@@ -636,27 +644,37 @@ function changementAnnee(sens)
         }
 
         var positionPays = top;
+        var paysD3 = classement.select("#"+index[i].iso);
 
-        // régler égalités
-        for(var j = 0; j < already.length; j++)
+        // SI PAS DE NOTES
+        if(!isNaN(positionPays))
         {
-            if(top == already[j])
+   
+            // REGLER EGALITES
+            for(var j = 0; j < already.length; j++)
             {
-                top += 1;
+                if(top == already[j])
+                {
+                    top += 1;
+                }
             }
+            already.push(top);
+            top *= espaceEntreDeux;
+
+            var nomPays = "";
+            if(langue == "FR"){ nomPays = index[i].nom; } else { nomPays = index[i].name; }
+
+
+            // RECLASSER LA LISTE
+            paysD3
+                .transition().duration(700)
+                .style("display", "inline")
+                .style("top", top+"px")
+                .text("#"+positionPays+" "+nomPays);
+
+        } else {
+            paysD3.style("display", "none");
         }
-        already.push(top);
-        top *= espaceEntreDeux;
-
-        var nomPays = "";
-        if(langue == "FR"){ nomPays = index[i].nom; } else { nomPays = index[i].name; }
-
-
-        var classement = d3.select("#classement");
-        classement.select("#"+index[i].iso)
-            .transition().duration(700)
-            .style("top", top+"px")
-            .text("#"+positionPays+" "+nomPays);
 
     }
 
@@ -842,7 +860,6 @@ var Canvas = function()
 
         this.mouseDown = false;
         this.scrollSouris = false;
-        this.centreCarte = [ 0, 0 ];
         this.angleSpot = 0;
         this.xSouris = 0; this.xSourisOld = 0;
         this.ySouris = 0; this.ySourisOld = 0;
@@ -860,15 +877,15 @@ var Canvas = function()
         this.angleCamera = [];
         this.angleCamera[0] = 90;
         this.angleCamera[1] = 90;
-        this.positionInitCam = projectionfor3d(projection([0, -89]));
-        this.focusCamera = [ this.centreCarte[0], this.centreCarte[1], 100 ];
+        this.positionInitCam = [0,0,800];
+        this.focusCamera = [ 0,0,0 ];
         this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
-        this.camera.up = new THREE.Vector3( 0, 0, 1 );
+        this.camera.up = new THREE.Vector3( 0, 1, 0 );
 
-        this.rayonCamera = this.positionInitCam[1];
+        this.rayonCamera = this.positionInitCam[2];
 
-        this.camera.position.set( this.positionInitCam[0], this.positionInitCam[1], 800 );
-        this.camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+        this.camera.position.set( this.positionInitCam[0], this.positionInitCam[1], this.positionInitCam[2] );
+        this.camera.lookAt(new THREE.Vector3( this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ));
         this.scene.add(this.camera);
 
 
@@ -1005,15 +1022,16 @@ var Canvas = function()
         if(this.isZoom)
         {
             this.angleCamera[0] = 90;
-            this.rayonCamera = this.positionInitCam[1];
+            this.angleCamera[1] = 90;
+            this.rayonCamera = this.positionInitCam[2];
 
             this.transitionCamera.setup(
                 [ this.camera.position.x, this.camera.position.y, this.camera.position.z ], 
-                [ this.centreCarte[0], this.centreCarte[1]+this.rayonCamera, 800 ] );
+                [ this.positionInitCam[0], this.positionInitCam[1], this.rayonCamera ] );
             
             this.transitionFocusCamera.setup(
                 [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
-                [ this.centreCarte[0], this.centreCarte[1], 100 ] );
+                [ this.positionInitCam[0], this.positionInitCam[1], 0 ] );
 
             this.isZoom = false;
         }
@@ -1025,23 +1043,31 @@ var Canvas = function()
     this.positionCamera = function()
     {
 
-        // ROTATION HORIZONTALE
+        // ANGLES
         this.angleCamera[0] += (this.xSouris - this.xSourisOld) * 0.1;
+        this.angleCamera[1] += (this.ySouris - this.ySourisOld);
 
 
+        // CONDITIONS ANGLES
+        var limiteAngle = [ 20, 160 ];
+        if(this.angleCamera[0] > limiteAngle[1]){ this.angleCamera[0] = limiteAngle[1]; }
+        if(this.angleCamera[0] < limiteAngle[0]){ this.angleCamera[0] = limiteAngle[0]; }
 
-        var x = ( Math.cos(this.angleCamera[0]*(Math.PI/180)) * this.rayonCamera ) + this.focusCamera[0]; // angle * rayon + decalage
-        var y = ( Math.sin(this.angleCamera[0]*(Math.PI/180)) * this.rayonCamera ) + this.focusCamera[1];
-        
-        this.camera.position.x = x;
-        this.camera.position.y = y;
+        if(this.angleCamera[1] > limiteAngle[1]){ this.angleCamera[1] = limiteAngle[1]; }
+        if(this.angleCamera[1] < limiteAngle[0]){ this.angleCamera[1] = limiteAngle[0]; }
 
-        // ROTATION VERTICALE
-        // this.angleCamera[1] += (this.ySouris - this.ySourisOld);
-        // var z = ( Math.cos(this.angleCamera[1]*(Math.PI/180)) * this.rayonCamera ) + this.focusCamera[1];
-        // this.camera.position.z = z;
+
+        this.camera.position.x = Math.cos(this.angleCamera[0]*(Math.PI/180)) * this.rayonCamera;
+        this.camera.position.y = Math.cos(this.angleCamera[1]*(Math.PI/180)) * this.rayonCamera;
+        this.camera.position.z = Math.sin(this.angleCamera[0]*(Math.PI/180)) * Math.sin(this.angleCamera[1]*(Math.PI/180)) * this.rayonCamera;
+
+
+        // var x = ( Math.cos(this.angleCamera[0]*(Math.PI/180)) * this.rayonCamera ) + this.focusCamera[0];    // angle * rayon + decalage
+        // var y = ( Math.sin(this.angleCamera[0]*(Math.PI/180)) * this.rayonCamera ) + this.focusCamera[1]; 
+    
 
         this.camera.lookAt( new THREE.Vector3( this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ) );
+
 
     }
 
@@ -1051,11 +1077,12 @@ var Canvas = function()
     {
 
         this.angleCamera[0] = 90;
-        this.rayonCamera = this.positionInitCam[1];
+        this.angleCamera[1] = 90;
+        this.rayonCamera = this.positionInitCam[2];
 
         this.transitionCamera.setup(
             [this.camera.position.x, this.camera.position.y, this.camera.position.z], 
-            [ position[0], position[1]+this.rayonCamera, 400 ] );
+            [ position[0], position[1], this.rayonCamera ] );
         
         this.transitionFocusCamera.setup(
             [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],

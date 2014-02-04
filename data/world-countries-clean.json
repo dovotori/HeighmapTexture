@@ -185,5 +185,7 @@
 {"type":"Feature","properties":{"name":"Kosovo"},"geometry":{"type":"Polygon","coordinates":[[[21.10,42.40],[21.10,43.40],[22.10,43.40],[22.10,42.40],[21.10,42.40]]]},"id":"RKS"},
 {"type":"Feature","properties":{"name":"Seychelles"},"geometry":{"type":"Polygon","coordinates":[[[55.27,-4.37],[55.27,-3.37],[56.27,-3.37],[56.27,-4.37],[55.27,-4.37]]]},"id":"SYC"},
 {"type":"Feature","properties":{"name":"Singapore"},"geometry":{"type":"Polygon","coordinates":[[[103.51,1.17],[103.51,2.17],[104.51,2.17],[104.51,1.17],[103.51,1.17]]]},"id":"SGP"},
-{"type":"Feature","properties":{"name":"Bahrain"},"geometry":{"type":"Polygon","coordinates":[[[50.30,26.10],[50.30,27.10],[51.30,27.10],[51.30,26.10],[50.30,26.10]]]},"id":"BHR"}
+{"type":"Feature","properties":{"name":"Bahrain"},"geometry":{"type":"Polygon","coordinates":[[[50.30,26.10],[50.30,27.10],[51.30,27.10],[51.30,26.10],[50.30,26.10]]]},"id":"BHR"},
+{"type":"Feature","properties":{"name":"Liechtenstein"},"geometry":{"type":"Polygon","coordinates":[[[9.311,47.83],[9.311,48.83],[10.311,48.83],[10.311,47.83],[9.311,47.83]]]},"id":"LIE"},
+{"type":"Feature","properties":{"name":"Andorra"},"geometry":{"type":"Polygon","coordinates":[[[1.31,42.30],[1.31,43.30],[2.31,43.30],[2.31,42.30],[1.31,42.30]]]},"id":"AND"}
 ]}

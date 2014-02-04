@@ -325,7 +325,7 @@ THREE.ShaderTerrain = {
 				"phase.y = phase.y - 1.0;",
 				"vec4 outColor = texture2D( textureSquare, phase );",
 				"if (outColor.a == 0.0){ discard; }",
-				//"gl_FragColor = gl_FragColor * outColor;",
+				"gl_FragColor = gl_FragColor * outColor;",
 
 
 				// HAUTEUR DES PIXELS
@@ -333,12 +333,18 @@ THREE.ShaderTerrain = {
 				"float hauteur = texture.z;",
 
 				// D'UNE COULEUR A L'AUTRE
-				"vec3 colorFond = vec3(0.4, 0.0, 0.0);",
-				"vec3 colorHaut = vec3(0.4, 0.9, 0.6);",
+				"vec3 colorFond = vec3(0.0, 0.0, 0.2);",
+				"vec3 colorHaut = vec3(0.2, 0.9, 0.2);",
 				//"gl_FragColor.xyz = ( gl_FragColor.xyz ) * vec3( 1.0, map( hauteur, 0.0, 1.0, 0.01, 0.6 ), map( hauteur, 0.0, 1.0, 0.01, 0.6 ) );",
+
+
+
+
+
 				"gl_FragColor.x = map( gl_FragColor.x, 0.0, 1.0, colorFond.x, colorHaut.x );",
 				"gl_FragColor.y = map( gl_FragColor.y, 0.0, 1.0, colorFond.y, colorHaut.y );",
 				"gl_FragColor.z = map( gl_FragColor.z, 0.0, 1.0, colorFond.z, colorHaut.z );",
+
 
 				// // MER NOIRE
 				"if( hauteur < 0.001 ){",

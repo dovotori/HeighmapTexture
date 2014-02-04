@@ -75,13 +75,103 @@
 				à l'aide de <a href="http://d3js.org/">D3.js</a> de Mike Bostock</p>
 			<h3>Changelog</h3>
 			<ul>
-				<li>18/12/2013 v.1.1 Amélioration des légendes et de la présentation de la répartition des croyants par pays.</li>
-				<li>12/12/2013 v.1</li>
+				<li></li>
+				<li></li>
 			</ul>
 		</div>
 
 
 
+		<script type="x-shader/x-vertex" id="vertexShader">
+
+				attribute vec4 tangent;
+
+				uniform vec2 uRepeatBase;
+				uniform sampler2D tNormal;
+				uniform float animLerp;
+
+				#ifdef VERTEX_TEXTURES
+					uniform sampler2D tDisplacement;
+					uniform float uDisplacementScale;
+					uniform float uDisplacementBias;
+				#endif
+
+				varying vec3 vTangent;
+				varying vec3 vBinormal;
+				varying vec3 vNormal;
+				varying vec2 vUv;
+				varying vec3 p;
+
+				varying vec3 vViewPosition;
+
+
+				void main() {
+
+					p = position.xyz;
+
+					vNormal = normalize( normalMatrix * normal );
+
+					// tangent and binormal vectors
+					vTangent = normalize( normalMatrix * tangent.xyz );
+
+					vBinormal = cross( vNormal, vTangent ) * tangent.w;
+					vBinormal = normalize( vBinormal );
+
+					// texture coordinates
+					vUv = uv;
+
+					vec2 uvBase = uv * uRepeatBase;
+
+					// DISPLACEMENT MAPPING
+					vec3 dv = texture2D( tDisplacement, uvBase ).xyz;
+					float df = uDisplacementScale * dv.x + uDisplacementBias;
+					vec3 displacedPosition = normal * df + position;
+
+					vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+					vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+					// ANIMATION
+					gl_Position = projectionMatrix * modelViewMatrix * vec4( p.x, p.y, displacedPosition.z * animLerp, 1.0 );
+					//gl_Position = projectionMatrix * mvPosition;
+
+					vViewPosition = -mvPosition.xyz;
+					vec3 normalTex = texture2D( tNormal, uvBase ).xyz * 2.0 - 1.0;
+					vNormal = normalMatrix * normalTex;
+
+				}
+
+			</script>
+
+
+
+
+			<script type="x-shader/x-fragment" id="fragmentShader">
+
+				#ifdef GL_ES
+				precision highp float;
+				#endif
+
+				uniform sampler2D texture;
+				varying vec2 vUv;
+
+				float random(vec3 scale,float seed){
+				    return fract(sin(dot(gl_FragCoord.xyz+seed,scale)) * 43758.5453 + seed);
+				}
+
+				float map(float valeur, float minRef, float maxRef, float minDest, float maxDest)
+				{
+					return minDest + (valeur - minRef) * (maxDest - minDest) / (maxRef - minRef);
+				}
+
+				void main(void)
+				{
+					// texture
+					vec4 texColor = texture2D( texture, vUv );
+				    gl_FragColor = texColor;
+				 
+				}
+
+			</script>
 
 
 		
