@@ -14,7 +14,7 @@ var projection = d3.geo.mercator()
 
 
 var svg = d3.select("#"+conteneur).append("svg")
-	.attr("id", "carteSvg")
+	.attr("id", "carte2d")
 	.attr("width", width)
 	.attr("height", height);
 
@@ -169,12 +169,17 @@ var Dessin2D = function()
                     {
 
                         // Remplir la liste du classement
-                        d3.select("#classement").append("li").attr("class", "itemPays")
+                        var pays = d3.select("#classement").append("li").attr("class","itemPays")
                             .style("position", "absolute")
                             .attr("id", index[i].iso)
-                            .on("click", function(){ clicPaysClassement(this.id); });
+                            .on("click", function(){ clicPaysClassement(this.id); })
+                            
+                        pays.append("span").attr("class","position");
+                        pays.append("span").attr("class","name");
 
                     }
+
+                    
                 }
 
             })
@@ -258,7 +263,7 @@ var Dessin2D = function()
     this.createTextureFromSvg = function()
     {
 
-        var svgImg = document.getElementById("carteSvg");
+        var svgImg = document.getElementById("carte2d");
 
         // transforme le svg en image
         var xml = new XMLSerializer().serializeToString(svgImg);
@@ -640,46 +645,62 @@ function changementAnnee(sens)
     for(var i = 0; i < index.length; i++)
     {
 
+
         var espaceEntreDeux = 20;
         var top = 0;
+
         switch(currentYear)
         {
             case 0: top = parseInt(index[i].an2013);  break;
             case 1: top = parseInt(index[i].an2012);  break;
         }
 
+
         var positionPays = top;
+
+
+
         var paysD3 = classement.select("#"+index[i].iso);
+        var paysD3name = paysD3.select(".name");
+        var paysD3position = paysD3.select(".position");
+
 
         // SI PAS DE NOTES
         if(!isNaN(positionPays))
         {
-   
+
             // REGLER EGALITES
             for(var j = 0; j < already.length; j++)
             {
                 if(top == already[j])
                 {
                     top += 1;
+                    positionPays = "&nbsp;";
+
                 }
+
             }
             already.push(top);
+
+
             top *= espaceEntreDeux;
 
             var nomPays = "";
             if(langue == "FR"){ nomPays = index[i].nom; } else { nomPays = index[i].name; }
+                
 
 
-            // RECLASSER LA LISTE
-            paysD3
-                .transition().duration(700)
-                .style("display", "inline")
+            paysD3.transition()
+                .duration(700)
                 .style("top", top+"px")
-                .text("#"+positionPays+" "+nomPays);
+            
+            paysD3name.html(nomPays);
+            paysD3position.html(positionPays);
 
         } else {
             paysD3.style("display", "none");
         }
+
 
     }
 
@@ -691,6 +712,7 @@ function changementAnnee(sens)
         setTimeout( function(){ d2d.createTextureFromSvg(); }, 700 ); 
     }
     
+
 
 }
 
@@ -713,15 +735,11 @@ function clicPaysClassement(isoPays)
 
     if(mode == "3d")
     {
-        var classement = d3.selectAll(".itemPays");
-        classement.style("color", "black");
-
+        
         for(var i = 0; i < index.length; i++)
         {
             if(isoPays == index[i].iso)
             {
-
-                d3.selectAll("#"+index[i].iso).style("color", "#00f");
                 var positionPays = projectionfor3d(getGeoCoord(index[i].latitude, index[i].longitude));
                 canvas.moveCamToPosition(positionPays);
             
@@ -922,7 +940,7 @@ var Canvas = function()
         this.scene.add(this.spot2);
 
         this.canvas = this.renderer.domElement;
-        this.canvas.id = "canvas3d";
+        this.canvas.id = "carte3d";
         document.getElementById(conteneur).appendChild(this.canvas);   
 
 
@@ -1208,7 +1226,7 @@ window.addEventListener("resize", onresize, false);
 function onresize()
 {
 
-    var newWidth = window.innerWidth;
+    var newWidth = 5*window.innerWidth/6;
     var newHeight = window.innerHeight;
 
     if(mode == "3d")

@@ -1,0 +1,171 @@
+// LESS config file
+@import "00-config";
+
+// LESS base styles
+@import "01-base";
+
+// LESS files : chose the ones you need
+@import "02-grids";
+@import "03-tables"; 
+@import "04-forms";
+@import "05-icons";
+@import "06-rwd";
+@import "07-flexbox"; 
+@import "08-print";
+
+/* ----------------------------- */
+/* ==own stylesheet              */
+/* ----------------------------- */
+
+/* Here should go your own CSS styles */
+/* You can also link them with a LESS @import */
+/* @import "my-styles.less"; */
+
+body{position: relative; height: 100%;}
+
+li {
+	list-style:none;
+}
+
+.mode2d {
+	#carte2d, #btn_3d {
+		display: inline;
+	}
+	#carte3d, #btn_2d {
+		display: none;
+	}
+
+}
+.mode3d {
+	#carte3d, #btn_2d {
+		display: inline;
+	}
+	#carte2d, #btn_3d {
+		display: none;
+	}
+
+}
+
+
+/* WEBFONT */
+@font-face 
+{
+    font-family: 'BebasNeueRegular';
+    src: url('http://rsf.org/squelettes/fonts/BebasNeue-webfont.eot');
+    src: url('http://rsf.org/squelettes/fonts/BebasNeue-webfont.eot?#iefix') format('embedded-opentype'),
+         url('http://rsf.org/squelettes/fonts/BebasNeue-webfont.woff') format('woff'),
+         url('http://rsf.org/squelettes/fonts/BebasNeue-webfont.ttf') format('truetype'),
+         url('http://rsf.org/squelettes/fonts/BebasNeue-webfont.svg#BebasNeueRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* END WEBFONT */
+
+#cp, #sources 
+{
+	max-width:@smallscreen;
+}
+
+h1, h2 
+{
+	font-family:"BebasNeueRegular";
+}
+
+
+
+
+
+#main
+{
+	position:relative;
+	background-color: #000;
+	color: #fff;
+	
+}
+
+
+#carte {
+	position: relative;
+	float:left;
+	height:100%;
+}
+
+
+#liste {
+	width:16.667%;
+	float:left;
+	padding:10px 20px ;
+	position: absolute;
+	top:0;
+	right:0;
+	
+	overflow: hidden;
+}
+
+#control_annees {
+	padding:10px 20px ;
+
+}
+
+#classement
+{
+
+	font-size:0.9em;
+	overflow: scroll;
+	width:100%;
+	min-height: 800px;
+	position: relative;
+	
+	padding:20px 0 100px;	
+
+	.itemPays {
+		width:200px;
+		overflow: hidden;	
+	}
+	.odd{
+			background-color:rgba(255, 255, 255, 0.2);
+	}
+
+	& > * {
+		float:left;
+	}
+
+	.position {
+		.w50p;
+		display: block;
+		float:left;
+	}
+
+}
+
+
+.btn_mode
+{
+	color: #fff;
+	background-color: #aaa;
+    border:none;
+    text-decoration:none;
+    cursor:pointer;
+    width: 100px;
+	height: 30px;
+
+}
+
+.btn_mode:hover
+{
+	color: #aaa;
+	background-color: #fff;
+}
+
+.btn_mode:active
+{
+	background-color: #0aa;
+}
+
+
+
+
+
+
+

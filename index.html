@@ -4,8 +4,13 @@
 		<title>Reporters sans frontières</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link rel="stylesheet" href="knacss.css" media="all">
-		<link rel="stylesheet" href="style.css" media="all">
+		<!-- <link rel="stylesheet" href="knacss.css" media="all"> -->
+
+
+
+
+		<link rel="stylesheet/less" type="text/css" href="knacss/knacss.less" />
+		<!-- <link rel="stylesheet" href="style.less" media="all"> -->
 
 
 		<!-- GOOGLE ANALYTICS -->
@@ -28,59 +33,87 @@
 
 	<body class="mode2d">
 		
-		<div id="cp" class="line">
-			<div class="txtcenter">
-				<a href="http://rsf.org">
-					<img class="w150p" src="http://fr.rsf.org/squelettes/img/fr/logo-fr.png" alt="logo RSF"/>
-				</a>
-				<br/>
-				<br/>
-				RSF rend public son rapport :
+		<section id="cp" class="line center grid">
+			<header class="mod grid4-1">
+				<h1 class="mod">
+					<a href="http://rsf.org">
+						<img class="w150p" src="http://fr.rsf.org/squelettes/img/fr/logo-fr.png" alt="logo RSF"/>
+					</a>
+				</h1>
+				<div class="grid">
+					<ul class="grid2">
+						<li class="mod">Français</li>
+						<li class="mod">English</li>
+					</ul>
+				</div>
+			</header>
+
+
+			<article>
+
+				<h2>Classement de la liberté de la presse</h2>
+				<nav class="grid">
+					<ul class="grid5">
+						<li class="mod left"><a href="#">Asie</a></li>
+						<li class="mod left"><a href="#">Afrique</a></li>
+						<li class="mod left"><a href="#">Amériques</a></li>
+						<li class="mod left"><a href="#">Moyen-orient et Maghreb</a></li>
+						<li class="mod left"><a href="#">Europe et ex-URSS</a></li>
+					</ul>
+				</nav>
+
+				<p id="intro">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ultrices nisl nunc, quis mattis quam iaculis quis. Cras a mollis metus. Aliquam nulla massa, hendrerit et facilisis eu, convallis non dui. Nulla orci tellus, auctor vel mauris et, iaculis lacinia tellus. Nunc felis sem, pellentesque vel risus ac, accumsan consequat dolor. Donec a orci a tortor ultrices pellentesque. Suspendisse dignissim nulla ultricies enim feugiat lacinia sit amet ut nulla. </p>
+				<p id="more">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ultrices nisl nunc, quis mattis quam iaculis quis. Cras a mollis metus. Aliquam nulla massa, hendrerit et facilisis eu, convallis non dui. Nulla orci tellus, auctor vel mauris et, iaculis lacinia tellus. Nunc felis sem, pellentesque vel risus ac, accumsan consequat dolor. Donec a orci a tortor ultrices pellentesque. Suspendisse dignissim nulla ultricies enim feugiat lacinia sit amet ut nulla. </p>
+			<article>
+
+
+		</section>
+
+
+		<section id="main" class="line">
+
+			<div id="conteneurClassement" class="mod w100">
+				<img id="loader" src="data/loader.gif" width="40px" height="40px" alt="loader"/>
+
+				<div id="carte" class="mod left w100">
+
+					<div id="control_mode">
+						<button class="btn_mode" id="btn_2d" type="button">2d</button>
+						<button class="btn_mode" id="btn_3d" type="button">3d</button>
+						<button class="btn_mode" id="btn_in" type="button">zoom +</button>
+						<button class="btn_mode" id="btn_out" type="button">zoom -</button>
+					</div>
+				</div>
+				
+				<div id="liste" class="mod left w10">
+					<div id="control_annees">
+						<button id="btn_precedent" type="button">precedent</button>
+						<span id="current_year">2013</span>
+						<button id="btn_suivant" type="button">suivant</button>
+					</div>
+					<ul id="classement" class="mod left"> </ul>
+				</div>
 			</div>
-			<h2>Classement de la liberté de la presse</h2>
-			<p id="intro">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ultrices nisl nunc, quis mattis quam iaculis quis. Cras a mollis metus. Aliquam nulla massa, hendrerit et facilisis eu, convallis non dui. Nulla orci tellus, auctor vel mauris et, iaculis lacinia tellus. Nunc felis sem, pellentesque vel risus ac, accumsan consequat dolor. Donec a orci a tortor ultrices pellentesque. Suspendisse dignissim nulla ultricies enim feugiat lacinia sit amet ut nulla. </p>
-			<p id="more">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ultrices nisl nunc, quis mattis quam iaculis quis. Cras a mollis metus. Aliquam nulla massa, hendrerit et facilisis eu, convallis non dui. Nulla orci tellus, auctor vel mauris et, iaculis lacinia tellus. Nunc felis sem, pellentesque vel risus ac, accumsan consequat dolor. Donec a orci a tortor ultrices pellentesque. Suspendisse dignissim nulla ultricies enim feugiat lacinia sit amet ut nulla. </p>
-		</div>
+
+		
 
 
-		<div id="control_annees">
-			
-			<button id="btn_precedent" type="button">precedent</button>
-			<span id="current_year">2013</span>
-			<button id="btn_suivant" type="button">suivant</button>
-			
-		</div>
+		</section>
 
 
 
-		<div id="carte">
-
-			<div id="control_mode">
-				<button id="btn_2d" type="button">2d</button>
-				<button id="btn_3d" type="button">3d</button>
-			</div>
-
-
-			<img id="loader" src="data/loader.gif" width="40px" height="40px" alt="loader"/>
-			<div id="conteneurClassement">Classement
-				<ul id="classement"></ul>
-			</div>
-		</div>
-
-
-
-		<div id="sources" class="line">
+		<section id="sources" class="line center">
 			<h3>Sources</h3>
 			<p>
 			</p>
 			<p>Data visualisation réalisée par Pierre-Alain Leboucher et Dorian Ratovo</br>
-				à l'aide de <a href="http://d3js.org/">D3.js</a> de Mike Bostock</p>
+				à l'aide de <a href="http://d3js.org/">D3.js</a> de Mike Bostock, <a href="http://threejs.org/">THREE.js</a> de Mrdoob</p>
 			<h3>Changelog</h3>
 			<ul>
 				<li></li>
 				<li></li>
 			</ul>
-		</div>
+		</section>
 
 
 
@@ -225,6 +258,9 @@
 		<script type="text/javascript" src="js/blur.js"></script>
 		<script type="text/javascript" src="js/ShaderTerrain.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
+		<script type="text/javascript" src="js/less-1.6.2.min.js" ></script>
+		
+
 
 	</body>
 </html>
