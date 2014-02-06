@@ -41,6 +41,7 @@ var currentYear;
 var langue;
 var pathFrontieres;
 var mode;
+var loader;
 
 
 
@@ -66,12 +67,20 @@ function setup()
     langue = "FR";
     pathFrontieres = [];
     mode = "2d";
-
+    
+    loader = new Image();
+    loader.addEventListener("load", function(){ document.body.appendChild(this); }, false);
+    loader.src="data/loader.gif";
+    loader.style.display = "none";
+    loader.width = "40px";
+    loader.height = "40px";
 
     // gestion boutons 2D
     document.getElementById("btn_precedent").addEventListener("click", function(){ changementAnnee(1); }, false);
     document.getElementById("btn_suivant").addEventListener("click", function(){ changementAnnee(-1); }, false);
     document.getElementById("btn_2d").addEventListener("click", passage2d, false);
+    document.getElementById("btn_in").addEventListener("click", function(){ zoom(1); }, false);
+    document.getElementById("btn_out").addEventListener("click", function(){ zoom(-1); }, false);
 
 
     d2d = new Dessin2D();
@@ -131,7 +140,6 @@ function animate()
 
 var Dessin2D = function()
 {
-
 
 
     this.setup = function()
@@ -307,11 +315,11 @@ var Dessin2D = function()
 
 
 
-    this.resize = function(newWidth, newHeight, scale)
+    this.resize = function(newWidth, newHeight, scale, translateX, translateY)
     {
 
         projection
-            .translate( [ newWidth/2, newHeight/2 ] )
+            .translate( [ translateX, translateY ] )
             .scale(scale);
 
         svg
@@ -383,7 +391,7 @@ var Dessin3D = function()
         this.oldTexture = this.newTexture;
         this.newTexture = texture;
         this.uniformsTerrain[ "tDisplacement" ].value = this.newTexture;
-        document.getElementById("loader").style.display = "none";
+        loader.style.display = "none";
 
     }
 
@@ -537,10 +545,6 @@ var Dessin3D = function()
 
 
 
-
-
-
-
 }
 
 
@@ -574,6 +578,7 @@ function passage2d()
     {
         mode = "2d";
         onresize();
+        canvas.resetCam();
 
         // fond de la carte svg transparent
         svgFond.style("fill", "rgba(0,0,0,0)");
@@ -596,9 +601,10 @@ function passage3d()
     {
 
         mode = "3d"; 
-        d2d.resize(520, 520, 80);
+        d2d.resize(520, 520, 80, 520/2, 520/2);
+        canvas.onResize(window.innerWidth, window.innerWidth);
 
-        document.getElementById("loader").style.display = "block";    
+        loader.style.display = "block";    
 
         // fond de la carte svg noir
         svgFond.style("fill", "rgba(0,0,0,1)");
@@ -692,7 +698,8 @@ function changementAnnee(sens)
 
             paysD3.transition()
                 .duration(700)
-                .style("top", top+"px")
+                .style("display", "inline")
+                .style("top", top+"px");
             
             paysD3name.html(nomPays);
             paysD3position.html(positionPays);
@@ -708,7 +715,7 @@ function changementAnnee(sens)
 
     if(mode == "3d")
     {
-        document.getElementById("loader").style.display = "block";
+        loader.style.display = "block";
         setTimeout( function(){ d2d.createTextureFromSvg(); }, 700 ); 
     }
     
@@ -719,6 +726,14 @@ function changementAnnee(sens)
 
 
 
+
+
+function zoom(sens)
+{
+
+
+
+}
 
 
 
@@ -735,7 +750,6 @@ function clicPaysClassement(isoPays)
 
     if(mode == "3d")
     {
-        
         for(var i = 0; i < index.length; i++)
         {
             if(isoPays == index[i].iso)
@@ -745,7 +759,6 @@ function clicPaysClassement(isoPays)
             
             }
         }
-        
     }
 
 }
@@ -906,7 +919,7 @@ var Canvas = function()
         this.angleCamera = [];
         this.angleCamera[0] = 0;
         this.angleCamera[1] = 0;
-        this.positionInitCam = [0, 0, 800];
+        this.positionInitCam = [0, 0, 1000];
         this.focusCamera = [ 0,0,0 ];
         this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
         this.camera.up = new THREE.Vector3( 0, 1, 0 );
@@ -941,7 +954,7 @@ var Canvas = function()
 
         this.canvas = this.renderer.domElement;
         this.canvas.id = "carte3d";
-        document.getElementById(conteneur).appendChild(this.canvas);   
+        document.getElementById("cadre3d").appendChild(this.canvas);   
 
 
 
@@ -1055,11 +1068,22 @@ var Canvas = function()
     }
 
 
-    this.initCam = function()
+    this.resetCam = function()
     {
 
-        var classement = d3.selectAll(".itemPays");
-        classement.style("color", "black");
+        this.angleCamera[0] = 0;
+        this.angleCamera[1] = 0;
+
+        this.camera.position.set(this.positionInitCam[0], this.positionInitCam[1], this.positionInitCam[2]);
+        this.camera.lookAt(this.positionInitCam[0], this.positionInitCam[1], 0);
+
+        this.isZoom = false;
+
+    }
+
+
+    this.initCam = function()
+    {
 
         if(this.isZoom)
         {
@@ -1151,8 +1175,7 @@ var Canvas = function()
 
     this.onResize = function(newWidth, newHeight)
     {
-
-        this.renderer.setSize(newHeight, newHeight);
+        this.renderer.setSize(newWidth, newHeight);
     
     }
 
@@ -1226,17 +1249,17 @@ window.addEventListener("resize", onresize, false);
 function onresize()
 {
 
-    var newWidth = 5*window.innerWidth/6;
+    var newWidth = window.innerWidth;
     var newHeight = window.innerHeight;
 
     if(mode == "3d")
     {
 
-        canvas.onResize(newWidth, newHeight);
+        canvas.onResize(newWidth, newWidth);
 
     } else {
 
-        d2d.resize(newWidth, newHeight, newWidth/12);     
+        d2d.resize(newWidth, newWidth, newWidth/10, newWidth/2, newWidth/2);     
 
     }
 

@@ -86,27 +86,31 @@ h1, h2
 
 
 #carte {
+
 	position: relative;
 	float:left;
 	height:100%;
+	max-height: 1000px;
+	overflow: hidden;
+
+	#carte2d, #carte3d  {
+		margin-top: -22%;
+	}
+
+
 }
 
 
 #liste {
+
 	width:16.667%;
 	float:left;
-	padding:10px 20px ;
+	padding:10px 20px;
 	position: absolute;
-	top:0;
-	right:0;
-	
+	top:0; right:0;
 	overflow: hidden;
 }
 
-#control_annees {
-	padding:10px 20px ;
-
-}
 
 #classement
 {
@@ -123,8 +127,9 @@ h1, h2
 		width:200px;
 		overflow: hidden;	
 	}
+	
 	.odd{
-			background-color:rgba(255, 255, 255, 0.2);
+		background-color: rgba(255, 255, 255, 0.2);
 	}
 
 	& > * {
@@ -137,35 +142,91 @@ h1, h2
 		float:left;
 	}
 
+
+	.itemPays {
+		cursor: pointer;	
+	}
+
 }
 
 
-.btn_mode
+
+
+
+#control_mode
 {
-	color: #fff;
-	background-color: #aaa;
-    border:none;
-    text-decoration:none;
-    cursor:pointer;
-    width: 100px;
-	height: 30px;
+
+	position: absolute;
+	left: 10px;
+	top: 10px;
+
+	.btn_mode
+	{
+		color: #fff;
+		background-color: #aaa;
+	    border:none;
+	    text-decoration:none;
+	    cursor:pointer;
+	    width: 100px;
+		height: 30px;
+		margin: 5px;
+
+	}
+
+	.btn_mode:hover
+	{
+		color: #aaa;
+		background-color: #fff;
+	}
+
+	.btn_mode:active
+	{
+		background-color: #0aa;
+	}
 
 }
 
-.btn_mode:hover
+
+
+
+#control_annees
 {
-	color: #aaa;
-	background-color: #fff;
+
+	padding:10px 20px ;
+
+
+	#current_year, .fleche
+	{
+		float: left; 
+	}
+
+	.fleche
+	{
+		cursor: pointer;
+		position: relative;
+		height: 52px;
+		width: 26px;
+		overflow: hidden;
+		opacity: 0.5;
+	}
+
+	.fleche:hover
+	{
+		opacity: 1.0;
+	}
+
+	#btn_precedent 
+	{
+		margin-right: 2%;
+		
+	}
+
+	#btn_suivant
+	{
+		margin-left: 2%;
+		margin-top: -26px;
+	}
+
 }
-
-.btn_mode:active
-{
-	background-color: #0aa;
-}
-
-
-
-
-
 
 

@@ -73,36 +73,37 @@
 		<section id="main" class="line">
 
 			<div id="conteneurClassement" class="mod w100">
-				<img id="loader" src="data/loader.gif" width="40px" height="40px" alt="loader"/>
 
 				<div id="carte" class="mod left w100">
 
 					<div id="control_mode">
 						<button class="btn_mode" id="btn_2d" type="button">2d</button>
 						<button class="btn_mode" id="btn_3d" type="button">3d</button>
+						<br/>
 						<button class="btn_mode" id="btn_in" type="button">zoom +</button>
+						<br/>
 						<button class="btn_mode" id="btn_out" type="button">zoom -</button>
 					</div>
+
+					<div id="cadre3d"></div>
 				</div>
 				
 				<div id="liste" class="mod left w10">
 					<div id="control_annees">
-						<button id="btn_precedent" type="button">precedent</button>
-						<span id="current_year">2013</span>
-						<button id="btn_suivant" type="button">suivant</button>
+						<div class="fleche"><img src="data/fleches.png" id="btn_precedent" type="button" alt="precedent" /></div>
+						<h2 id="current_year">2013</h2>
+						<div class="fleche"><img src="data/fleches.png" id="btn_suivant" type="button" alt="suivant" /></div>
 					</div>
 					<ul id="classement" class="mod left"> </ul>
 				</div>
 			</div>
-
-		
-
 
 		</section>
 
 
 
 		<section id="sources" class="line center">
+			<br/>
 			<h3>Sources</h3>
 			<p>
 			</p>
