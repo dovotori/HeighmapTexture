@@ -69,11 +69,10 @@ function setup()
     mode = "2d";
     
     loader = new Image();
-    loader.addEventListener("load", function(){ document.body.appendChild(this); }, false);
-    loader.src="data/loader.gif";
+    loader.addEventListener("load", function(){ document.getElementById("carte").appendChild(this); }, false);
+    loader.src= "data/loader.gif";
+    loader.id = "loader";
     loader.style.display = "none";
-    loader.width = "40px";
-    loader.height = "40px";
 
     // gestion boutons 2D
     document.getElementById("btn_precedent").addEventListener("click", function(){ changementAnnee(1); }, false);
@@ -954,7 +953,7 @@ var Canvas = function()
 
         this.canvas = this.renderer.domElement;
         this.canvas.id = "carte3d";
-        document.getElementById("cadre3d").appendChild(this.canvas);   
+        document.getElementById(conteneur).appendChild(this.canvas);   
 
 
 
