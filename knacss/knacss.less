@@ -31,13 +31,13 @@ li {
 	#carte2d, #btn_3d {
 		display: inline;
 	}
-	#carte3d, #btn_2d {
+	#carte3d, #btn_2d, #btn_rotation {
 		display: none;
 	}
 
 }
 .mode3d {
-	#carte3d, #btn_2d {
+	#carte3d, #btn_2d, #btn_rotation {
 		display: inline;
 	}
 	#carte2d, #btn_3d {
@@ -102,6 +102,7 @@ h1, h2
 	height:100%;
 	max-height: 1000px;
 	overflow: hidden;
+	z-index: 0;
 
 	#carte2d, #carte3d  {
 		margin-top: -22%;
@@ -169,6 +170,7 @@ h1, h2
 	position: absolute;
 	left: 10px;
 	top: 10px;
+	z-index: 10;
 
 	.btn_mode
 	{
@@ -179,7 +181,7 @@ h1, h2
 	    cursor:pointer;
 	    width: 100px;
 		height: 30px;
-		margin: 5px;
+		margin: 4px 0;
 
 	}
 
@@ -187,6 +189,7 @@ h1, h2
 	{
 		color: #aaa;
 		background-color: #fff;
+
 	}
 
 	.btn_mode:active
@@ -202,12 +205,14 @@ h1, h2
 #control_annees
 {
 
-	padding:10px 20px ;
+	padding: 10px 20px;
+	text-align: bottom;
 
 
 	#current_year, .fleche
 	{
-		float: left; 
+		float: left;
+
 	}
 
 	.fleche
@@ -218,6 +223,7 @@ h1, h2
 		width: 26px;
 		overflow: hidden;
 		opacity: 0.5;
+		margin: 4%;
 	}
 
 	.fleche:hover

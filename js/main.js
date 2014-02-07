@@ -4,35 +4,9 @@ window.addEventListener("load", setup, false);
 
 
 
+var conteneur = "carte";
 var width = 520;
 var height = 520;
-var conteneur = "carte";
-
-var projection = d3.geo.mercator()
-    .scale(80)
-    .translate([width/2, height/2]);
-
-
-var svg = d3.select("#"+conteneur).append("svg")
-	.attr("id", "carte2d")
-	.attr("width", width)
-	.attr("height", height);
-
-var path = d3.geo.path().projection(projection);  
-
-var graticule = d3.geo.graticule();
-
-// svg.append("path")
-//     .datum(graticule)
-//     .attr("class", "graticule")
-//     .attr("d", path)
-//     .style("stroke", "#fff")
-//     .style("stroke-width", ".1px");
-
-var svgFond = svg.append("svg:rect").attr("x", 0).attr("y", 0)
-	.attr("width", width).attr("height", height)
-	.style("fill", "rgba(0, 0, 0, 0)"); 
-
 var index;
 var canvas;
 var d2d;
@@ -42,7 +16,6 @@ var langue;
 var pathFrontieres;
 var mode;
 var loader;
-
 
 
 
@@ -91,9 +64,12 @@ function setup()
 	{
 
         // 3D
-		document.getElementById("btn_3d").addEventListener("click", function(){ passage3d(); }, false);
         canvas = new Canvas();
-        canvas.setup(width, height);
+        canvas.setup();
+
+        document.getElementById("btn_3d").addEventListener("click", function(){ passage3d(); }, false);
+        document.getElementById('rotationX').addEventListener("change", function(event){ canvas.rotation(event); }, false);
+        document.getElementById('rotationY').addEventListener("change", function(event){ canvas.rotation(event); }, false);
 
         d3d = new Dessin3D();
         d3d.setup();
@@ -116,6 +92,7 @@ function setup()
 
 function animate()
 {
+
     requestAnimationFrame(animate); 
     
     if(mode == "3d")
@@ -140,9 +117,47 @@ function animate()
 var Dessin2D = function()
 {
 
+    this.projection;
+    this.svg;
+    this.svgFond;
+    this.path;
+    this.scale;
+    this.focusPosition;
+
+
+
 
     this.setup = function()
     {
+
+        this.scale = 1;
+
+        this.projection = d3.geo.mercator()
+            .scale(80)
+            .translate([width/2, height/2]);
+
+
+        this.svg = d3.select("#"+conteneur).append("svg")
+            .attr("id", "carte2d")
+            .attr("width", width)
+            .attr("height", height);
+
+
+        this.svgFond = this.svg.append("svg:rect").attr("x", 0).attr("y", 0)
+            .attr("width", width).attr("height", height)
+            .style("fill", "rgba(0, 0, 0, 0)"); 
+
+        this.path = d3.geo.path().projection(this.projection);
+
+        this.focusPosition = [ width/2, height/2 ];
+
+        // var graticule = d3.geo.graticule();
+        // svg.append("path")
+        //     .datum(graticule)
+        //     .attr("class", "graticule")
+        //     .attr("d", path)
+        //     .style("stroke", "#fff")
+        //     .style("stroke-width", ".1px");
 
         queue()
             .defer(lireJson, "data/world-countries-clean.json")
@@ -158,17 +173,18 @@ var Dessin2D = function()
         index = results[1];
         var features = results[0].features;
 
-        var frontieres = svg.append("svg:g")
+
+        var frontieres = d2d.svg.append("svg:g")
             .selectAll("path")
             .data(features)
             .enter().append("svg:path")
             .attr("id", function(d){ return d.id; })
-            .attr("d", function(d){ return path(d); })
+            .attr("d", function(d){ return d2d.path(d); })
             .style("fill", "rgba(200, 200, 200, 1)")
             .each(function(d, i){
 
                 // calcul des frontieres pour la 3d
-                pathFrontieres[i] = getPath(path(d));
+                pathFrontieres[i] = getPath(d2d.path(d));
 
                 for (var i = 0; i < index.length; i++) {
 
@@ -176,7 +192,7 @@ var Dessin2D = function()
                     {
 
                         // Remplir la liste du classement
-                        var pays = d3.select("#classement").append("li").attr("class","itemPays")
+                        var pays = d3.select("#classement").append("li").attr("class", "itemPays")
                             .style("position", "absolute")
                             .attr("id", index[i].iso)
                             .on("click", function(){ clicPaysClassement(this.id); })
@@ -210,10 +226,20 @@ var Dessin2D = function()
 
     this.redrawSvg = function()
     {
-        
+
+        if(mode == "3d")
+        {
+            // fond de la carte svg noir
+            this.svgFond.style("fill", "rgba(0,0,0,1)");
+        } else {
+            // fond de la carte svg transparent
+            this.svgFond.style("fill", "rgba(0,0,0,0)");
+        }
+
+
         for(var i = 0; i < index.length; i++)
         {
-            var pays = svg.select("#"+index[i].iso);
+            var pays = this.svg.select("#"+index[i].iso);
 
             var hauteur = 0;
             switch(currentYear)
@@ -317,17 +343,86 @@ var Dessin2D = function()
     this.resize = function(newWidth, newHeight, scale, translateX, translateY)
     {
 
-        projection
+        this.projection
             .translate( [ translateX, translateY ] )
             .scale(scale);
 
-        svg
+        this.svg
             .attr("width", newWidth)
             .attr("height", newHeight);
 
-        svg.selectAll("path").attr('d', path);
+        this.focusPosition = [ newWidth/2, newHeight/2 ];
+
+        this.svg.selectAll("path").attr('d', this.path);
 
     }
+
+
+
+
+    this.zoom = function(sens)
+    {
+
+        if(sens < 0)
+        {
+            if(this.scale > 1)
+            {
+                this.scale--;
+            }
+        } else {
+            if(this.scale < 4)
+            {
+                this.scale++;
+            }
+        }
+
+       this.scaling(); 
+
+    }
+
+
+
+
+    this.moveToPosition = function(position)
+    {
+
+        this.focusPosition = position;
+        this.scaling();
+
+    }
+
+
+
+    this.scaling = function()
+    {
+
+        var w = parseInt(this.svg.attr("width"));
+        var h = parseInt(this.svg.attr("height"));
+
+        this.svg.transition()
+            .duration(750)
+            .attr("transform", "translate(" + w / 2 + ", " + h / 2 + ")scale("+this.scale+")translate(" + -this.focusPosition[0] + "," + -this.focusPosition[1] + ")");
+    
+    }
+
+
+
+    this.reset = function()
+    {
+
+
+        this.focusPosition = [ 520, 520 ];
+        this.scale = 1;
+
+        //this.scaling();
+
+    }
+
+
+
+
+
+
 
 
 }
@@ -544,6 +639,7 @@ var Dessin3D = function()
 
 
 
+
 }
 
 
@@ -578,9 +674,6 @@ function passage2d()
         mode = "2d";
         onresize();
         canvas.resetCam();
-
-        // fond de la carte svg transparent
-        svgFond.style("fill", "rgba(0,0,0,0)");
         
         d2d.redrawSvg();
 
@@ -599,14 +692,13 @@ function passage3d()
     if(mode == "2d")
     {
 
-        mode = "3d"; 
+        mode = "3d";
+        d2d.reset();
         d2d.resize(520, 520, 80, 520/2, 520/2);
         canvas.onResize(window.innerWidth, window.innerWidth);
 
         loader.style.display = "block";    
 
-        // fond de la carte svg noir
-        svgFond.style("fill", "rgba(0,0,0,1)");
 
         d2d.redrawSvg();
         d2d.createTextureFromSvg();
@@ -730,11 +822,26 @@ function changementAnnee(sens)
 function zoom(sens)
 {
 
+    if(mode == "3d")
+    {
 
+        canvas.zoom(sens);
+
+    } else {
+
+        d2d.zoom(sens);
+
+    }
 
 }
 
 
+function rotation(range)
+{
+
+    canvas.rotation(range);
+
+}
 
 
 
@@ -747,18 +854,21 @@ function zoom(sens)
 function clicPaysClassement(isoPays)
 {
 
-    if(mode == "3d")
-    {
         for(var i = 0; i < index.length; i++)
         {
             if(isoPays == index[i].iso)
             {
-                var positionPays = projectionfor3d(getGeoCoord(index[i].latitude, index[i].longitude));
-                canvas.moveCamToPosition(positionPays);
-            
+                
+                if(mode == "3d")
+                {
+                    var positionPays = projectionfor3d(getGeoCoord(index[i].latitude, index[i].longitude));
+                    canvas.moveCamToPosition(positionPays);
+                } else {
+                    d2d.moveToPosition(getGeoCoord(index[i].latitude, index[i].longitude));
+                }
             }
         }
-    }
+    
 
 }
 
@@ -823,7 +933,7 @@ function getGeoCoord(x, y)
         if(sens == "W"){ long *= -1; }
 
         coordonneesCapitale = [ long, lat ];
-        var traductionCoor = projection(coordonneesCapitale);        
+        var traductionCoor = d2d.projection(coordonneesCapitale);        
 
     }
 
@@ -889,12 +999,12 @@ var Canvas = function()
 
 
 
-    this.setup = function(WIDTH, HEIGHT)
+    this.setup = function()
     {
 
 
         var VIEW_ANGLE = 45,
-            ASPECT = WIDTH / HEIGHT,
+            ASPECT = width / height,
             NEAR = 0.1,
             FAR = 10000;          
 
@@ -935,7 +1045,7 @@ var Canvas = function()
 
         // RENDERER
         this.renderer = new THREE.WebGLRenderer();
-        this.renderer.setSize(window.innerWidth, 4*window.innerWidth/6);
+        this.renderer.setSize(window.innerWidth, 4 * window.innerWidth / 6);
         this.renderer.setClearColor("rgb(20, 50, 100)", 1);
 
 
@@ -1013,6 +1123,7 @@ var Canvas = function()
         
         if(this.mouseDown)
         {
+
             this.xSouris = event.clientX;
             this.ySouris = event.clientY;
 
@@ -1067,6 +1178,8 @@ var Canvas = function()
     }
 
 
+
+
     this.resetCam = function()
     {
 
@@ -1079,6 +1192,8 @@ var Canvas = function()
         this.isZoom = false;
 
     }
+
+
 
 
     this.initCam = function()
@@ -1109,54 +1224,55 @@ var Canvas = function()
     {
         
         // ANGLES
-        this.angleCamera[0] += (this.xSouris - this.xSourisOld);
-        this.angleCamera[1] += (this.ySouris - this.ySourisOld);
+        var decalageX = (this.xSouris - this.xSourisOld) * 0.1;
+        var decalageY = (this.ySouris - this.ySourisOld) * 0.1;
 
 
-        /*
-        // CONDITIONS ANGLES
-        var limiteAngle = [ 20, 160 ];
-        // if(this.angleCamera[0] > limiteAngle[1]){ this.angleCamera[0] = limiteAngle[1]; }
-        // if(this.angleCamera[0] < limiteAngle[0]){ this.angleCamera[0] = limiteAngle[0]; }
-
-        if(this.angleCamera[1] > limiteAngle[1]){ this.angleCamera[1] = limiteAngle[1]; }
-        if(this.angleCamera[1] < limiteAngle[0]){ this.angleCamera[1] = limiteAngle[0]; }
-
-
-        // IO
-        // this.camera.position.x = Math.cos(this.angleCamera[0]*(Math.PI/180)) * this.rayonCamera;
-        // this.camera.position.y = Math.cos(this.angleCamera[1]*(Math.PI/180)) * this.rayonCamera;
-        // this.camera.position.z = Math.sin(this.angleCamera[0]*(Math.PI/180)) * Math.sin(this.angleCamera[1]*(Math.PI/180)) * this.rayonCamera;
-
-        this.camera.lookAt( new THREE.Vector3( this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ) );
-        */
-
-        if(this.angleCamera[0] > 120){ this.angleCamera[0] = 120; }
-        if(this.angleCamera[0] < -120){ this.angleCamera[0] = -120; }
-
-        if(this.angleCamera[1] > 180){ this.angleCamera[1] = 180; }
-        if(this.angleCamera[1] < -180){ this.angleCamera[1] = -180; }
-
-        this.camera.position.x = this.rayonCamera * Math.sin( this.angleCamera[0] * Math.PI / 360 ) * Math.cos( this.angleCamera[1] * Math.PI / 360 );
-        this.camera.position.y = this.rayonCamera * Math.sin( this.angleCamera[1] * Math.PI / 360 );
-        this.camera.position.z = this.rayonCamera * Math.cos( this.angleCamera[0] * Math.PI / 360 ) * Math.cos( this.angleCamera[1] * Math.PI / 360 );
-        this.camera.updateMatrix();
-
+        this.camera.position.x -= decalageX;
+        this.focusCamera[0] -= decalageX;
+        this.camera.position.y += decalageY;
+        this.focusCamera[1] += decalageY;
+        this.camera.lookAt(this.focusCamera[0], this.focusCamera[1], this.focusCamera[2]);
+  
 
     }
+
+
+
+
+    this.rotation = function(event)
+    {
+
+
+        if(event.target.id == "rotationX")
+        {
+            this.angleCamera[0] = event.target.value;
+        } else {
+            this.angleCamera[1] = event.target.value;
+        }
+
+
+        // CONDITIONS ANGLES
+        var x = this.rayonCamera * Math.sin( this.angleCamera[0] * Math.PI / 360 ) * Math.cos( this.angleCamera[1] * Math.PI / 360 );
+        var y = this.rayonCamera * Math.sin( this.angleCamera[1] * Math.PI / 360 );
+        var z = this.rayonCamera * Math.cos( this.angleCamera[0] * Math.PI / 360 ) * Math.cos( this.angleCamera[1] * Math.PI / 360 );
+
+
+        this.transitionCamera.setup(
+                [ this.camera.position.x, this.camera.position.y, this.camera.position.z ], 
+                [ x, y, z ] );
+
+    }
+
 
 
 
     this.moveCamToPosition = function(position)
     {
 
-        this.angleCamera[0] = 0;
-        this.angleCamera[1] = 0;
-        this.rayonCamera = this.positionInitCam[2];
-
-        this.transitionCamera.setup(
-            [this.camera.position.x, this.camera.position.y, this.camera.position.z], 
-            [ position[0], position[1], this.rayonCamera ] );
+        // this.transitionCamera.setup(
+        //     [ this.camera.position.x, this.camera.position.y, this.camera.position.z ], 
+        //     [ position[0], position[1], this.rayonCamera ] );
         
         this.transitionFocusCamera.setup(
             [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
@@ -1166,17 +1282,40 @@ var Canvas = function()
 
     }
 
-    
 
 
+    this.zoom = function(sens)
+    {
+        var distance = 300;
+        if(sens > 0)
+        {
+            if(this.rayonCamera > 200.0)
+            {
+                this.rayonCamera -= distance;
+            }
+        } else {
+            if(this.rayonCamera < 900.0)
+            {
+                this.rayonCamera += distance;
+            }
+        }
+
+        this.transitionCamera.setup(
+            [ this.camera.position.x, this.camera.position.y, this.camera.position.z], 
+            [ this.camera.position.x, this.camera.position.y, this.rayonCamera ] );
+
+    }
 
 
 
     this.onResize = function(newWidth, newHeight)
     {
+
         this.renderer.setSize(newWidth, newHeight);
     
     }
+
+
 
 
 
