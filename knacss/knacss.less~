@@ -31,7 +31,7 @@ li {
 	#carte2d, #btn_3d {
 		display: inline;
 	}
-	#carte3d, #btn_2d, #btn_rotation, #noWebgl {
+	#carte3d, #btn_2d, #btn_rotation {
 		display: none;
 	}
 
@@ -40,22 +40,11 @@ li {
 	#carte3d, #btn_2d, #btn_rotation {
 		display: inline;
 	}
-	#carte2d, #btn_3d, #noWebgl {
+	#carte2d, #btn_3d {
 		display: none;
 	}
 
 }
-.noWebgl {
-	#carte2d, #btn_2d, #noWebgl {
-		display: inline;
-	}
-	#carte3d, #btn_rotation, #btn_3d {
-		display: none;
-	}
-
-}
-
-
 
 
 /* WEBFONT */
@@ -84,23 +73,6 @@ h1, h2
 }
 
 
-#noWebgl
-{
-	position: absolute;
-	top: 10%;
-	width: 100%;
-	font-size: 1em;
-	text-align: center;
-	z-index: 3;
-	
-	& > * 
-	{
-		display: block;
-		text-align: center;
-		margin: 0 auto;
-	}
-	
-}
 
 
 #loader
@@ -133,7 +105,6 @@ h1, h2
 
 	position: relative;
 	width: 80%;
-	text-align: center;
 	float: left;
 	
 	
@@ -172,9 +143,7 @@ h1, h2
 	
 
 	.itemPays {
-		position: relative;
 		width:200px;	
-		height: 20px;
 	}
 	
 	.odd{

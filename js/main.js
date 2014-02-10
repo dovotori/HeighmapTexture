@@ -16,7 +16,7 @@ var langue;
 var pathFrontieres;
 var mode;
 var loader;
-
+var noWebgl;
 
 
 
@@ -40,34 +40,39 @@ function setup()
     langue = "FR";
     pathFrontieres = [];
     mode = "2d";
+    noWebgl = false;
     
     loader = new Image();
-    loader.addEventListener("load", function(){ document.getElementById("carte").appendChild(this); }, false);
+    loader.addEventListener("load", function(){ document.getElementById("main").appendChild(this); }, false);
     loader.src= "data/loader.gif";
     loader.id = "loader";
-    loader.style.display = "none";
 
     // gestion boutons 2D
     document.getElementById("btn_precedent").addEventListener("click", function(){ changementAnnee(1); }, false);
     document.getElementById("btn_suivant").addEventListener("click", function(){ changementAnnee(-1); }, false);
-    document.getElementById("btn_2d").addEventListener("click", passage2d, false);
+    
+    document.getElementById("btn_2d").addEventListener("click", function(){ passage2d(); }, false);
+    document.getElementById("btn_3d").addEventListener("click", function(){ passage3d(); }, false);
+    
     document.getElementById("btn_in").addEventListener("click", function(){ zoom(1); }, false);
     document.getElementById("btn_out").addEventListener("click", function(){ zoom(-1); }, false);
+    document.getElementById("btn_reset").addEventListener("click", function(){ reset(); }, false);
+    
 
 
     d2d = new Dessin2D();
     d2d.setup();
 
 
-	// si WegGL est supporté
-	if(window.WebGLRenderingContext)
+	// si WegGL est supporté	
+	var canvasTest = document.createElement( 'canvas' ); 
+	if(window.WebGLRenderingContext && ( canvasTest.getContext( 'webgl' ) || canvasTest.getContext( 'experimental-webgl' )))
 	{
 
         // 3D
         canvas = new Canvas();
         canvas.setup();
 
-        document.getElementById("btn_3d").addEventListener("click", function(){ passage3d(); }, false);
         document.getElementById('rotationX').addEventListener("change", function(event){ canvas.rotation(event); }, false);
         document.getElementById('rotationY').addEventListener("change", function(event){ canvas.rotation(event); }, false);
 
@@ -77,7 +82,9 @@ function setup()
         animate();
 
 	} else {
-		alert("WebGL not supported, 3d mode not supported");
+		
+		noWebgl = true;
+		
 	}
 
 
@@ -93,15 +100,81 @@ function setup()
 function animate()
 {
 
-    requestAnimationFrame(animate); 
+    setTimeout(animate, 1000/50); 
     
     if(mode == "3d")
     {
        canvas.draw();
-       d3d.update();
     }
 
 }
+
+
+
+
+
+
+//////////////////////////////////////////////////////////
+////////////// PASSAGE MODE /////////////////////////////
+////////////////////////////////////////////////////////
+
+function passage2d()
+{
+
+	
+    if(mode == "3d" || mode == "noWebgl")
+    {
+		loader.style.display = "block";
+        
+        if(!noWebgl){ canvas.initCam(); }
+        setTimeout(function(){
+        	mode = "2d";
+		    onresize();
+		    d2d.redrawSvg();
+        	document.body.setAttribute("class", "mode2d");
+        	loader.style.display = "none";
+        }, 3000);
+        
+
+    }
+
+}
+
+
+
+function passage3d()
+{
+
+    if(mode == "2d")
+    {
+    	
+    	if(!noWebgl)
+    	{
+	        loader.style.display = "block";
+	
+	        d2d.reset();
+		
+			setTimeout(function(){
+				document.body.setAttribute("class", "mode3d");
+				mode = "3d";
+				d2d.redrawSvg();
+				d2d.resize(520, 520, 80, 520/2, 520/2);
+				d2d.createTextureFromSvg();
+			}, 800);
+			
+	        canvas.onResize(window.innerWidth, window.innerWidth);
+	       
+    	} else {
+    		
+    		document.body.setAttribute("class", "noWebgl");
+    		mode = "noWebgl";
+    		
+    	}
+    }
+
+}
+
+
 
 
 
@@ -178,9 +251,11 @@ var Dessin2D = function()
             .selectAll("path")
             .data(features)
             .enter().append("svg:path")
+            .attr("class", "land")
             .attr("id", function(d){ return d.id; })
             .attr("d", function(d){ return d2d.path(d); })
             .style("fill", "rgba(200, 200, 200, 1)")
+            .style("stroke-width", "0.4")
             .each(function(d, i){
 
                 // calcul des frontieres pour la 3d
@@ -192,7 +267,7 @@ var Dessin2D = function()
                     {
 
                         // Remplir la liste du classement
-                        var pays = d3.select("#classement").append("li").attr("class", "itemPays")
+                        var pays = d3.select("#liste").append("li").attr("class", "itemPays")
                             .style("position", "absolute")
                             .attr("id", index[i].iso)
                             .on("click", function(){ clicPaysClassement(this.id); })
@@ -208,19 +283,16 @@ var Dessin2D = function()
             })
        
         changementAnnee(0);
-        d2d.setup3d();
+		if(!noWebgl){ d3d.draw(canvas.scene); }
+    	onresize();
+    	loader.style.display = "none";
 
     }
 
 
 
-    this.setup3d = function()
-    {
 
-        d3d.draw(canvas.scene);
-        onresize();
 
-    }
 
 
 
@@ -239,57 +311,63 @@ var Dessin2D = function()
 
         for(var i = 0; i < index.length; i++)
         {
-            var pays = this.svg.select("#"+index[i].iso);
 
-            var hauteur = 0;
-            switch(currentYear)
-            {
-                case 0: hauteur = index[i].an2013;  break;
-                case 1: hauteur = index[i].an2012;  break;
-            }
-
-            var hauteurMax = index.length;
-            var red, green, blue;
-
-            if(mode == "3d")
-            {
-                var gris = map(hauteur, hauteurMax, 0, 0, 255);
-                gris = Math.floor(gris);
-                red = green = blue = gris; 
-
-            } else {
-
-                if(hauteur < hauteurMax / 3){
-                    // de vert à jaune
-                    red = map(hauteur, 0, hauteurMax / 3, 0, 255);
-                    green = 255;
+            var hauteur = getPositionCurrentYear(i);
             
-                } else if(hauteur < 2 * hauteurMax / 3) {
-                    // de jaune à orange
-                    red = 255;
-                    green = map(hauteur, hauteurMax / 3, 2 * hauteurMax / 3, 255, 127);
-
-                } else if(hauteur <= hauteurMax){
-                    // de orange à rouge
-                    red = 255;
-                    green = map(hauteur, 2 * hauteurMax / 3, hauteurMax, 127, 0);
-
-                }
-                
-                red = Math.floor(red);
-                green = Math.floor(green);
-                blue = 70;
-
-            }
-
-            pays.style("fill", "rgba("+red+","+green+","+blue+", 1)" );
-            pays.style( "stroke", "rgba("+red+","+green+","+blue+", 1)" );
+            var pays = this.svg.select("#"+index[i].iso);
+        
+       		var rvb = this.couleurPays(hauteur);
+        
+       		pays.style("fill", "rgba("+rvb[0]+","+rvb[1]+","+rvb[2]+", 1)" );
+        	pays.style( "stroke", "rgba("+rvb[0]+","+rvb[1]+","+rvb[2]+", 1)" );
 
         }
 
     }
 
 
+
+
+	this.couleurPays = function(hauteur)
+	{
+		var hauteurMax = index.length;
+		var red, green, blue;
+
+        if(mode == "3d")
+        {
+            var gris = map(hauteur, hauteurMax, 0, 0, 255);
+            gris = Math.floor(gris);
+            red = green = blue = gris;
+            return [red, green, blue]; 
+
+        } else {
+
+            if(hauteur < hauteurMax / 3){
+                // de vert à jaune
+                red = map(hauteur, 0, hauteurMax / 3, 0, 255);
+                green = 255;
+        
+            } else if(hauteur < 2 * hauteurMax / 3) {
+                // de jaune à orange
+                red = 255;
+                green = map(hauteur, hauteurMax / 3, 2 * hauteurMax / 3, 255, 127);
+
+            } else if(hauteur <= hauteurMax){
+                // de orange à rouge
+                red = 255;
+                green = map(hauteur, 2 * hauteurMax / 3, hauteurMax, 127, 0);
+
+            }
+            
+            red = Math.floor(red);
+            green = Math.floor(green);
+            blue = 70;
+            
+            return [red, green, blue];
+           
+        }
+
+	}
 
 
 
@@ -380,6 +458,19 @@ var Dessin2D = function()
 
     }
 
+	
+	   this.scaling = function()
+    {
+
+        var w = parseInt(this.svg.attr("width"));
+        var h = parseInt(this.svg.attr("height"));
+
+        this.svg.selectAll("path").transition().duration(750)
+            .attr("transform", "translate(" + w / 2 + ", " + h / 2 + ")scale("+this.scale+")translate(" + -this.focusPosition[0] + "," + -this.focusPosition[1] + ")");
+         
+           
+    
+    }
 
 
 
@@ -390,35 +481,42 @@ var Dessin2D = function()
         this.scaling();
 
     }
-
-
-
-    this.scaling = function()
-    {
-
-        var w = parseInt(this.svg.attr("width"));
-        var h = parseInt(this.svg.attr("height"));
-
-        this.svg.transition()
-            .duration(750)
-            .attr("transform", "translate(" + w / 2 + ", " + h / 2 + ")scale("+this.scale+")translate(" + -this.focusPosition[0] + "," + -this.focusPosition[1] + ")");
     
+    
+    this.colorerPays = function(iso, position)
+    {
+		this.svg.selectAll(".land").transition().duration(400)
+			.style("fill", "rgb(60, 90, 140)").style("stroke", "#fff");
+
+            
+        var pays = this.svg.select("#"+iso);
+    
+   		var rvb = this.couleurPays(position);
+    
+   		pays.transition().duration(400)
+   			.style("fill", "rgba("+rvb[0]+","+rvb[1]+","+rvb[2]+", 1)" )
+   			.style( "stroke", "rgba("+rvb[0]+","+rvb[1]+","+rvb[2]+", 1)" ); 
+
     }
 
+
+
+ 
 
 
     this.reset = function()
     {
 
-
-        this.focusPosition = [ 520, 520 ];
+		var w = parseInt(this.svg.attr("width"));
+        var h = parseInt(this.svg.attr("height"));
+        this.focusPosition = [ w/2, h/2 ];
         this.scale = 1;
-
-        //this.scaling();
+        
+        this.scaling();
+        
+        this.redrawSvg();
 
     }
-
-
 
 
 
@@ -443,15 +541,17 @@ var Dessin3D = function()
 
 
     this.uniformsTerrain;
-    this.lerp;
-    this.newTexture;
-    this.oldTexture;
-
 
 
     this.setup = function()
     {
-        this.lerp = 0.0;
+        this.uniformsTerrain = {
+
+            lerp:  { type:'f', value: 0.0 },
+            displacement: { type:'t', value: null }
+
+        };
+
     }
 
 
@@ -467,24 +567,12 @@ var Dessin3D = function()
 
 
 
-    this.update = function()
-    {
-        if(this.lerp < 1.0)
-        {
-            this.uniformsTerrain[ "animLerp" ].value = this.lerp;
-            this.lerp += 0.02;
-        }
-    }
-
 
 
     this.updateTexture = function( texture )
     {
 
-        this.lerp = 0.0;
-        this.oldTexture = this.newTexture;
-        this.newTexture = texture;
-        this.uniformsTerrain[ "tDisplacement" ].value = this.newTexture;
+        this.uniformsTerrain[ "displacement" ].value = texture;
         loader.style.display = "none";
 
     }
@@ -550,54 +638,26 @@ var Dessin3D = function()
 
 
         var fourchetteHauteur = 100;
+        //this.uniformsTerrain[ "lerp" ].value = this.lerp;
+ 
 
-        // TEXTURE EFFECT
-        var detailTexture = THREE.ImageUtils.loadTexture("data/textureLisse.jpg", null, loaded);
-
-        // SQUARE TEXTURE
-        var wireTexture = new THREE.ImageUtils.loadTexture( 'data/square.png' );
-        wireTexture.wrapS = wireTexture.wrapT = THREE.RepeatWrapping; 
-        wireTexture.repeat.set( 40, 40 );
-
-        var terrainShader = THREE.ShaderTerrain[ "terrain" ];
-
-        this.uniformsTerrain = THREE.UniformsUtils.clone(terrainShader.uniforms);
-
-        this.uniformsTerrain[ "animLerp" ].value = this.lerp;                         // animation lerp
-        this.uniformsTerrain[ "textureSquare" ].value = wireTexture;            // texture pour le cadrillage
-        this.uniformsTerrain[ "uDisplacementScale" ].value = fourchetteHauteur; // hauteur max
-        this.uniformsTerrain[ "tNormal" ].value = detailTexture;
-        this.uniformsTerrain[ "tDiffuse1" ].value = detailTexture;
-        this.uniformsTerrain[ "tDetail" ].value = detailTexture;
-        this.uniformsTerrain[ "uNormalScale" ].value = 1;
-        this.uniformsTerrain[ "enableDiffuse1" ].value = true;
-        this.uniformsTerrain[ "enableDiffuse2" ].value = true;
-        this.uniformsTerrain[ "enableSpecular" ].value = true;
-        this.uniformsTerrain[ "uDiffuseColor" ].value.setHex(0x888888);         // diffuse
-        this.uniformsTerrain[ "uSpecularColor" ].value.setHex(0xffffff);        // spec // pas de repercution
-        this.uniformsTerrain[ "uAmbientColor" ].value.setHex(0x888888);         // ambiant
-        this.uniformsTerrain[ "uShininess" ].value = 3;                         // shininess
-        this.uniformsTerrain[ "uRepeatOverlay" ].value.set(3, 3);               // light reflection
-
-
+		
 
         // MATERIAL
         var material = new THREE.ShaderMaterial({
 
             uniforms: this.uniformsTerrain,
-            vertexShader: terrainShader.vertexShader,
-            fragmentShader: terrainShader.fragmentShader,
-            lights: true,
-            fog: false,
-            side: THREE.DoubleSide
+            vertexShader: document.getElementById("vertexShader").textContent,
+            fragmentShader: document.getElementById("fragmentShader").textContent,
+            fog: false
 
         });
         
 
-        var geometryTerrain = new THREE.PlaneGeometry(width, height, 128, 128 );
+        var geometryTerrain = new THREE.PlaneGeometry(width, height, 256, 256 );
         //geometryTerrain.computeFaceNormals();
-        geometryTerrain.computeVertexNormals();
-        geometryTerrain.computeTangents();
+        //geometryTerrain.computeVertexNormals();
+        //geometryTerrain.computeTangents();
 
 
         var terrain = new THREE.Mesh( geometryTerrain, material );
@@ -606,6 +666,7 @@ var Dessin3D = function()
 
         loaded();
 
+		this.terrainShader = null;
 
     }
 
@@ -660,56 +721,6 @@ var Dessin3D = function()
 
 
 
-//////////////////////////////////////////////////////////
-////////////// PASSAGE MODE /////////////////////////////
-////////////////////////////////////////////////////////
-
-function passage2d()
-{
-
-    document.body.setAttribute("class", "mode2d");
-
-    if(mode == "3d")
-    {
-        mode = "2d";
-        onresize();
-        canvas.resetCam();
-        
-        d2d.redrawSvg();
-
-    }
-
-}
-
-
-
-function passage3d()
-{
-
-    document.body.setAttribute("class", "mode3d");
-
-
-    if(mode == "2d")
-    {
-
-        mode = "3d";
-        d2d.reset();
-        d2d.resize(520, 520, 80, 520/2, 520/2);
-        canvas.onResize(window.innerWidth, window.innerWidth);
-
-        loader.style.display = "block";    
-
-
-        d2d.redrawSvg();
-        d2d.createTextureFromSvg();
-        
-    }
-
-}
-
-
-
-
 
 
 
@@ -717,12 +728,11 @@ function passage3d()
 
 
 /////////////////////////////////////////////////////////////////////////////////
-///////////// CHANGEMENT ANNEE /////////////////////////////////////////////////
+///////////// INTERACTION///// /////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 function changementAnnee(sens)
 {
-
 
     if(sens > 0 && currentYear < 1)
     {
@@ -736,7 +746,7 @@ function changementAnnee(sens)
     displayYear.innerHTML = 2013-currentYear;
 
     var already = [];
-    var classement = d3.select("#classement");
+    var classement = d3.select("#liste");
 
 
     for(var i = 0; i < index.length; i++)
@@ -746,13 +756,8 @@ function changementAnnee(sens)
         var espaceEntreDeux = 20;
         var top = 0;
 
-        switch(currentYear)
-        {
-            case 0: top = parseInt(index[i].an2013);  break;
-            case 1: top = parseInt(index[i].an2012);  break;
-        }
 
-
+		top = getPositionCurrentYear(i);
         var positionPays = top;
 
 
@@ -817,6 +822,24 @@ function changementAnnee(sens)
 
 
 
+function reset()
+{
+
+    if(mode == "3d")
+    {
+
+        canvas.initCam();
+
+    } else {
+
+        d2d.reset();
+
+    }
+
+}
+
+
+
 
 
 function zoom(sens)
@@ -864,7 +887,8 @@ function clicPaysClassement(isoPays)
                     var positionPays = projectionfor3d(getGeoCoord(index[i].latitude, index[i].longitude));
                     canvas.moveCamToPosition(positionPays);
                 } else {
-                    d2d.moveToPosition(getGeoCoord(index[i].latitude, index[i].longitude));
+                    //d2d.moveToPosition(getGeoCoord(index[i].latitude, index[i].longitude));
+                    d2d.colorerPays(isoPays, getPositionCurrentYear(i));
                 }
             }
         }
@@ -886,6 +910,18 @@ function clicPaysClassement(isoPays)
 //////////////////////////////////////////////////////////
 ////////////// UTILS ////////////////////////////////////
 ////////////////////////////////////////////////////////
+
+
+
+function getPositionCurrentYear(i)
+{
+	switch(currentYear)
+    {
+            case 0: return parseInt(index[i].an2013);  break;
+            case 1: return parseInt(index[i].an2012);  break;
+    }	
+}
+
 
 
 function getPath(path)
@@ -978,11 +1014,6 @@ var Canvas = function()
     this.ySouris, this.ySourisOld;
     this.mouseDown;
     this.scrollSouris; 
-    
-    this.spot1; this.spot2;
-    this.angleSpot;
-
-    this.isZoom;
 
     this.camera;
     this.angleCamera;
@@ -993,9 +1024,9 @@ var Canvas = function()
     this.transitionFocusCamera;
 
 
-    this.background;
-    this.backgroundScene;
-    this.backgroundCam;
+    //this.background;
+    //this.backgroundScene;
+    //this.backgroundCam;
 
 
 
@@ -1011,7 +1042,6 @@ var Canvas = function()
 
         this.mouseDown = false;
         this.scrollSouris = false;
-        this.angleSpot = 0;
         this.xSouris = 0; this.xSourisOld = 0;
         this.ySouris = 0; this.ySourisOld = 0;
 
@@ -1050,17 +1080,7 @@ var Canvas = function()
 
 
 
-        // LIGHT
-        this.scene.add( new THREE.AmbientLight( 0xffffff ) );
-
-        this.spot1 = new THREE.DirectionalLight( 0xff0000, 2 );
-        this.spot1.position.set( 0.5, 1, 0 );
-        this.scene.add(this.spot1);
-
-        this.spot2 = new THREE.DirectionalLight( 0x00ff00, 2 );
-        this.spot2.position.set( -0.5, 1, 0 );
-        this.scene.add(this.spot2);
-
+        // RENDU
         this.canvas = this.renderer.domElement;
         this.canvas.id = "carte3d";
         document.getElementById(conteneur).appendChild(this.canvas);   
@@ -1073,7 +1093,6 @@ var Canvas = function()
         this.canvas.addEventListener("mousedown", function(event){ clone.onMouseDown(event); }, false);
         this.canvas.addEventListener("mouseup", function(event){ clone.onMouseUp(event); }, false);
         this.canvas.addEventListener("mouseout", function(event){ clone.onMouseUp(event); }, false); // releve le clic si tu sort du canvas
-        this.canvas.addEventListener("click", function(event){ clone.onClick(event); }, false);
 
 
         // BACKGROUND
@@ -1087,7 +1106,6 @@ var Canvas = function()
     this.draw = function()
     {
   
-
         // transition pour la position de la camera
         if(!this.transitionCamera.isFinished)
         {
@@ -1107,7 +1125,6 @@ var Canvas = function()
             this.camera.lookAt(new THREE.Vector3(this.focusCamera[0], this.focusCamera[1], this.focusCamera[2]));
         }
 
-        // background
         this.drawBackground();
 
         // rendu
@@ -1165,31 +1182,18 @@ var Canvas = function()
 
 
 
-    this.onClick = function(event)
-    {
-        
-        if(this.scrollSouris == false)
-        {
-            this.initCam();
-        } else {
-            this.scrollSouris = false;
-        }
-
-    }
-
-
-
 
     this.resetCam = function()
     {
 
         this.angleCamera[0] = 0;
         this.angleCamera[1] = 0;
+        
+        document.getElementById('rotationX').setAttribute("value", 0);
+        document.getElementById('rotationY').setAttribute("value", 0);
 
         this.camera.position.set(this.positionInitCam[0], this.positionInitCam[1], this.positionInitCam[2]);
         this.camera.lookAt(this.positionInitCam[0], this.positionInitCam[1], 0);
-
-        this.isZoom = false;
 
     }
 
@@ -1199,22 +1203,20 @@ var Canvas = function()
     this.initCam = function()
     {
 
-        if(this.isZoom)
-        {
-            this.angleCamera[0] = 0;
-            this.angleCamera[1] = 0;
-            this.rayonCamera = this.positionInitCam[2];
+        this.angleCamera[0] = 0;
+        this.angleCamera[1] = 0;
+        this.rayonCamera = this.positionInitCam[2];
 
-            this.transitionCamera.setup(
-                [ this.camera.position.x, this.camera.position.y, this.camera.position.z ], 
-                [ this.positionInitCam[0], this.positionInitCam[1], this.rayonCamera ] );
+        this.transitionCamera.setup(
+            [ this.camera.position.x, this.camera.position.y, this.camera.position.z ], 
+            [ this.positionInitCam[0], this.positionInitCam[1], this.rayonCamera ] );
+        
+        this.transitionFocusCamera.setup(
+            [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
+            [ this.positionInitCam[0], this.positionInitCam[1], 0 ] );
             
-            this.transitionFocusCamera.setup(
-                [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
-                [ this.positionInitCam[0], this.positionInitCam[1], 0 ] );
-
-            this.isZoom = false;
-        }
+        document.getElementById('rotationX').setAttribute("value", 0);
+        document.getElementById('rotationY').setAttribute("value", 0);
 
     }
 
@@ -1243,6 +1245,7 @@ var Canvas = function()
     this.rotation = function(event)
     {
 
+		console.log(event);
 
         if(event.target.id == "rotationX")
         {
@@ -1323,17 +1326,8 @@ var Canvas = function()
     this.setupBackground = function()
     {
 
-        var attributes = {};
-
-        var uniforms = {
-
-            noise:  { type:'f', value: 0.04 },
-
-        };
 
         var shaderMaterial = new THREE.ShaderMaterial({
-            uniforms: uniforms,
-            attributes: attributes,
             vertexShader:   document.getElementById("background_vertexshader").textContent,
             fragmentShader: document.getElementById("background_fragmentshader").textContent
         });

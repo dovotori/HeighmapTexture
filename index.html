@@ -4,14 +4,8 @@
 		<title>Reporters sans frontières</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<!-- <link rel="stylesheet" href="knacss.css" media="all"> -->
-
-
-
 
 		<link rel="stylesheet/less" type="text/css" href="knacss/knacss.less" />
-		<!-- <link rel="stylesheet" href="style.less" media="all"> -->
-
 
 		<!-- GOOGLE ANALYTICS -->
 		<script type="text/javascript">
@@ -31,7 +25,12 @@
 
 	</head>
 
+
+
+
 	<body class="mode2d">
+		
+		<br/>
 		
 		<section id="cp" class="line center grid">
 			<header class="mod grid4-1">
@@ -40,6 +39,7 @@
 						<img class="w150p" src="http://fr.rsf.org/squelettes/img/fr/logo-fr.png" alt="logo RSF"/>
 					</a>
 				</h1>
+
 				<div class="grid">
 					<ul class="grid2">
 						<li class="mod">Français</li>
@@ -48,10 +48,15 @@
 				</div>
 			</header>
 
+			
 
 			<article>
 
+				<br/>
 				<h2>Classement de la liberté de la presse</h2>
+				<br/>
+				<br/>
+
 				<nav class="grid">
 					<ul class="grid5">
 						<li class="mod left"><a href="#">Asie</a></li>
@@ -62,6 +67,9 @@
 					</ul>
 				</nav>
 
+
+				<br/>
+				<br/>
 				<p id="intro">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ultrices nisl nunc, quis mattis quam iaculis quis. Cras a mollis metus. Aliquam nulla massa, hendrerit et facilisis eu, convallis non dui. Nulla orci tellus, auctor vel mauris et, iaculis lacinia tellus. Nunc felis sem, pellentesque vel risus ac, accumsan consequat dolor. Donec a orci a tortor ultrices pellentesque. Suspendisse dignissim nulla ultricies enim feugiat lacinia sit amet ut nulla. </p>
 				<p id="more">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ultrices nisl nunc, quis mattis quam iaculis quis. Cras a mollis metus. Aliquam nulla massa, hendrerit et facilisis eu, convallis non dui. Nulla orci tellus, auctor vel mauris et, iaculis lacinia tellus. Nunc felis sem, pellentesque vel risus ac, accumsan consequat dolor. Donec a orci a tortor ultrices pellentesque. Suspendisse dignissim nulla ultricies enim feugiat lacinia sit amet ut nulla. </p>
 			<article>
@@ -70,38 +78,38 @@
 		</section>
 
 
-		<section id="main" class="line">
-
-			<div id="conteneurClassement" class="mod w100">
-
-				<div id="carte" class="mod left w100">
-
-					<div id="control_mode">
-						<button class="btn_mode" id="btn_2d" type="button">2d</button>
-						<button class="btn_mode" id="btn_3d" type="button">3d</button>
+		<section id="main">
+		
+				<article id="noWebgl"><p>Votre carte graphique ou votre navigateur ne supporte pas webgl. <br/>Vous pouvez essayer d'utiliser firefox ou rester sur la version 2d de la carte.</p></article>
+		
+				<div id="control_mode">
+					<button class="btn_mode" id="btn_2d" type="button">2d</button>
+					<button class="btn_mode" id="btn_3d" type="button">3d</button>
+					<br/>
+					<button class="btn_mode" id="btn_in" type="button">zoom +</button>
+					<br/>
+					<button class="btn_mode" id="btn_out" type="button">zoom -</button>
+					<br/>
+					<button class="btn_mode" id="btn_reset" type="button">reset</button>
+					<br/>
+					<div id="btn_rotation">
+						<input id="rotationX" type="range" min="-180" max="180" step="1" value="0" /> Rotation X
 						<br/>
-						<button class="btn_mode" id="btn_in" type="button">zoom +</button>
-						<br/>
-						<button class="btn_mode" id="btn_out" type="button">zoom -</button>
-						<br/>
-						<div id="btn_rotation">
-							<input id="rotationX" type="range" min="-180" max="180" step="1" value="0" /> Rotation X
-							<br/>
-							<input id="rotationY" type="range" min="-180" max="180" step="1" value="0" /> Rotation Y
-						</div>
+						<input id="rotationY" type="range" min="-180" max="180" step="1" value="0" /> Rotation Y
 					</div>
-					
 				</div>
+
+				<div id="carte"></div>
 				
-				<div id="liste" class="mod left w10">
+				<div id="classement">
 					<div id="control_annees">
 						<div class="fleche"><img src="data/fleches.png" id="btn_precedent" type="button" alt="precedent" /></div>
 						<h2 id="current_year">2013</h2>
 						<div class="fleche"><img src="data/fleches.png" id="btn_suivant" type="button" alt="suivant" /></div>
 					</div>
-					<ul id="classement" class="mod left"> </ul>
+					<ul id="liste"> </ul>
 				</div>
-			</div>
+
 
 		</section>
 
@@ -122,100 +130,133 @@
 		</section>
 
 
-
+		
+		<!-- RELIEF -->		
 		<script type="x-shader/x-vertex" id="vertexShader">
 
-				attribute vec4 tangent;
+			#ifdef GL_ES
+			precision highp float;
+			#endif
+				
+			uniform sampler2D displacement;
+			varying vec2 vUv;
+			varying vec3 vNormal;
+			
+				
+			void main() {	
 
-				uniform vec2 uRepeatBase;
-				uniform sampler2D tNormal;
-				uniform float animLerp;
+				vec4 newPosition;
+				vec4 dv;
+				float df;
+				dv = texture2D( displacement, uv );
+	
+				df = 0.30*dv.x + 0.59*dv.y + 0.11*dv.z;
+	
+				newPosition = vec4( normal * df * 100.0, 0.0) + vec4(position, 1.0);
+				
+				vUv = uv;
+				//vNormal = normal;
+				vNormal = normalize(newPosition.xyz);
+				
+				gl_Position = projectionMatrix * modelViewMatrix * newPosition;
+				
 
-				#ifdef VERTEX_TEXTURES
-					uniform sampler2D tDisplacement;
-					uniform float uDisplacementScale;
-					uniform float uDisplacementBias;
-				#endif
+			}
 
-				varying vec3 vTangent;
-				varying vec3 vBinormal;
-				varying vec3 vNormal;
-				varying vec2 vUv;
-				varying vec3 p;
-
-				varying vec3 vViewPosition;
+		</script>
 
 
-				void main() {
 
-					p = position.xyz;
 
-					vNormal = normalize( normalMatrix * normal );
+		<script type="x-shader/x-fragment" id="fragmentShader">
 
-					// tangent and binormal vectors
-					vTangent = normalize( normalMatrix * tangent.xyz );
+			#ifdef GL_ES
+			precision highp float;
+			#endif
 
-					vBinormal = cross( vNormal, vTangent ) * tangent.w;
-					vBinormal = normalize( vBinormal );
+			
+			uniform sampler2D displacement;
+			
+			varying vec2 vUv;
+			varying vec3 vNormal;
+			
+			
 
-					// texture coordinates
-					vUv = uv;
+			float random(vec3 scale,float seed){
+			    return fract(sin(dot(gl_FragCoord.xyz+seed,scale)) * 43758.5453 + seed);
+			}
 
-					vec2 uvBase = uv * uRepeatBase;
+			float map(float valeur, float minRef, float maxRef, float minDest, float maxDest)
+			{
+				return minDest + (valeur - minRef) * (maxDest - minDest) / (maxRef - minRef);
+			}
 
-					// DISPLACEMENT MAPPING
-					vec3 dv = texture2D( tDisplacement, uvBase ).xyz;
-					float df = uDisplacementScale * dv.x + uDisplacementBias;
-					vec3 displacedPosition = normal * df + position;
-
-					vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
-					vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-
-					// ANIMATION
-					gl_Position = projectionMatrix * modelViewMatrix * vec4( p.x, p.y, displacedPosition.z * animLerp, 1.0 );
-					//gl_Position = projectionMatrix * mvPosition;
-
-					vViewPosition = -mvPosition.xyz;
-					vec3 normalTex = texture2D( tNormal, uvBase ).xyz * 2.0 - 1.0;
-					vNormal = normalMatrix * normalTex;
-
+			void main(void)
+			{
+			
+				
+			    float n = 0.04 * ( .5 - random( vec3( 1. ), length( gl_FragCoord ) ) );
+			    float hauteur = texture2D( displacement, vUv ).z;
+			    
+			    
+			    // DIFFUSE
+			    vec3 light = vec3(0.5, 0.2, 1.0);
+				float diffuse = max(0.0, dot(normalize(vNormal), light));
+				//gl_FragColor = vec4(vec3(diffuse), 1.0);
+			    
+			    
+			    
+			    
+			    // MER
+				if( hauteur < 0.001 ){
+					gl_FragColor = vec4( (20.0/255.0)+n, (50.0/255.0)+n, (100.0/255.0)+n, 1.0 );
+				} else { 			
+			
+					// 4 COULEURS
+					float r, v, b;
+					vec3 c1 = vec3(20.0/255.0, 200.0/255.0, 0.0/255.0); 
+					vec3 c2 = vec3(200.0/255.0, 200.0/255.0, 20.0/255.0); 
+					vec3 c3 = vec3(200.0/255.0, 20.0/255.0, 20.0/255.0);
+					vec3 c4 = vec3(0.0/255.0, 40.0/255.0, 80.0/255.0);
+					
+					if(hauteur < 0.1){
+						// c4 -> c3
+						r = map(hauteur, 0.0, 0.1, c4.x, c3.x);
+						v = map(hauteur, 0.0, 0.1, c4.y, c3.y);
+						b = map(hauteur, 0.0, 0.1, c4.z, c3.z);
+						
+					} else if(hauteur < 0.5){
+					
+						// c3 -> c2
+						r = map(hauteur, 0.1, 0.5, c3.x, c2.x);
+						v = map(hauteur, 0.1, 0.5, c3.y, c2.y);
+						b = map(hauteur, 0.1, 0.5, c3.z, c2.z);
+						
+					} else {
+						
+						// c2 -> c1
+						r = map(hauteur, 0.5, 1.0, c2.x, c1.x);
+						v = map(hauteur, 0.5, 1.0, c2.y, c1.y);
+						b = map(hauteur, 0.5, 1.0, c2.z, c1.z);
+					}
+			
+					vec3 color = vec3(r, v, b);
+			    	gl_FragColor = vec4(color+n, 1.0);
+				
 				}
+			 
+			}
 
-			</script>
-
-
-
-
-			<script type="x-shader/x-fragment" id="fragmentShader">
-
-				#ifdef GL_ES
-				precision highp float;
-				#endif
-
-				uniform sampler2D texture;
-				varying vec2 vUv;
-
-				float random(vec3 scale,float seed){
-				    return fract(sin(dot(gl_FragCoord.xyz+seed,scale)) * 43758.5453 + seed);
-				}
-
-				float map(float valeur, float minRef, float maxRef, float minDest, float maxDest)
-				{
-					return minDest + (valeur - minRef) * (maxDest - minDest) / (maxRef - minRef);
-				}
-
-				void main(void)
-				{
-					// texture
-					vec4 texColor = texture2D( texture, vUv );
-				    gl_FragColor = texColor;
-				 
-				}
-
-			</script>
+		</script>
 
 
 		
+
+
+
+
+
+
 
 
 			<!-- BACKGROUND -->
@@ -238,7 +279,6 @@
 				precision highp float;
 				#endif
 
-				uniform float noise;
 
 				float random(vec3 scale,float seed){
 			    	return fract(sin(dot(gl_FragCoord.xyz+seed,scale)) * 43758.5453 + seed);
@@ -247,8 +287,7 @@
 				void main()
 				{
 					// noise
-			    	float n = noise * ( .5 - random( vec3( 1. ), length( gl_FragCoord ) ) );
-
+			    	float n = 0.04 * ( .5 - random( vec3( 1. ), length( gl_FragCoord ) ) );
 
 					gl_FragColor = vec4((20.0/255.0)+n, (50.0/255.0)+n, (100.0/255.0)+n, 1.0);
 				}
@@ -262,7 +301,6 @@
 		<script type="text/javascript" src="js/queue.js"></script>
 		<script type="text/javascript" src="js/utils.js"></script>
 		<script type="text/javascript" src="js/blur.js"></script>
-		<script type="text/javascript" src="js/ShaderTerrain.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
 		<script type="text/javascript" src="js/less-1.6.2.min.js" ></script>
 		
