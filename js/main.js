@@ -1250,17 +1250,13 @@ var Canvas = function()
 
 
 
-    this.rotation = function(event)
+    this.rotation = function(pictoX, pictoY)
     {
 
-		console.log(event);
+        console.log("X:"+pictoX+" // Y:"+pictoY)
 
-        if(event.target.id == "rotationX")
-        {
-            this.angleCamera[0] = event.target.value;
-        } else {
-            this.angleCamera[1] = event.target.value;
-        }
+        this.angleCamera[0] = map(pictoX, 0, 200, -180, 180);
+        this.angleCamera[1] = map(pictoY, 200, 500, -180, 180);
 
 
         // CONDITIONS ANGLES
