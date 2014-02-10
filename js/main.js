@@ -1234,8 +1234,8 @@ var Canvas = function()
     {
         
         // ANGLES
-        var decalageX = (this.xSouris - this.xSourisOld) * 0.1;
-        var decalageY = (this.ySouris - this.ySourisOld) * 0.1;
+        var decalageX = (this.xSouris - this.xSourisOld) * 0.5;
+        var decalageY = (this.ySouris - this.ySourisOld) * 0.5;
 
 
         this.camera.position.x -= decalageX;
@@ -1253,21 +1253,22 @@ var Canvas = function()
     this.rotation = function(pictoX, pictoY)
     {
 
-        console.log("X:"+pictoX+" // Y:"+pictoY)
 
-        this.angleCamera[0] = map(pictoX, 0, 200, -180, 180);
-        this.angleCamera[1] = map(pictoY, 200, 500, -180, 180);
-
-
+        this.angleCamera[0] = pictoX;
+        this.angleCamera[1] = pictoY;
         // CONDITIONS ANGLES
         var x = this.rayonCamera * Math.sin( this.angleCamera[0] * Math.PI / 360 ) * Math.cos( this.angleCamera[1] * Math.PI / 360 );
         var y = this.rayonCamera * Math.sin( this.angleCamera[1] * Math.PI / 360 );
         var z = this.rayonCamera * Math.cos( this.angleCamera[0] * Math.PI / 360 ) * Math.cos( this.angleCamera[1] * Math.PI / 360 );
 
+        this.camera.position.x = x;
+        this.camera.position.y = y;
+        this.camera.position.z = z;
 
-        this.transitionCamera.setup(
-                [ this.camera.position.x, this.camera.position.y, this.camera.position.z ], 
-                [ x, y, z ] );
+
+        // this.transitionCamera.setup(
+        //         [ this.camera.position.x, this.camera.position.y, this.camera.position.z ], 
+        //         [ x, y, z ] );
 
     }
 
@@ -1276,9 +1277,9 @@ var Canvas = function()
 
     this.moveCamToPosition = function(position)
     {
-        // this.transitionCamera.setup(
-        //     [ this.camera.position.x, this.camera.position.y, this.camera.position.z ], 
-        //     [ position[0], position[1], this.rayonCamera ] );
+        this.transitionCamera.setup(
+            [ this.camera.position.x, this.camera.position.y, this.camera.position.z ], 
+            [ position[0], position[1], this.rayonCamera ] );
 
         
         this.transitionFocusCamera.setup(
@@ -1327,9 +1328,9 @@ var Canvas = function()
     this.mouvementCool = function(event)
     {
 
-        // this.transitionCamera.setup(
-        //     [ this.camera.position.x, this.camera.position.y, this.camera.position.z], 
-        //     [ this.camera.position.x, this.camera.position.y-400, this.rayonCamera ] );        
+        this.transitionCamera.setup(
+            [ this.camera.position.x, this.camera.position.y, this.camera.position.z], 
+            [ this.camera.position.x, this.camera.position.y-400, this.rayonCamera ] );        
 
     }
 
