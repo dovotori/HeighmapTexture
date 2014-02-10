@@ -379,11 +379,15 @@ var Dessin2D = function()
         // transforme le svg en image
         var xml = new XMLSerializer().serializeToString(svgImg);
         var data = "data:image/svg+xml;base64," + btoa(xml);
+        console.log(data);
         
         var imageTexture = new Image();
         var clone = this;
         imageTexture.addEventListener("load", clone.blurImage, false);
+        //imageTexture.addEventListener("load", function(){ console.log("data"); }, false);
         imageTexture.src = data;
+
+
 
     }
 
@@ -405,13 +409,14 @@ var Dessin2D = function()
 
         // application du blur
         varBlur(ctx, function(x, y){ return 6.9; });
-        //document.getElementById(conteneur).appendChild(canvas2d);
+        document.getElementById(conteneur).appendChild(canvas2d);
         
         // creation de la texture THREE
         var textureCarted3js = new THREE.Texture( canvas2d );
         textureCarted3js.needsUpdate = true;
         
         d3d.updateTexture( textureCarted3js );
+
 
     }
 
