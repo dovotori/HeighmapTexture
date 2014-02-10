@@ -375,19 +375,19 @@ var Dessin2D = function()
     {
 
         var svgImg = document.getElementById("carte2d");
-
-        // transforme le svg en image
+ 
         var xml = new XMLSerializer().serializeToString(svgImg);
+
+        // var firstLine = xml.split('\n')[0];
+
+        xml = xml.replace('<svg id="carte2d" width="520" height="520">','<svg xmlns="http://www.w3.org/2000/svg" id="carte2d" width="520" height="520">\n');
+
         var data = "data:image/svg+xml;base64," + btoa(xml);
-        console.log(data);
         
         var imageTexture = new Image();
         var clone = this;
         imageTexture.addEventListener("load", clone.blurImage, false);
-        //imageTexture.addEventListener("load", function(){ console.log("data"); }, false);
         imageTexture.src = data;
-
-
 
     }
 
