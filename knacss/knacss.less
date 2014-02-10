@@ -36,15 +36,21 @@ li {
 	}
 
 }
+
 .mode3d {
-	#carte3d, #btn_2d, #btn_rotation {
+	#carte3d, #btn_2d {
 		display: inline;
+	}
+	#btn_rotation {
+		display: block;
 	}
 	#carte2d, #btn_3d, #noWebgl {
 		display: none;
 	}
 
 }
+
+
 .noWebgl {
 	#carte2d, #btn_2d, #noWebgl {
 		display: inline;
@@ -218,28 +224,34 @@ h1, h2
 
 	.btn_mode
 	{
-		color: #fff;
-		background-color: #aaa;
-	    border:none;
-	    text-decoration:none;
-	    cursor:pointer;
-	    width: 100px;
-		height: 30px;
-		margin: 4px 0;
+
 
 	}
 
 	.btn_mode:hover
 	{
-		color: #aaa;
-		background-color: #fff;
 
 	}
 
 	.btn_mode:active
 	{
-		background-color: #0cc;
-		color: #fff;
+	}
+
+	#btn_rotation {
+		background: transparent url("../data/cameraNav.png") no-repeat 0 0 scroll ;
+
+		width:200px;
+		height:200px;
+		position:relative;
+		overflow: hidden;
+		& > div{
+			position:absolute;
+			width:30px;
+			height:30px;
+			top: 90px;
+			left:90px;
+			background: transparent url("../data/pictoCam.png") no-repeat 0 0 scroll ;
+		}
 	}
 
 }

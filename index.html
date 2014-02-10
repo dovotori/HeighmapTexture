@@ -82,6 +82,7 @@
 		<section id="main">
 		
 				<article id="noWebgl"><p>Votre carte graphique ou votre navigateur ne supporte pas webgl. <br/>Vous pouvez essayer d'utiliser firefox ou rester sur la version 2d de la carte.</p></article>
+
 		
 				<div id="control_mode">
 					<button class="btn_mode" id="btn_2d" type="button">2d</button>
@@ -94,9 +95,7 @@
 					<button class="btn_mode" id="btn_reset" type="button">reset</button>
 					<br/>
 					<div id="btn_rotation">
-						<input id="rotationX" type="range" min="-180" max="180" step="1" value="0" /> Rotation X
-						<br/>
-						<input id="rotationY" type="range" min="-180" max="180" step="1" value="0" /> Rotation Y
+						<div id="picto_cam"></div>
 					</div>
 				</div>
 
@@ -338,10 +337,10 @@
 		<script type="text/javascript" src="js/three.js"></script>
 		<script type="text/javascript" src="js/queue.js"></script>
 		<script type="text/javascript" src="js/utils.js"></script>
-		<script type="text/javascript" src="js/blur.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
 		<script type="text/javascript" src="js/less-1.6.2.min.js" ></script>
-		
+		<script type="text/javascript" src="js/jquery-ui-1.10.4.custom.min.js"></script>
+		<script type="text/javascript" src="js/action.js"></script>
 
 
 	</body>

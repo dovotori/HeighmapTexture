@@ -73,8 +73,8 @@ function setup()
         canvas = new Canvas();
         canvas.setup();
 
-        document.getElementById('rotationX').addEventListener("change", function(event){ canvas.rotation(event); }, false);
-        document.getElementById('rotationY').addEventListener("change", function(event){ canvas.rotation(event); }, false);
+        // document.getElementById('rotationX').addEventListener("change", function(event){ canvas.rotation(event); }, false);
+        // document.getElementById('rotationY').addEventListener("change", function(event){ canvas.rotation(event); }, false);
 
         d3d = new Dessin3D();
         d3d.setup();
