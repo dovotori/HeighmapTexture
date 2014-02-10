@@ -142,6 +142,7 @@
 			uniform sampler2D displacement;
 			varying vec2 vUv;
 			varying vec3 vNormal;
+			varying vec3 vPosition;
 			
 				
 			void main() {	
@@ -158,6 +159,7 @@
 				vUv = uv;
 				//vNormal = normal;
 				vNormal = normalize(newPosition.xyz);
+				vPosition = newPosition.xyz;
 				
 				gl_Position = projectionMatrix * modelViewMatrix * newPosition;
 				
@@ -177,9 +179,11 @@
 
 			
 			uniform sampler2D displacement;
+			uniform sampler2D tWireframe;
 			
 			varying vec2 vUv;
 			varying vec3 vNormal;
+			varying vec3 vPosition;
 			
 			
 
@@ -210,6 +214,21 @@
 				var pointDeRuptureCouleur = []
 			    
 			    
+
+				// WIREFRAME
+				vec2 Tile = vec2(0.01, 0.01);
+				vec2 Shift = vec2(0.1, 0.1);
+				vec2 xy = vec2( map( vPosition.x, 0.0, 520.0, 0.0, 1.0 ), map( vPosition.y, 0.0, 520.0, 0.0, 1.0 ) );
+				vec2 phase = fract(xy / Tile) + Shift;
+				if (phase.x > 1.0)
+					phase.x = phase.x - 1.0;
+				if (phase.y > 1.0)
+					phase.y = phase.y - 1.0;
+				vec4 outColor = texture2D( tWireframe, phase );
+				
+				if (outColor.a == 0.0){ discard; }
+
+
 			    
 			    
 			    // MER
@@ -255,6 +274,8 @@
 			    	gl_FragColor = vec4(color+n, 1.0);
 				
 				}
+
+				
 			 
 			}
 

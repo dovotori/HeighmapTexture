@@ -198,6 +198,13 @@ var Dessin2D = function()
     this.focusPosition;
 
 
+    this.mouseDown;
+    this.xSouris, this.xSourisOld;
+    this.ySouris, this.ySourisOld;
+
+
+
+
 
 
     this.setup = function()
@@ -223,6 +230,21 @@ var Dessin2D = function()
         this.path = d3.geo.path().projection(this.projection);
 
         this.focusPosition = [ width/2, height/2 ];
+
+        this.mouseDown = false;
+        this.xSouris = 0; this.xSourisOld = 0;
+        this.ySouris = 0; this.ySourisOld = 0;
+
+
+
+        // INTERACTION
+        // var clone = this;
+        // var t = document.getElementById("carte2d");
+        // t.addEventListener("mousemove", function(event){ clone.onMouseMove(event); }, false);
+        // t.addEventListener("mousedown", function(event){ clone.onMouseDown(event); }, false);
+        // t.addEventListener("mouseup", function(event){ clone.onMouseUp(event); }, false);
+        // t.addEventListener("mouseout", function(event){ clone.onMouseUp(event); }, false); // releve le clic si tu sort du canvas
+
 
 
         queue()
@@ -475,6 +497,53 @@ var Dessin2D = function()
 
 
 
+    this.onMouseMove = function(event)
+    {
+        
+        if(this.mouseDown)
+        {
+
+            this.xSouris = event.clientX;
+            this.ySouris = event.clientY;
+
+            var decalageX = (this.xSouris - this.xSourisOld) * 0.1;
+            var decalageY = (this.ySouris - this.ySourisOld) * 0.1;
+
+            this.focusPosition[0] -= decalageX;
+            this.focusPosition[1] += decalageY;
+
+            this.scaling();
+
+            this.xSourisOld = this.xSouris;
+            this.ySourisOld = this.ySouris;
+
+            
+
+        }
+        return false;
+
+    }
+
+    this.onMouseDown = function(event)
+    {
+        this.mouseDown = true;
+        this.xSouris = event.clientX;
+        this.xSourisOld = this.xSouris;
+        this.ySouris = event.clientY;
+        this.ySourisOld = this.ySouris;
+    }
+
+
+    this.onMouseUp = function(event)
+    {
+        this.mouseDown = false;     
+    }
+
+
+
+
+
+
 
 
 }
@@ -499,10 +568,13 @@ var Dessin3D = function()
 
     this.setup = function()
     {
+        var cube = THREE.ImageUtils.loadTexture('data/square.png');
+
         this.uniformsTerrain = {
 
-            lerp:  { type:'f', value: 0.0 },
-            displacement: { type:'t', value: null }
+            lerp:           { type:'f', value: 0.0 },
+            displacement:   { type:'t', value: null },
+            tWireframe:     { type:'t', value: cube }
 
         };
 
@@ -972,7 +1044,6 @@ var Canvas = function()
     this.xSouris, this.xSourisOld;
     this.ySouris, this.ySourisOld;
     this.mouseDown;
-    this.scrollSouris; 
 
     this.camera;
     this.angleCamera;
@@ -1000,7 +1071,6 @@ var Canvas = function()
 
 
         this.mouseDown = false;
-        this.scrollSouris = false;
         this.xSouris = 0; this.xSourisOld = 0;
         this.ySouris = 0; this.ySourisOld = 0;
 
@@ -1108,7 +1178,6 @@ var Canvas = function()
             this.xSourisOld = this.xSouris;
             this.ySourisOld = this.ySouris;
 
-            this.scrollSouris = true;
 
         }
         return false;
