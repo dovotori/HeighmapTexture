@@ -159,7 +159,7 @@ function passage3d()
 				mode = "3d";
 				d2d.redrawSvg();
 				d2d.resize(520, 520, 80, 520/2, 520/2);
-				d2d.createTextureFromSvg();
+				d3d.loadTexture();
 			}, 800);
 			
 	        canvas.onResize(window.innerWidth, window.innerWidth);
@@ -224,13 +224,6 @@ var Dessin2D = function()
 
         this.focusPosition = [ width/2, height/2 ];
 
-        // var graticule = d3.geo.graticule();
-        // svg.append("path")
-        //     .datum(graticule)
-        //     .attr("class", "graticule")
-        //     .attr("d", path)
-        //     .style("stroke", "#fff")
-        //     .style("stroke-width", ".1px");
 
         queue()
             .defer(lireJson, "data/world-countries-clean.json")
@@ -371,54 +364,10 @@ var Dessin2D = function()
 
 
 
-    this.createTextureFromSvg = function()
-    {
-
-        var svgImg = document.getElementById("carte2d");
- 
-        var xml = new XMLSerializer().serializeToString(svgImg);
-
-        // var firstLine = xml.split('\n')[0];
-
-        xml = xml.replace('<svg id="carte2d" width="520" height="520">','<svg xmlns="http://www.w3.org/2000/svg" id="carte2d" width="520" height="520">\n');
-
-        var data = "data:image/svg+xml;base64," + btoa(xml);
-        
-        var imageTexture = new Image();
-        var clone = this;
-        imageTexture.addEventListener("load", clone.blurImage, false);
-        imageTexture.src = data;
-
-    }
+   
 
 
 
-
-
-    this.blurImage = function()
-    {
-
-        var canvas2d = document.createElement( "canvas" );
-        var ctx = canvas2d.getContext('2d');
-
-        canvas2d.width = width;
-        canvas2d.height = height;
-        canvas2d.id = "canvas2d";
-
-        ctx.drawImage( this, 0, 0, canvas2d.width, canvas2d.height );
-
-        // application du blur
-        varBlur(ctx, function(x, y){ return 6.9; });
-        document.getElementById(conteneur).appendChild(canvas2d);
-        
-        // creation de la texture THREE
-        var textureCarted3js = new THREE.Texture( canvas2d );
-        textureCarted3js.needsUpdate = true;
-        
-        d3d.updateTexture( textureCarted3js );
-
-
-    }
 
 
 
@@ -704,7 +653,12 @@ var Dessin3D = function()
 
 
 
-
+    this.loadTexture = function()
+    {     
+        var textureCarted3js = THREE.ImageUtils.loadTexture('data/years/'+(2013-currentYear)+'.png', null, function(){
+            d3d.updateTexture( textureCarted3js );
+        });
+    }
 
 }
 
@@ -817,7 +771,7 @@ function changementAnnee(sens)
     if(mode == "3d")
     {
         loader.style.display = "block";
-        setTimeout( function(){ d2d.createTextureFromSvg(); }, 700 ); 
+        setTimeout( function(){ d3d.loadTexture(); }, 700 ); 
     }
     
 
@@ -1029,9 +983,9 @@ var Canvas = function()
     this.transitionFocusCamera;
 
 
-    //this.background;
-    //this.backgroundScene;
-    //this.backgroundCam;
+    this.background;
+    this.backgroundScene;
+    this.backgroundCam;
 
 
 
