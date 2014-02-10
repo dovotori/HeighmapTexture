@@ -158,8 +158,8 @@ function passage3d()
 				document.body.setAttribute("class", "mode3d");
 				mode = "3d";
 				d2d.redrawSvg();
-				d2d.resize(520, 520, 80, 520/2, 520/2);
 				d3d.loadTexture();
+                canvas.mouvementCool();
 			}, 800);
 			
 	        canvas.onResize(window.innerWidth, window.innerWidth);
@@ -192,7 +192,6 @@ var Dessin2D = function()
 
     this.projection;
     this.svg;
-    this.svgFond;
     this.path;
     this.scale;
     this.focusPosition;
@@ -221,11 +220,6 @@ var Dessin2D = function()
             .attr("id", "carte2d")
             .attr("width", width)
             .attr("height", height);
-
-
-        this.svgFond = this.svg.append("svg:rect").attr("x", 0).attr("y", 0)
-            .attr("width", width).attr("height", height)
-            .style("fill", "rgba(0, 0, 0, 0)"); 
 
         this.path = d3.geo.path().projection(this.projection);
 
@@ -267,7 +261,7 @@ var Dessin2D = function()
             .data(features)
             .enter().append("svg:path")
             .attr("class", "land")
-            .attr("id", function(d){ return d.id; })
+            .attr("id", function(d){ return "svg"+d.id; })
             .attr("d", function(d){ return d2d.path(d); })
             .style("fill", "rgba(200, 200, 200, 1)")
             .style("stroke-width", "0.4")
@@ -314,22 +308,13 @@ var Dessin2D = function()
     this.redrawSvg = function()
     {
 
-        if(mode == "3d")
-        {
-            // fond de la carte svg noir
-            this.svgFond.style("fill", "rgba(0,0,0,1)");
-        } else {
-            // fond de la carte svg transparent
-            this.svgFond.style("fill", "rgba(0,0,0,0)");
-        }
-
 
         for(var i = 0; i < index.length; i++)
         {
 
             var hauteur = getPositionCurrentYear(i);
             
-            var pays = this.svg.select("#"+index[i].iso);
+            var pays = this.svg.select("#svg"+index[i].iso);
         
        		var rvb = this.couleurPays(hauteur);
         
@@ -354,47 +339,39 @@ var Dessin2D = function()
         var color5 = [46 ,16 ,47 ]
         var transition = [0.25*hauteurMax,0.5*hauteurMax,0.75*hauteurMax,0.9*hauteurMax]
 
-        if(mode == "3d")
-        {
-            var gris = map(hauteur, hauteurMax, 0, 0, 255);
-            gris = Math.floor(gris);
-            red = green = blue = gris;
-            return [red, green, blue]; 
+       
+
+        if(hauteur < transition[0]){
+            // de vert à jaune
+            red     = map(hauteur, 0, transition[0], color1[0], color2[0]);
+            green   = map(hauteur, 0, transition[0], color1[1], color2[1]);
+            blue    = map(hauteur, 0, transition[0], color1[2], color2[2]);
+    
+        } else if(hauteur < transition[1]) {
+            // de jaune à orange
+                            // de vert à jaune
+            red     = map(hauteur, transition[0], transition[1], color2[0], color3[0]);
+            green   = map(hauteur, transition[0], transition[1], color2[1], color3[1]);
+            blue    = map(hauteur, transition[0], transition[1], color2[2], color3[2]);
+
+        } else if(hauteur < transition[2]){
+            // de orange à rouge
+            red     = map(hauteur, transition[1], transition[2], color3[0], color4[0]);
+            green   = map(hauteur, transition[1], transition[2], color3[1], color4[1]);
+            blue    = map(hauteur, transition[1], transition[2], color3[2], color4[2]);
 
         } else {
-
-            if(hauteur < transition[0]){
-                // de vert à jaune
-                red     = map(hauteur, 0, transition[0], color1[0], color2[0]);
-                green   = map(hauteur, 0, transition[0], color1[1], color2[1]);
-                blue    = map(hauteur, 0, transition[0], color1[2], color2[2]);
-        
-            } else if(hauteur < transition[1]) {
-                // de jaune à orange
-                                // de vert à jaune
-                red     = map(hauteur, transition[0], transition[1], color2[0], color3[0]);
-                green   = map(hauteur, transition[0], transition[1], color2[1], color3[1]);
-                blue    = map(hauteur, transition[0], transition[1], color2[2], color3[2]);
-
-            } else if(hauteur < transition[2]){
-                // de orange à rouge
-                red     = map(hauteur, transition[1], transition[2], color3[0], color4[0]);
-                green   = map(hauteur, transition[1], transition[2], color3[1], color4[1]);
-                blue    = map(hauteur, transition[1], transition[2], color3[2], color4[2]);
-
-            } else {
-                red     = map(hauteur, transition[2], transition[3], color4[0], color5[0]);
-                green   = map(hauteur, transition[2], transition[3], color4[1], color5[1]);
-                blue    = map(hauteur, transition[2], transition[3], color4[2], color5[2]);
-            }
-            
-            red = Math.floor(red);
-            green = Math.floor(green);
-            blue = Math.floor(blue);
-            
-            return [red, green, blue];
-           
+            red     = map(hauteur, transition[2], transition[3], color4[0], color5[0]);
+            green   = map(hauteur, transition[2], transition[3], color4[1], color5[1]);
+            blue    = map(hauteur, transition[2], transition[3], color4[2], color5[2]);
         }
+        
+        red = Math.floor(red);
+        green = Math.floor(green);
+        blue = Math.floor(blue);
+        
+        return [red, green, blue];
+           
 
 	}
 
@@ -449,7 +426,7 @@ var Dessin2D = function()
     }
 
 	
-	   this.scaling = function()
+	this.scaling = function()
     {
 
         var w = parseInt(this.svg.attr("width"));
@@ -476,16 +453,28 @@ var Dessin2D = function()
     this.colorerPays = function(iso, position)
     {
 		this.svg.selectAll(".land").transition().duration(400)
-			.style("fill", "rgb(60, 90, 140)").style("stroke", "#fff");
+			.style("fill", "#888").style("stroke", "#fff");
 
             
-        var pays = this.svg.select("#"+iso);
+        var pays = this.svg.select("#svg"+iso);
     
    		var rvb = this.couleurPays(position);
     
    		pays.transition().duration(400)
    			.style("fill", "rgba("+rvb[0]+","+rvb[1]+","+rvb[2]+", 1)" )
-   			.style( "stroke", "rgba("+rvb[0]+","+rvb[1]+","+rvb[2]+", 1)" ); 
+   			.style( "stroke", "rgba("+rvb[0]+","+rvb[1]+","+rvb[2]+", 1)" );
+
+
+        var paysDom = document.getElementById("svg"+iso);
+
+        bbox = paysDom.getBBox();
+        this.focusPosition = [bbox.x + bbox.width/2, bbox.y + bbox.height/2];
+        this.scale = 2;
+
+        this.scaling();
+
+
+
 
     }
 
@@ -1071,10 +1060,6 @@ var Canvas = function()
     this.transitionFocusCamera;
 
 
-    this.background;
-    this.backgroundScene;
-    this.backgroundCam;
-
 
 
     this.setup = function()
@@ -1105,7 +1090,7 @@ var Canvas = function()
         this.angleCamera[0] = 0;
         this.angleCamera[1] = 0;
         this.positionInitCam = [0, 0, 1000];
-        this.focusCamera = [ 0,0,0 ];
+        this.focusCamera = [ 0, 0, 0 ];
         this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
         this.camera.up = new THREE.Vector3( 0, 1, 0 );
 
@@ -1141,8 +1126,6 @@ var Canvas = function()
         this.canvas.addEventListener("mouseout", function(event){ clone.onMouseUp(event); }, false); // releve le clic si tu sort du canvas
 
 
-        // BACKGROUND
-        //this.setupBackground();
 
 
     }
@@ -1171,7 +1154,6 @@ var Canvas = function()
             this.camera.lookAt(new THREE.Vector3(this.focusCamera[0], this.focusCamera[1], this.focusCamera[2]));
         }
 
-       //this.drawBackground();
 
         // rendu
         this.renderer.render(this.scene, this.camera);
@@ -1317,7 +1299,6 @@ var Canvas = function()
 
     this.moveCamToPosition = function(position)
     {
-
         // this.transitionCamera.setup(
         //     [ this.camera.position.x, this.camera.position.y, this.camera.position.z ], 
         //     [ position[0], position[1], this.rayonCamera ] );
@@ -1367,42 +1348,16 @@ var Canvas = function()
 
 
 
-
-    this.setupBackground = function()
+    this.mouvementCool = function(event)
     {
 
-
-        var shaderMaterial = new THREE.ShaderMaterial({
-            vertexShader:   document.getElementById("background_vertexshader").textContent,
-            fragmentShader: document.getElementById("background_fragmentshader").textContent
-        });
-
-        this.background = new THREE.Mesh(
-            new THREE.PlaneGeometry(2, 2, 0),
-            shaderMaterial
-        );
-
-        this.background.material.depthTest = false;
-        this.background.material.depthWrite = false;
-
-        this.backgroundScene = new THREE.Scene();
-        this.backgroundCam = new THREE.Camera();
-        this.backgroundScene.add(this.backgroundCam);
-        this.backgroundScene.add(this.background);
+        // this.transitionCamera.setup(
+        //     [ this.camera.position.x, this.camera.position.y, this.camera.position.z], 
+        //     [ this.camera.position.x, this.camera.position.y-400, this.rayonCamera ] );        
 
     }
 
 
-
-
-    this.drawBackground = function()
-    { 
-
-        this.renderer.autoClear = false;
-        this.renderer.clear();
-        this.renderer.render(this.backgroundScene, this.backgroundCam);
-
-    }
 
 
 
