@@ -347,6 +347,12 @@ var Dessin2D = function()
 	{
 		var hauteurMax = index.length;
 		var red, green, blue;
+        var color1 = [200,255,200]
+        var color2 = [253,227,6  ]
+        var color3 = [241,151,3  ]
+        var color4 = [218,0  ,46 ]
+        var color5 = [46 ,16 ,47 ]
+        var transition = [0.25*hauteurMax,0.5*hauteurMax,0.75*hauteurMax,0.9*hauteurMax]
 
         if(mode == "3d")
         {
@@ -357,26 +363,34 @@ var Dessin2D = function()
 
         } else {
 
-            if(hauteur < hauteurMax / 3){
+            if(hauteur < transition[0]){
                 // de vert à jaune
-                red = map(hauteur, 0, hauteurMax / 3, 0, 255);
-                green = 255;
+                red     = map(hauteur, 0, transition[0], color1[0], color2[0]);
+                green   = map(hauteur, 0, transition[0], color1[1], color2[1]);
+                blue    = map(hauteur, 0, transition[0], color1[2], color2[2]);
         
-            } else if(hauteur < 2 * hauteurMax / 3) {
+            } else if(hauteur < transition[1]) {
                 // de jaune à orange
-                red = 255;
-                green = map(hauteur, hauteurMax / 3, 2 * hauteurMax / 3, 255, 127);
+                                // de vert à jaune
+                red     = map(hauteur, transition[0], transition[1], color2[0], color3[0]);
+                green   = map(hauteur, transition[0], transition[1], color2[1], color3[1]);
+                blue    = map(hauteur, transition[0], transition[1], color2[2], color3[2]);
 
-            } else if(hauteur <= hauteurMax){
+            } else if(hauteur < transition[2]){
                 // de orange à rouge
-                red = 255;
-                green = map(hauteur, 2 * hauteurMax / 3, hauteurMax, 127, 0);
+                red     = map(hauteur, transition[1], transition[2], color3[0], color4[0]);
+                green   = map(hauteur, transition[1], transition[2], color3[1], color4[1]);
+                blue    = map(hauteur, transition[1], transition[2], color3[2], color4[2]);
 
+            } else {
+                red     = map(hauteur, transition[2], transition[3], color4[0], color5[0]);
+                green   = map(hauteur, transition[2], transition[3], color4[1], color5[1]);
+                blue    = map(hauteur, transition[2], transition[3], color4[2], color5[2]);
             }
             
             red = Math.floor(red);
             green = Math.floor(green);
-            blue = 70;
+            blue = Math.floor(blue);
             
             return [red, green, blue];
            
@@ -1108,7 +1122,7 @@ var Canvas = function()
         // RENDERER
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setSize(window.innerWidth, 4 * window.innerWidth / 6);
-        this.renderer.setClearColor("rgb(20, 50, 100)", 1);
+        this.renderer.setClearColor("#282828", 1);
 
 
 
@@ -1128,7 +1142,7 @@ var Canvas = function()
 
 
         // BACKGROUND
-        this.setupBackground();
+        //this.setupBackground();
 
 
     }
@@ -1157,7 +1171,7 @@ var Canvas = function()
             this.camera.lookAt(new THREE.Vector3(this.focusCamera[0], this.focusCamera[1], this.focusCamera[2]));
         }
 
-        this.drawBackground();
+       //this.drawBackground();
 
         // rendu
         this.renderer.render(this.scene, this.camera);
