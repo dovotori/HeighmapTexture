@@ -158,6 +158,7 @@ function passage3d()
 				document.body.setAttribute("class", "mode3d");
 				mode = "3d";
 				d2d.redrawSvg();
+                d2d.resize(520, 520, 80, 520/2, 520/2);
 				d3d.loadTexture();
                 canvas.mouvementCool();
 			}, 800);
@@ -512,10 +513,7 @@ var Dessin2D = function()
             var decalageX = (this.xSouris - this.xSourisOld) * 0.1;
             var decalageY = (this.ySouris - this.ySourisOld) * 0.1;
 
-            //var t = document.getElementById("carte2d").style.marginTop;
-            var t = $("#carte2d").css("margin-top");
-            console.log(t);
-
+            
             //this.scaling();
 
             this.xSourisOld = this.xSouris;
@@ -765,7 +763,7 @@ var Dessin3D = function()
 
 
 /////////////////////////////////////////////////////////////////////////////////
-///////////// INTERACTION///// /////////////////////////////////////////////////
+///////////// INTERACTION //////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 function changementAnnee(sens)
@@ -1090,7 +1088,7 @@ var Canvas = function()
         this.angleCamera[0] = 0;
         this.angleCamera[1] = 0;
         this.positionInitCam = [0, 0, 1000];
-        this.focusCamera = [ 0, 0, 0 ];
+        this.focusCamera = [ 0,0,0 ];
         this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
         this.camera.up = new THREE.Vector3( 0, 1, 0 );
 
@@ -1210,21 +1208,6 @@ var Canvas = function()
 
 
 
-    this.resetCam = function()
-    {
-
-        this.angleCamera[0] = 0;
-        this.angleCamera[1] = 0;
-        
-        document.getElementById('rotationX').setAttribute("value", 0);
-        document.getElementById('rotationY').setAttribute("value", 0);
-
-        this.camera.position.set(this.positionInitCam[0], this.positionInitCam[1], this.positionInitCam[2]);
-        this.camera.lookAt(this.positionInitCam[0], this.positionInitCam[1], 0);
-
-    }
-
-
 
 
     this.initCam = function()
@@ -1241,9 +1224,7 @@ var Canvas = function()
         this.transitionFocusCamera.setup(
             [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
             [ this.positionInitCam[0], this.positionInitCam[1], 0 ] );
-            
-        document.getElementById('rotationX').setAttribute("value", 0);
-        document.getElementById('rotationY').setAttribute("value", 0);
+
 
     }
 
@@ -1302,12 +1283,11 @@ var Canvas = function()
         // this.transitionCamera.setup(
         //     [ this.camera.position.x, this.camera.position.y, this.camera.position.z ], 
         //     [ position[0], position[1], this.rayonCamera ] );
+
         
         this.transitionFocusCamera.setup(
             [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
             [ position[0], position[1], 0 ] );
-
-        this.isZoom = true;
 
     }
 
