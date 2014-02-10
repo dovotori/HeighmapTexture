@@ -236,14 +236,18 @@ var Dessin2D = function()
         this.ySouris = 0; this.ySourisOld = 0;
 
 
-
         // INTERACTION
-        var clone = this;
-        var t = document.getElementById("carte2d");
-        t.addEventListener("mousemove", function(event){ clone.onMouseMove(event); }, false);
-        t.addEventListener("mousedown", function(event){ clone.onMouseDown(event); }, false);
-        t.addEventListener("mouseup", function(event){ clone.onMouseUp(event); }, false);
-        t.addEventListener("mouseout", function(event){ clone.onMouseUp(event); }, false); // releve le clic si tu sort du canvas
+        //var clone = this;
+        //var t = document.getElementById("carte2d");
+
+        // $("#carte2d").on("dragmove",function(event, drag){
+        //      $(this).width(drag.location.x() - $(this).offset().left   )
+        // })
+
+        // t.addEventListener("mousemove", function(event){ clone.onMouseMove(event); }, false);
+        // t.addEventListener("mousedown", function(event){ clone.onMouseDown(event); }, false);
+        // t.addEventListener("mouseup", function(event){ clone.onMouseUp(event); }, false);
+        // t.addEventListener("mouseout", function(event){ clone.onMouseUp(event); }, false); // releve le clic si tu sort du canvas
 
 
 
@@ -524,7 +528,7 @@ var Dessin2D = function()
             var decalageY = (this.ySouris - this.ySourisOld) * 0.1;
 
             //var t = document.getElementById("carte2d").style.marginTop;
-            var t = $("#carte2d").css("margin-top");
+            var top = $("#carte2d").css("margin-top");
             console.log(t);
 
             //this.scaling();
