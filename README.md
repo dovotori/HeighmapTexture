@@ -22,8 +22,8 @@ Pays manquants sur la carte
 - Seychelles OK
 - Singapour OK
 - Bahreïn OK
-- Andorre -> trou dans la map
-- Liechtenstein -> trou dans la map car - pas de notes, on les vire OK
+- Andorre OK
+- Liechtenstein OK
 - Israël deux notes
 
 
