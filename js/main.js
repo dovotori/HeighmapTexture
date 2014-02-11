@@ -59,7 +59,6 @@ function setup()
     document.getElementById("btn_reset").addEventListener("click", function(){ reset(); }, false);
     
 
-
     d2d = new Dessin2D();
     d2d.setup();
 
@@ -722,7 +721,7 @@ var Dessin3D = function()
 
     this.loadTexture = function()
     {     
-        var textureCarted3js = THREE.ImageUtils.loadTexture('data/years/'+(2013-currentYear)+'.png', null, function(){
+        var textureCarted3js = THREE.ImageUtils.loadTexture('data/years/'+(2014-currentYear)+'.png', null, function(){
             d3d.updateTexture( textureCarted3js );
         });
     }
@@ -760,7 +759,7 @@ var Dessin3D = function()
 function changementAnnee(sens)
 {
 
-    if(sens > 0 && currentYear < 1)
+    if(sens > 0 && currentYear < 2)
     {
         currentYear++;
     } else if(sens < 0 && currentYear >= 1){
@@ -769,7 +768,7 @@ function changementAnnee(sens)
 
 
     var displayYear = document.getElementById("current_year");
-    displayYear.innerHTML = 2013-currentYear;
+    displayYear.innerHTML = 2014-currentYear;
 
     var already = [];
     var classement = d3.select("#liste");
@@ -953,8 +952,9 @@ function getPositionCurrentYear(i)
 {
 	switch(currentYear)
     {
-            case 0: return parseInt(index[i].an2013);  break;
-            case 1: return parseInt(index[i].an2012);  break;
+            case 0: return parseInt(index[i].an2014);  break;
+            case 1: return parseInt(index[i].an2013);  break;
+            case 2: return parseInt(index[i].an2012);  break;
     }	
 }
 
