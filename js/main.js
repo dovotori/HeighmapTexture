@@ -453,20 +453,7 @@ var Dessin2D = function()
     
     this.colorerPays = function(iso, position)
     {
-		this.svg.selectAll(".land").transition().duration(400)
-			.style("fill", "#888").style("stroke", "#fff");
-
-            
-        var pays = this.svg.select("#svg"+iso);
-    
-   		var rvb = this.couleurPays(position);
-    
-   		pays.transition().duration(400)
-   			.style("fill", "rgba("+rvb[0]+","+rvb[1]+","+rvb[2]+", 1)" )
-   			.style( "stroke", "rgba("+rvb[0]+","+rvb[1]+","+rvb[2]+", 1)" );
-
-
-        var paysDom = document.getElementById("svg"+iso);
+		var paysDom = document.getElementById("svg"+iso);
 
         bbox = paysDom.getBBox();
         this.focusPosition = [bbox.x + bbox.width/2, bbox.y + bbox.height/2];
@@ -1225,7 +1212,10 @@ var Canvas = function()
             [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
             [ this.positionInitCam[0], this.positionInitCam[1], 0 ] );
 
-
+        $("#picto_cam").animate({
+            left: "100px",
+            top: "100px"
+            }, 1000);
     }
 
 
@@ -1286,6 +1276,11 @@ var Canvas = function()
             [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
             [ position[0], position[1], 0 ] );
 
+        $("#picto_cam").animate({
+                left: "100px",
+                top: "100px"
+            }, 2000);
+
     }
 
 
@@ -1328,18 +1323,19 @@ var Canvas = function()
     this.mouvementCool = function(event)
     {
 
+        
+
         this.transitionCamera.setup(
             [ this.camera.position.x, this.camera.position.y, this.camera.position.z], 
             [ this.camera.position.x, this.camera.position.y-400, this.rayonCamera ] );        
 
+            $("#picto_cam").animate({
+                left: "100px",
+                top: "150px"
+                }, 2000);
+        
     }
-
-
-
-
-
 }
-
 
 
 
@@ -1373,6 +1369,8 @@ function onresize()
     }
 
 }
+
+
 
 
 

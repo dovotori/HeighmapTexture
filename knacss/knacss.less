@@ -84,9 +84,13 @@ li {
 	max-width:@smallscreen;
 }
 
-h1, h2 
+h1, h2, h3
 {
-	font-family:"BebasNeueRegular";
+	&, .grid & {
+		font-family:"BebasNeueRegular";
+		font-weight: normal;
+		line-height: 1
+	}
 }
 
 
@@ -160,11 +164,9 @@ nav {
 	text-align: center;
 	float: left;
 	
-	
-
 	#carte2d, #carte3d  {
 		z-index: 0;
-		margin-top: -26%;
+		margin: -26% 0;
 	}
 
 
@@ -231,7 +233,11 @@ nav {
 }
 
 
-
+.encadre {
+	background-color: #FBF8D4;
+	padding: 50px 130px 30px 30px;
+	margin:10px 0 0;
+}
 
 
 #control_mode
@@ -255,19 +261,36 @@ nav {
 	{
 	}
 
+	#btn_in, #btn_out {
+		background: transparent url("../data/zoom.png") no-repeat 0 0 scroll ;
+		width:23px;
+		left:25px;
+		margin:0;
+		padding:0;
+		border: none;
+		line-height: -100;
+		overflow: hidden;
+		display: block;
+	}
+	#btn_out {
+		background-position: left bottom;
+	}
+
 	#btn_rotation {
 		background: transparent url("../data/cameraNav.png") no-repeat 0 0 scroll ;
 
-		width:220px;
-		height:220px;
+		width:210px;
+		height:210px;
+		padding:10px;
 		position:relative;
 		overflow: hidden;
 		& > div{
 			position:absolute;
 			width:30px;
 			height:30px;
-			top: 90px;
-			left:90px;
+			top: 100px;
+			left:100px;
+			margin:-10px -10px;
 			background: transparent url("../data/pictoCam.png") no-repeat 0 0 scroll ;
 		}
 	}
