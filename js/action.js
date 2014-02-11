@@ -12,7 +12,7 @@ $(function(){
 	
 	$(".mode2d #carte").draggable();
   
-   $("#picto_cam").draggable({
+  $("#picto_cam").draggable({
    		containment: "parent",
    		start: function(event, ui ) {
    			if (origine == false){
@@ -35,13 +35,14 @@ $(function(){
   			canvas.rotation(angleX , angleY);
 
 
-
   		}
 	});
 
-   
+  
 
-   	$("#more").hide(0);
+
+
+  $("#more").hide(0);
 	$("#intro").append("<br/><a href='#'>Lire la suite</a>");
 	$("#intro a").click(function(){
 		$("#more").slideDown(500);
@@ -51,6 +52,16 @@ $(function(){
 
 
 }); 
+
+
+
+
+function action_resetPositionCarte()
+{
+  $("#carte").animate({ 
+    top: 0, 
+    left: 0}, 400);
+}
 
 
 

@@ -154,6 +154,7 @@ function passage3d()
 	        loader.style.display = "block";
 	
 	        d2d.reset();
+            action_resetPositionCarte();
 		
 			setTimeout(function(){
 				document.body.setAttribute("class", "mode3d");
@@ -857,6 +858,7 @@ function reset()
 
     } else {
 
+        action_resetPositionCarte();
         d2d.reset();
 
     }
@@ -1087,7 +1089,7 @@ var Canvas = function()
         this.angleCamera[0] = 0;
         this.angleCamera[1] = 0;
         this.positionInitCam = [0, 0, 1000];
-        this.focusCamera = [ 0,0,0 ];
+        this.focusCamera = [ 0,0,-100 ];
         this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
         this.camera.up = new THREE.Vector3( 0, 1, 0 );
 
@@ -1222,7 +1224,7 @@ var Canvas = function()
         
         this.transitionFocusCamera.setup(
             [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
-            [ this.positionInitCam[0], this.positionInitCam[1], 0 ] );
+            [ this.positionInitCam[0], this.positionInitCam[1], this.focusCamera[2] ] );
 
         action_recentrerPictoCam(100, 100);
     }
@@ -1233,8 +1235,8 @@ var Canvas = function()
     {
         
         // ANGLES
-        var decalageX = (this.xSouris - this.xSourisOld) * 0.5;
-        var decalageY = (this.ySouris - this.ySourisOld) * 0.5;
+        var decalageX = (this.xSouris - this.xSourisOld) * (this.rayonCamera * 0.0005);
+        var decalageY = (this.ySouris - this.ySourisOld) * (this.rayonCamera * 0.0005);
 
 
         this.camera.position.x -= decalageX;
@@ -1283,7 +1285,7 @@ var Canvas = function()
         
         this.transitionFocusCamera.setup(
             [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
-            [ position[0], position[1], 0 ] );
+            [ position[0], position[1], this.focusCamera[2] ] );
 
         action_recentrerPictoCam(100, 100);
     }
@@ -1295,7 +1297,7 @@ var Canvas = function()
         var distance = 300;
         if(sens > 0)
         {
-            if(this.rayonCamera > 200.0)
+            if(this.rayonCamera > 500.0)
             {
                 this.rayonCamera -= distance;
             }
