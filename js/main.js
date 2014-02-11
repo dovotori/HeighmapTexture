@@ -125,6 +125,7 @@ function passage2d()
     if(mode == "3d" || mode == "noWebgl")
     {
 		loader.style.display = "block";
+        action_removeFocusPaysListe();
         
         if(!noWebgl){ canvas.initCam(); }
         setTimeout(function(){
@@ -195,14 +196,12 @@ var Dessin2D = function()
     this.svg;
     this.path;
     this.scale;
-    this.focusPosition;
+    this.focusPosition
 
 
     this.mouseDown;
     this.xSouris, this.xSourisOld;
     this.ySouris, this.ySourisOld;
-
-
 
 
 
@@ -291,6 +290,7 @@ var Dessin2D = function()
                 }
 
             })
+            .on("click", function(d){ clicPaysCarte(d.id); });
        
         changementAnnee(0);
 		if(!noWebgl){ d3d.draw(canvas.scene); }
@@ -406,6 +406,8 @@ var Dessin2D = function()
 
 
 
+
+
     this.zoom = function(sens)
     {
 
@@ -450,6 +452,8 @@ var Dessin2D = function()
 
     }
     
+
+
     
     this.colorerPays = function(iso, position)
     {
@@ -513,6 +517,8 @@ var Dessin2D = function()
 
     }
 
+
+
     this.onMouseDown = function(event)
     {
         this.mouseDown = true;
@@ -523,14 +529,11 @@ var Dessin2D = function()
     }
 
 
+
     this.onMouseUp = function(event)
     {
         this.mouseDown = false;     
     }
-
-
-
-
 
 
 
@@ -920,6 +923,15 @@ function clicPaysClassement(isoPays)
 
 
 
+function clicPaysCarte(isoPays)
+{
+   
+    action_focusPaysListe(isoPays);
+
+}
+
+
+
 
 
 
@@ -1212,10 +1224,7 @@ var Canvas = function()
             [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
             [ this.positionInitCam[0], this.positionInitCam[1], 0 ] );
 
-        $("#picto_cam").animate({
-            left: "100px",
-            top: "100px"
-            }, 1000);
+        action_recentrerPictoCam(100, 100);
     }
 
 
@@ -1276,11 +1285,7 @@ var Canvas = function()
             [ this.focusCamera[0], this.focusCamera[1], this.focusCamera[2] ],
             [ position[0], position[1], 0 ] );
 
-        $("#picto_cam").animate({
-                left: "100px",
-                top: "100px"
-            }, 2000);
-
+        action_recentrerPictoCam(100, 100);
     }
 
 
@@ -1329,10 +1334,7 @@ var Canvas = function()
             [ this.camera.position.x, this.camera.position.y, this.camera.position.z], 
             [ this.camera.position.x, this.camera.position.y-400, this.rayonCamera ] );        
 
-            $("#picto_cam").animate({
-                left: "100px",
-                top: "150px"
-                }, 2000);
+        action_recentrerPictoCam(100, 150);
         
     }
 }

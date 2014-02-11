@@ -1,3 +1,5 @@
+
+
 $(function(){
 
 	var origine = false;
@@ -5,9 +7,11 @@ $(function(){
 	var origineY;
 	var angleX;
 	var angleY;
-	
-	$(".mode2d #carte").draggable()
 
+
+	
+	$(".mode2d #carte").draggable();
+  
    $("#picto_cam").draggable({
    		containment: "parent",
    		start: function(event, ui ) {
@@ -25,8 +29,8 @@ $(function(){
   			angleY = Math.max ( event.clientY - origineY + 100, -100);
   			angleY = Math.min ( angleY , 100);
 
-  			angleX = map(angleX, -100, 100, -90, 90)
-  			angleY = map(angleY, -100, 100, 90, -90)
+  			angleX = map(angleX, -100, 100, -90, 90);
+  			angleY = map(angleY, -100, 100, 90, -90);
 
   			canvas.rotation(angleX , angleY);
 
@@ -47,5 +51,36 @@ $(function(){
 
 
 }); 
+
+
+
+
+function action_focusPaysListe(isoPays)
+{
+
+    action_removeFocusPaysListe();
+    $("#"+isoPays).addClass( "focusList");
+
+    $("#liste").animate({
+          scrollTop: $("#"+isoPays).position().top + $("#liste").scrollTop() },
+          1000);
+
+}
+
+
+function action_removeFocusPaysListe()
+{
+  $(".itemPays").removeClass("focusList");
+}
+
+
+
+function action_recentrerPictoCam(x, y)
+{
+  $("#picto_cam").animate({
+                left: x+"px",
+                top: y+"px"
+                }, 2000);
+}
 
 
