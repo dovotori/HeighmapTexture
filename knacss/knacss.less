@@ -88,11 +88,24 @@ h1, h2, h3
 {
 	&, .grid & {
 		font-family:"BebasNeueRegular";
-		font-weight: normal;
+		font-weight: normal!important;
 		line-height: 1
+	}
+
+	.rtl & {
+		text-align:right;
+	}
+
+	a {
+		text-decoration: none;
+		color:#000;
 	}
 }
 
+i {
+	display: inline;
+	font-variant: italic;
+}
 
 nav {
 	padding:20px 0;
@@ -104,11 +117,31 @@ nav {
 		text-align: center;
 		border-radius: 2px;
 		text-decoration: none;
+		line-height: 0.95;
+		padding:4px 0;
+		margin-bottom: 3px;
+		&:hover {
+			background-color: #bbb;
+		}
+	}
+
+	.shortText a{
+		padding:10px 0;  
+		line-height: 1;
 	}
 
 }
 
+#selected-asie #asie a, #selected-afrique #afrique a, #selected-ameriques #ameriques a, #selected-mo  #mo a, #selected-ue #ue a, #selected-europe-est #europe-est a {
+	background-color: #fff;
+	font-family:"BebasNeueRegular";
+	font-weight: normal;
+	font-size: 1.3em;
+}
 
+#langues a{
+	font-size:0.7em;
+}
 
 
 
@@ -150,8 +183,9 @@ nav {
 	color: #fff;
 	width: 100%;
 	height:100%;
-	max-height: 1000px;
+	max-height: 600px;
 	overflow: hidden;
+	margin: 30px 0;
 }
 
 
@@ -163,6 +197,7 @@ nav {
 	width: 80%;
 	text-align: center;
 	float: left;
+	z-index:50;
 	
 	#carte2d, #carte3d  {
 		z-index: 0;
@@ -172,16 +207,73 @@ nav {
 
 }
 
-
 #classement {
-
 	position: relative;
-	width:20%;
-	min-width: 200px;
-	height: 1000px;
-	overflow: hidden;
-	float: left;
-	
+	z-index:100;
+	background-color: rgba(0,0,0,0.2);
+	height: 800px;
+}
+
+#control_annees {
+	margin:10px 30px;
+	& > * {
+		text-align:center;
+	}
+}
+
+#btn_precedent, #btn_suivant {
+	padding:25px 0 0 ;
+}
+
+#liste-container {
+	position: relative;
+	width:100%;
+	height: 80%;
+	overflow-y: scroll;
+
+}
+
+#liste {
+
+	margin:10px 60px;
+	height:4000px;
+
+	li {
+		width:100%;
+	}
+
+	.position {
+		.w20;
+		display: block;
+		float:left;
+		font-weight: bold;
+	}
+
+	.name{
+		position: relative;
+		.w80;
+		overflow: hidden;
+		text-overflow: ellipsis;
+
+	}
+
+	.itemPays {
+		cursor: pointer;	
+	}
+}
+
+
+
+
+
+/*
+#classement {
+	background-color: rgba(0,0,0,0.2);
+	padding:15px;
+}
+
+#control_annees {
+	z-index: 100;
 }
 
 
@@ -189,27 +281,6 @@ nav {
 
 #liste
 {
-
-	position: absolute;
-	font-size:0.9em;
-	width:100%;
-	height: 80%;
-	overflow-y: scroll;
-	
-
-	.itemPays {
-		position: relative;
-		width:200px;	
-		height: 20px;
-	}
-	
-	.odd{
-		background-color: rgba(255, 255, 255, 0.2);
-	}
-
-	& > * {
-		float:left;
-	}
 
 	.position {
 		.w50p;
@@ -230,16 +301,8 @@ nav {
 		cursor: pointer;	
 	}
 
-	.focusList {
-		background-color: rgba(255, 255, 255, 0.6);
-		color: #fff;
-		/*border-width: 0px 100px 0px 0px;
- 		border-style: solid;
- 		border-color: rgba(255, 255, 255, 0.6);*/
-	}
-
 }
-
+*/
 
 .encadre {
 	background-color: #FBF8D4;
@@ -251,34 +314,89 @@ nav {
 #control_mode
 {
 	position: absolute;
-	top: 10px; left: 10px;
-	z-index: 1;
+	top: 0; 
+	left: 0;
+	z-index: 1000;
+	padding:30px;
+	text-align: center;
 
-	.btn_mode
-	{
+	.w100p;
+
+	.mode3d & {
+		width:260px;
 	}
 
-	.btn_mode:hover
-	{
-		opacity: .50;
+	background-color: rgba(0,0,0,0.3);
+
+	#btn_2d, #btn_3d {
+		
+		background: transparent url("../data/sprite.png") no-repeat -97px top scroll ;
+		width:49px;
+		height:50px;
+
+		margin:0 3px 10px 0 !important ;
+
+		border: none;
+
+		line-height: 100;
+
+		overflow: hidden;
+		margin:0;
+		border: none;
+
+		float : left;
+
+		&:hover {
+			background-position: -36px top;
+		}
+
 	}
 
-	.btn_mode:active
-	{
+	#btn_3d {
+		
+		background-position: -218px top;
+
+		&:hover {
+			background-position: -160px top;
+		}		
+	}
+
+	#btn_reset{
+		margin:10px 0 0;
+		padding:0;
+		cursor: pointer;
+		text-align: left;
+		
+		&:hover {
+			color:#aaa;
+		}		
+
 	}
 
 	#btn_in, #btn_out {
-		background: transparent url("../data/zoom.png") no-repeat 0 0 scroll ;
-		position: relative;
+		background: transparent url("../data/sprite.png") no-repeat right top scroll ;
 		width:23px;
 		height:25px;
+
 		margin:0;
-		padding:0;
 		border: none;
+
+		line-height: 100;
+
+		overflow: hidden;
 		display: block;
+
+		&:hover {
+			background-position: left top;
+		}
+			
 	}
 	#btn_out {
-		background-position: left bottom;
+		background-position: right bottom;
+
+		&:hover {
+			background-position: left bottom;
+		}
 	}
 
 	#btn_rotation {
@@ -304,49 +422,5 @@ nav {
 
 
 
-
-#control_annees
-{
-
-	position: relative;
-	height: 100px;
-	z-index: 1;
-
-
-	#current_year, .fleche
-	{
-		float: left;
-
-	}
-
-	.fleche
-	{
-		cursor: pointer;
-		position: relative;
-		height: 52px;
-		width: 26px;
-		overflow: hidden;
-		opacity: 0.5;
-		margin: 4%;
-	}
-
-	.fleche:hover
-	{
-		opacity: 1.0;
-	}
-
-	#btn_precedent 
-	{
-		margin-right: 2%;
-		
-	}
-
-	#btn_suivant
-	{
-		margin-left: 2%;
-		margin-top: -26px;
-	}
-
-}
 
 

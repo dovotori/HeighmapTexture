@@ -9,7 +9,10 @@ $(function(){
 	var angleY;
 
 
-	
+  $("#main").hide(0);
+
+
+ 	
 	$(".mode2d #carte").draggable();
   
   $("#picto_cam").draggable({
@@ -40,13 +43,26 @@ $(function(){
 
   
 
+  var readMoreTrad = [];
+ readMoreTrad["fr"] = "Lire la suite";
+ readMoreTrad["en"] = "Read more";
+ readMoreTrad["es"] = "Leer más";
+ readMoreTrad["ru"] = "Дальше";
+ readMoreTrad["ar"] = "اقرأ المزيد";
 
+ var readMore = "Read more";
+
+ if( readMoreTrad[$("html").attr("lang")] ){
+    readMore = readMoreTrad[$("html").attr("lang")];  
+ }
+
+ 
 
   $("#more").hide(0);
-	$("#intro").append("<br/><a href='#'>Lire la suite</a>");
-	$("#intro a").click(function(){
+	$("#intro").append("<br/><a class='morelink' href='#'>"+readMore+"</a>");
+	$("#intro > a").add("#intro").click(function(){
 		$("#more").slideDown(500);
-		$(this).hide(0);
+		$(".morelink").hide(0);
 	})
 
 

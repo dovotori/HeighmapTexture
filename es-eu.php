@@ -1,0 +1,73 @@
+<?php 
+	$selected 	= "ue";
+	$title 		= "World Press Freedom Index 2014 | EASTERN EUROPE AND CENTRAL ASIA"
+?>
+<?php include "en-header.php" ?>
+
+<h2>European Union and Balkans</h2>
+<h5>EUROPEAN UNION – RIGHTS GUARANTEED BUT UNDER THREAT</h5>
+The Council of Europe was barely a year old in 1950 when it affirmed the “freedom to hold opinions and to receive and impart information and ideas without interference by public authority and regardless of frontiers.”
+
+In the 63 years since then, this principle has been reiterated many times in documents that have established the foundations of the European Union. European law requires member states to enforce explicit and well-crafted guarantees. They include those contained in the European Convention on Human Rights, which took effect in 1953, and the Charter of Fundamental Rights of the European Union, which was proclaimed in 2000 and which enshrines the freedom to inform and be informed. The press freedom index seems to suggest that these guarantees are being applied. The top 50 countries include 31 European ones.
+
+The models of respect for media freedom are in northern Europe. Finland, Norway and Netherlands have led the index for years. Their success rests on solid constitutional and legal foundations, which in turn are based on a real culture of individual freedoms, a culture that is more integrated than in southern Europe. The only positive evolution in the south is to be found in Italy, which has finally emerged from a negative spiral and is preparing an encouraging law that would decriminalize defamation via the media.
+
+The country that has headed the index since 2008, Finland, paradoxically evinces two obstacles to the development of a benign environment for freedom of information: defamation is punishable by imprisonment in certain circumstances, and just three companies own virtually almost all the national media. In practice, however, it is extremely rare for journalists to receive jail terms for what they write and there is a great deal of media pluralism despite the concentrated ownership. In a country where print is resisting digital well, the media are self-regulated through the Council for Mass Media, an independent body based on the voluntary membership of news media and journalists’ associations and funded mainly by member contributions.
+
+Despite the European Union’s good showing in the press freedom index, regrettable developments have sullied the performance of some countries as regards protection of freedom of information. They include the United Kingdom and France – countries traditionally respectful of media freedom which had a worrying 2013.
+
+The Franco-German tandem hit some bumps. Germany remained in a good position but France slipped one position. Its Constitutional Council approved a law that makes publishing the assets of certain elected officials punishable by imprisonment and it still awaits a law that would provide effective protection for the confidentiality of journalists’ sources. <a href="https://www.wefightcensorship.org/censored/courts-censor-bettencourt-recordingshtml.html">The year’s low point in France was a court order withdrawing the Bettencourt recordings from the Mediapart and <i>Le Point </i>websites</a>, a grave media freedom violation that denied the public’s right to be informed about a matter of general interest involving leading politicians.
+
+In the United Kingdom,<a href="http://en.rsf.org/uk-government-s-culpable-20-08-2013,45073.html"> the government sent officials to <i>The Guardian</i>’s basement to supervise destruction of the newspaper’s computer hard disks containing information from whistleblower Edward Snowden</a> about the practices of GCHQ, Britain’s signals intelligence agency. Shortly thereafter, the partner of Glenn Greenwald, the former <i>Guardian</i> star reporter who had worked closely with Snowden, was held at Heathrow Airport for nine hours under the Terrorism Act. By identifying journalism with terrorism with such disturbing ease, the UK authorities are following one of the most widespread practices of authoritarian regimes. Against this backdrop, civil society could only be alarmed by a Royal Charter for regulating the press. Adopted in response to the outcry about the <i>News of the World</i> tabloid’s scandalous phone hacking, its impact on freedom of information in the UK will be assessed in the next index.
+
+These developments showed that, while freedom of information has an excellent legal framework and is exercised in a relatively satisfactory manner overall in the European Union, it is put to a severe test in some member countries including those that most pride themselves on respecting civil liberties.
+<div class="encadre">
+<h6><b>Bulgaria – lowest ranked EU country</b></h6>
+Although closely challenged by Greece, Bulgaria retains the status of lowest ranked European Union country after a trying year marked by five months of major protests and political tension. <a href="http://en.rsf.org/bulgarie-police-attack-journalists-covering-26-07-2013,44980.html">Reporters were repeatedly the victims of police violence during these demonstrations calling for the government’s resignation.</a>
+
+Independent journalists, especially investigative reporters, are meanwhile exposed to harassment that can take the form of arson attacks on their cars. In 2013, the car of Genka Shikerova, a journalist known for her hard-hitting political interviews, <a href="http://en.rsf.org/bulgaria-interview-with-genka-shikerova-on-02-10-2013,45271.html">was set on fire outside her Sofia home</a>. In 2012, investigative reporter Lidia Pavlova’s car was torched.
+
+</div>
+<h5></h5>
+<h5>EUROPEAN COUNTRIES THAT ARE FALLING IN THE INDEX</h5>
+While freedom of information is occasionally abused in some European Union countries, it is repeatedly and blatantly flouted in others. This is the case in Greece, which has plunged more than 50 places in the press freedom index in the space of just five years. This is a dizzying fall for the world’s oldest democracy.
+
+The 2007 economic crisis hit the Greek media hard. The few wealthy shipowners and entrepreneurs who financed the national media have moved their investments into more profitable sectors. One news organization after another has announced layoffs. Many journalists are now unemployed. As well as economic difficulties, the Greek media have a bad reputation that is the result of years of clientelism. Reporters covering the frequent street protests against the austerity measures adopted by a series of short-lived governments have been the victims of both police violence and violence by demonstrators accusing them of colluding with the government.
+
+The security situation has been aggravated by the rise of the neo-Nazi party Golden Dawn, which won nearly 20 seats in the Voulí (parliament) in June 2012 thanks to euroscepticism and growing hostility towards foreigners accused of “stealing Greece.” Golden Dawn’s leaders and supporters openly target journalists. <a href="http://en.rsf.org/greece-golden-dawn-close-to-being-added-04-06-2013,44709.html">Physical attacks have become systematic throughout the country.</a> Death threats are growing.
+
+June 2013 was a turning point in Greece’s media history. In a race to cut spending, conservative Prime Minister Antonis Samaras took what was an unprecedented decision in a European Union country. Under pressure from the troika (the European Commission, European Central Bank and IMF) to reduce the budget deficit, <a href="http://en.rsf.org/greece-rwb-secretary-general-flies-to-12-06-2013,44769.html">Samaras closed the state-owned national broadcaster</a>, <i>ERT</i>, consisting of four TV stations and five radio stations. Just hours after <i>ERT </i>was told of the decision, dark screens with the words “No signal” stunned Europe and the world. Under international pressure, the government finally announced the creation of a new state broadcaster to be called NERIT.
+
+Now jostling Greece in the press freedom index, Hungary has undergone a significant erosion of civil liberties, above all freedom of information, since Viktor Orbán was elected prime minister in 2010.
+
+The Orbán government used its two-thirds majority in parliament to get a highly restrictive media law adopted in 2011. It introduced fines for the creators of content that is not “balanced” – a concept deliberately left vague – and established a dangerous media regulatory authority with statutory links to Fidesz, the conservative ruling party. This “Media Council” guaranteed just one thing – political interference in news and information content. The European Union subsequently managed to get the government to rescind some of its provisions but not the most draconian ones.
+
+In the witchhunt against independently reported news, the Budapest-based news and talk radio station <i>Klubradio </i>became symbol of the fight to be informed. The new Media Council refused to renew its licence, despite its years of existence and hundreds of thousands of listeners, and reassigned its frequency to an unknown station. After a major campaign in support of the station and several court rulings, the Media Council finally gave <i>Klubradio</i> a long-term licence in March 2013.
+<div class="encadre">
+<h6><b>EU’s 28th member facing challenges</b></h6>
+Croatia became the European Union’s 28th member in July 2013. Six years of negotiations with the European Commission led to significant changes such as the inclusion of references to media freedom and the right of access to information in the constitution. But much remains to be done. The state radio and TV broadcaster <i>HRT</i> has been criticized for a lack of independence after reforms carried out under centre-left Prime Minister Zoran Milanovic. The head of HRT, the members of its supervisory board and its administrators are now appointed by parliament. This gives the ruling party political control over broadcast content.
+
+</div>
+<h5></h5>
+<h5>BALKAN POWDER KEG FOR JOURNALISTS</h5>
+<div>
+
+Macedonia has been seeking European Union membership since 2005 but, eight years later, membership negotiations have yet to start. Ever since independence in 1991, Macedonia has been locked in a naming dispute with neighbouring Greece that is blocking talks. Both countries and their peoples claim the name of Macedonia, Greece for its northern region. Although Macedonia has been tackling reforms designed to put it on the road to membership, the democratic window-dressing of the past few years is not enough to hide the many freedom of information violations.
+
+The journalist Tomislav Kezarovski has become the symbol of these violations. <a href="https://en.rsf.org/macedonia-reporter-sentenced-to-four-and-a-21-10-2013,45353.html">After he was sentenced to four and a half years in prison in October 2013 for revealing the name of a protected witness in a murder case</a>, his jail term was changed to house arrest under international pressure. But another Macedonian journalism, Zoran Bozinovski, was arrested in Serbia on an Interpol warrant for spying the next day. Known as “Macedonia’s Julian Assange,” Bozinovski has done a great deal of investigative reporting on Sashe Mijalko, Macedonia’s intelligence chief and relative of Prime Minister Nikola Gruevski.
+
+Journalists’ safety continues to be a major concern in Montenegro, Europe’s youngest country since winning independence from Serbia in 2006. It has a tradition of investigative journalism that is more developed than in some of its neighbours. The main sources of independent reporting are the daily newspapers <i>Vijesti</i> and <i>Dan</i> and the magazine <i>Monitor</i>, whose journalists are often the victims of threats and physical attacks. Some of these attacks have been extremely serious.
+
+In August 2013, <a href="http://en.rsf.org/montenegro-bomb-attack-on-investigative-13-08-2013,45047.html">a TNT charge exploded outside the home of Tufik Softic</a>, an investigative reporter who writes for both <i>Vijesti</i> and <i>Monitor</i>. Softic, who is used to threats and violence, was not hurt but the bomb could have been fatal if it had gone off a few minutes earlier. He has been writing about clandestine organizations and drug trafficking for years, often implicating government officials in his articles. The response from the authorities to this violence has been minimal. Almost all cases have gone unpunished, including the 2004 murder of <i>Dan</i> editor Dusko Jovanovic, who was gunned down on the street. The person behind it has never been identified and brought to justice.
+
+The threat to independent journalists is not just physical. Other means are used in an attempt to silence them. Like Macedonia, Montenegro has been trying to join the EU since 2010. Its politicians have mastered the language of the EU’s institutions and put on show of striving to be more democratic for the benefit of an international community more concerned about regional stability than actual progress in respect for civil liberties. Led by President Milo Djukanovic, a wealthy and controversial businessman and former associate of Slobodan Milosevic, the Democratic Socialist Party (DPS) that has ruled Montenegro for nearly 20 years wages full-blown hate campaigns against independent journalists.
+
+Often branded as “traitors to the nation” or “fascists,” they are also subjected to threats and insults of incredible vulgarity. In 2013, shortly after publishing an op-ed piece headlined “Dancing with the dictator,” <i>Monitor</i> editor Milka Tadic-Mijovic was the target of obscene sexist vilification by various means including an SMS message. Although a report was filed with the police, which was given the phone number from which the SMS was sent, no action was taken against those responsible.
+
+</div>
+<div class="encadre">
+<h6><b>New page in Albania’s media history</b></h6>
+Albania’s June 2013 elections resulted in a change of government. The Socialist Party of Albania won clean elections that ended two decades of complicated electoral exercises. Its programme for the Albanian media is ambitious: draft new legislation that improves media ownership transparency, reinforce the Albanian public broadcaster’s independence and guarantee media access to information held by state entities. In October 2013, the 11 members of the public broadcaster’s board of governors had exceeded their term of office by one year. This gives an idea of the scale of the challenge faced by the new government, which aspires to be accepted as a candidate for European Union membership.
+
+</div>
+<?php include "en-footer.php" ?>
