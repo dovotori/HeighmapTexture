@@ -4,19 +4,19 @@ window.addEventListener("load", setup, false);
 
 
 
-var conteneur = "carte";
-var width = 520;
-var height = 520;
-var index;
-var canvas;
-var d2d;
-var d3d;
-var currentYear;
-var langue;
-var pathFrontieres;
-var mode;
-var loader;
-var noWebgl;
+var conteneur = "carte";                // id de la balise qui doit contenir la carte
+var tailleCartePourTexture = 520;       // largeur et hauteur de la carte à 520 pour avoir la totalité de la carte pour créer la texture
+var index;                              // garde en mémoire les infos de index.csv
+var canvas;                             // instance de la classe Canvas qui contient la scene 3d et les mouvements camera
+var dessin2d;                           // instance de la classe Dessin2D pour la carte en mode 2D
+var dessin3d;                           // instance de la classe Dessin3D pour la carte en mode 3D
+var limitYear = 2014;                   // année à mettre à jour dès qu'on rajoute une année
+var currentYear;                        // année en cours visualiser dans le programme
+var langue;                             // FR pour francais, autre pour anglais                       
+var pathFrontieres;                     // coordonnées des dessins des frontieres, recuperer dans dessin2d et dessiner dans dessin3d
+var mode = "2d";                        // mode 2d / 3d
+var loader;                             // picto chargement
+var noWebgl;                            // boolean si le navigateur ou l'ordinateur ne supporte pas WebGL
 
 
 
@@ -36,26 +36,27 @@ function lireJson(url, callback) {
 function setup()
 {
 
-    currentYear = 0;
-    langue = "EN";
 
     if( $("html").attr("lang") == "fr"){
         langue = "FR";        
+    } else {
+        langue = "EN";
     }
 
-
+    currentYear = limitYear;
     pathFrontieres = [];
     mode = "2d";
     noWebgl = false;
     
+    // chargement du gif loader
     loader = new Image();
     loader.addEventListener("load", function(){ document.getElementById("main").appendChild(this); }, false);
     loader.src= "data/loader.gif";
     loader.id = "loader";
 
     // gestion boutons 2D
-    document.getElementById("btn_precedent").addEventListener("click", function(){ changementAnnee(1); }, false);
-    document.getElementById("btn_suivant").addEventListener("click", function(){ changementAnnee(-1); }, false);
+    document.getElementById("btn_precedent").addEventListener("click", function(){ changementAnnee(-1); }, false);
+    document.getElementById("btn_suivant").addEventListener("click", function(){ changementAnnee(1); }, false);
     
     document.getElementById("btn_2d").addEventListener("click", function(){ passage2d(); }, false);
     document.getElementById("btn_3d").addEventListener("click", function(){ passage3d(); }, false);
@@ -65,8 +66,8 @@ function setup()
     document.getElementById("btn_reset").addEventListener("click", function(){ reset(); }, false);
     
 
-    d2d = new Dessin2D();
-    d2d.setup();
+    dessin2d = new Dessin2D();
+    dessin2d.setup();
 
 
 	// si WegGL est supporté	
@@ -78,11 +79,8 @@ function setup()
         canvas = new Canvas();
         canvas.setup();
 
-        // document.getElementById('rotationX').addEventListener("change", function(event){ canvas.rotation(event); }, false);
-        // document.getElementById('rotationY').addEventListener("change", function(event){ canvas.rotation(event); }, false);
-
-        d3d = new Dessin3D();
-        d3d.setup();
+        dessin3d = new Dessin3D();
+        dessin3d.setup();
 
         animate();
 
@@ -101,11 +99,11 @@ function setup()
 
 
 
-
+// fonction qui boucle sur elle 
 function animate()
 {
 
-    setTimeout(animate, 1000/50); 
+    setTimeout(animate, 1000/50);   // règle le "Frame Per Second"
     
     if(mode == "3d")
     {
@@ -119,8 +117,10 @@ function animate()
 
 
 
+
+
 //////////////////////////////////////////////////////////
-////////////// PASSAGE MODE /////////////////////////////
+/* FUNCTION DES PASSAGES ENTRE LES DEUX MODES 2D / 3D */
 ////////////////////////////////////////////////////////
 
 function passage2d()
@@ -129,18 +129,18 @@ function passage2d()
 	
     if(mode == "3d" || mode == "noWebgl")
     {
-		loader.style.display = "block";
-        action_removeFocusPaysListe();
+		loader.style.display = "block";   // loader apparait
+        action_removeFocusPaysListe();    // retire le surlignage en mode 2d du pays dans la liste
+        action_resetPositionCarte();      // le bouton de rotation 3d revient au centre
         
-        if(!noWebgl){ canvas.initCam(); }
+        if(!noWebgl){ canvas.initCam(); }                 // retour de la camera à sa position d'origine
         setTimeout(function(){
         	mode = "2d";
 		    onresize();
-		    d2d.redrawSvg();
+		    changementAnnee(0);
         	document.body.setAttribute("class", "mode2d");
-        	loader.style.display = "none";
-        }, 3000);
-        
+        	loader.style.display = "none"; // loader disparait
+        }, 3000);       
 
     }
 
@@ -151,33 +151,35 @@ function passage2d()
 function passage3d()
 {
 
-    if(mode == "2d")
+    if(!noWebgl)
     {
+        if(mode == "2d")
+        {
     	
-    	if(!noWebgl)
-    	{
 	        loader.style.display = "block";
 	
-	        d2d.reset();
+	        dessin2d.reset();
             action_resetPositionCarte();
 		
 			setTimeout(function(){
 				document.body.setAttribute("class", "mode3d");
 				mode = "3d";
-				d2d.redrawSvg();
-                d2d.resize(520, 520, 80, 520/2, 520/2);
-				d3d.loadTexture();
+				changementAnnee(0);
+                dessin2d.resize(tailleCartePourTexture, tailleCartePourTexture, 80, tailleCartePourTexture/2, tailleCartePourTexture/2);
+                //dessin2d.createTextureFromSvg();
+				dessin3d.loadTexture();
                 canvas.mouvementCool();
 			}, 800);
 			
 	        canvas.onResize(window.innerWidth, window.innerWidth);
 	       
-    	} else {
-    		
-    		document.body.setAttribute("class", "noWebgl");
-    		mode = "noWebgl";
-    		
-    	}
+    	} 
+
+    } else {
+            
+        document.body.setAttribute("class", "noWebgl");
+        mode = "noWebgl";
+        
     }
 
 }
@@ -202,7 +204,9 @@ var Dessin2D = function()
     this.svg;
     this.path;
     this.scale;
-    this.focusPosition
+    this.focusPosition;
+    this.traitSahara;
+    this.svgFond;
 
 
     this.mouseDown;
@@ -219,21 +223,26 @@ var Dessin2D = function()
 
         this.projection = d3.geo.mercator()
             .scale(80)
-            .translate([width/2, height/2]);
-
+            .translate([tailleCartePourTexture / 2, tailleCartePourTexture / 2]);
 
         this.svg = d3.select("#"+conteneur).append("svg")
             .attr("id", "carte2d")
-            .attr("width", width)
-            .attr("height", height);
+            .attr("width", tailleCartePourTexture)
+            .attr("height", tailleCartePourTexture);
 
         this.path = d3.geo.path().projection(this.projection);
 
-        this.focusPosition = [ width/2, height/2 ];
+        this.focusPosition = [ tailleCartePourTexture/2, tailleCartePourTexture/2 ];
 
         this.mouseDown = false;
         this.xSouris = 0; this.xSourisOld = 0;
         this.ySouris = 0; this.ySourisOld = 0;
+
+
+        this.svgFond = this.svg.append("svg:rect").attr("x", 0).attr("y", 0)
+            .attr("width", tailleCartePourTexture).attr("height", tailleCartePourTexture)
+            .style("fill", "rgba(0, 0, 0, 0)"); 
+
 
 
 
@@ -247,7 +256,7 @@ var Dessin2D = function()
 
 
 
-        queue()
+         queue()
             .defer(lireJson, "data/world-countries-clean.json")
             .defer(lireCsv, "data/index.csv")
             .awaitAll(this.draw);
@@ -262,19 +271,19 @@ var Dessin2D = function()
         var features = results[0].features;
 
 
-        var frontieres = d2d.svg.append("svg:g")
+        var frontieres = dessin2d.svg.append("svg:g")
             .selectAll("path")
             .data(features)
             .enter().append("svg:path")
             .attr("class", "land")
             .attr("id", function(d){ return "svg"+d.id; })
-            .attr("d", function(d){ return d2d.path(d); })
+            .attr("d", function(d){ return dessin2d.path(d); })
             .style("fill", "rgba(200, 200, 200, 1)")
             .style("stroke-width", "0.4")
             .each(function(d, i){
 
                 // calcul des frontieres pour la 3d
-                pathFrontieres[i] = getPath(d2d.path(d));
+                pathFrontieres[i] = getPath(dessin2d.path(d));
 
                 for (var i = 0; i < index.length; i++) {
 
@@ -287,6 +296,7 @@ var Dessin2D = function()
                             .attr("id", index[i].iso)
                             .on("click", function(){ clicPaysClassement(this.id); })
                             
+                        pays.append("span").attr("class","diff");
                         pays.append("span").attr("class","position");
                         pays.append("span").attr("class","name");
 
@@ -297,37 +307,77 @@ var Dessin2D = function()
 
             })
             .on("click", function(d){ clicPaysCarte(d.id); });
-       
+
+        dessin2d.suiteDessin();
+
         changementAnnee(0);
-		if(!noWebgl){ d3d.draw(canvas.scene); }
+		if(!noWebgl){ dessin3d.draw(canvas.scene); }
     	onresize();
     	loader.style.display = "none";
         $("#main").slideDown(500);
+
 
     }
 
 
 
-
-
-
-
-
-    this.redrawSvg = function()
+    this.suiteDessin = function()
     {
+        var pointSahara1 = this.projection([-13.1648, 27.6665]);
+        var pointSahara2 = this.projection([-8.6686, 27.6665]);
+
+        this.traitSahara =  dessin2d.svg.append("svg:line")
+            .attr("x1", pointSahara1[0])
+            .attr("y1", pointSahara1[1])
+            .attr("x2", pointSahara2[0])
+            .attr("y2", pointSahara2[1])
+            .attr("stroke-width", 0.5)
+            .attr("stroke", "#000");
+    }
+
+
+
+
+    this.redrawSvg = function(min, max)
+    {
+
+
+        if(mode == "3d")
+        {
+
+            this.svgFond.style("fill", "rgba(0,0,0,1)");
+
+        } else {
+
+            this.svgFond.style("fill", "rgba(0,0,0,0)");
+
+        }
 
 
         for(var i = 0; i < index.length; i++)
         {
 
-            var hauteur = getPositionCurrentYear(i);
             
+            if(currentYear > 2012)
+            {
+                var score = getScoreCurrentYear(i);
+                var rvb = this.couleurPaysNote(score, min, max);
+            } else {
+                var hauteur = getPositionCurrentYear(i);
+                var rvb = this.couleurPaysRang(hauteur);
+            }
+
             var pays = this.svg.select("#svg"+index[i].iso);
-        
-       		var rvb = this.couleurPays(hauteur);
         
        		pays.style("fill", "rgba("+rvb[0]+","+rvb[1]+","+rvb[2]+", 1)" );
         	pays.style( "stroke", "rgba("+rvb[0]+","+rvb[1]+","+rvb[2]+", 1)" );
+
+            if(index[i].iso == "MAR")
+            {
+                var pays = this.svg.select("#svgESH");
+                pays.style("fill", "rgba("+rvb[0]+","+rvb[1]+","+rvb[2]+", 1)" );
+                pays.style( "stroke", "rgba("+rvb[0]+","+rvb[1]+","+rvb[2]+", 1)" );
+            }
 
         }
 
@@ -336,18 +386,79 @@ var Dessin2D = function()
 
 
 
-	this.couleurPays = function(hauteur)
+
+
+    this.couleurPaysNote = function(score, min, max)
+    {
+        var red, green, blue;
+
+        if(mode == "3d")
+        {
+            var gris = map(score, max, min, 0, 255);
+            gris = Math.floor(gris);
+            red = green = blue = gris; 
+
+        } else {
+
+            var color1 = [ 200, 255, 200 ];
+            var color2 = [ 253, 227, 6   ];
+            var color3 = [ 241, 151, 3   ];
+            var color4 = [ 218, 0  , 46  ];
+            var color5 = [ 46 , 16 , 47  ];
+            var fourchette = max - min;
+            var transition = [ 0.25*fourchette, 0.5*fourchette, 0.75*fourchette, 0.9*fourchette ]; 
+
+            if(score < transition[0]){
+                // de vert à jaune
+                red     = map(score, min, transition[0], color1[0], color2[0]);
+                green   = map(score, min, transition[0], color1[1], color2[1]);
+                blue    = map(score, min, transition[0], color1[2], color2[2]);
+        
+            } else if(score < transition[1]) {
+                // de jaune à orange
+                red     = map(score, transition[0], transition[1], color2[0], color3[0]);
+                green   = map(score, transition[0], transition[1], color2[1], color3[1]);
+                blue    = map(score, transition[0], transition[1], color2[2], color3[2]);
+
+            } else if(score < transition[2]){
+                // de orange à rouge
+                red     = map(score, transition[1], transition[2], color3[0], color4[0]);
+                green   = map(score, transition[1], transition[2], color3[1], color4[1]);
+                blue    = map(score, transition[1], transition[2], color3[2], color4[2]);
+
+            } else {
+                red     = map(score, transition[2], transition[3], color4[0], color5[0]);
+                green   = map(score, transition[2], transition[3], color4[1], color5[1]);
+                blue    = map(score, transition[2], transition[3], color4[2], color5[2]);
+            }
+            
+            red = Math.floor(red);
+            green = Math.floor(green);
+            blue = Math.floor(blue);
+        }
+
+        return [red, green, blue];
+           
+
+    }
+
+
+
+
+
+
+
+
+	this.couleurPaysRang = function(hauteur)
 	{
 		var hauteurMax = index.length;
 		var red, green, blue;
-        var color1 = [200,255,200]
-        var color2 = [253,227,6  ]
-        var color3 = [241,151,3  ]
-        var color4 = [218,0  ,46 ]
-        var color5 = [46 ,16 ,47 ]
-        var transition = [0.25*hauteurMax,0.5*hauteurMax,0.75*hauteurMax,0.9*hauteurMax]
-
-       
+        var color1 = [200,255,200];
+        var color2 = [253,227,6  ];
+        var color3 = [241,151,3  ];
+        var color4 = [218,0  ,46 ];
+        var color5 = [46 ,16 ,47 ];
+        var transition = [0.25*hauteurMax,0.5*hauteurMax,0.75*hauteurMax,hauteurMax];
 
         if(hauteur < transition[0]){
             // de vert à jaune
@@ -357,7 +468,6 @@ var Dessin2D = function()
     
         } else if(hauteur < transition[1]) {
             // de jaune à orange
-                            // de vert à jaune
             red     = map(hauteur, transition[0], transition[1], color2[0], color3[0]);
             green   = map(hauteur, transition[0], transition[1], color2[1], color3[1]);
             blue    = map(hauteur, transition[0], transition[1], color2[2], color3[2]);
@@ -408,6 +518,16 @@ var Dessin2D = function()
 
         this.svg.selectAll("path").attr('d', this.path);
 
+
+        var pointSahara1 = this.projection([-13.1648, 27.6665]);
+        var pointSahara2 = this.projection([-8.6686, 27.6665]);
+
+        this.traitSahara
+            .attr("x1", pointSahara1[0])
+            .attr("y1", pointSahara1[1])
+            .attr("x2", pointSahara2[0])
+            .attr("y2", pointSahara2[1]);
+
     }
 
 
@@ -435,6 +555,8 @@ var Dessin2D = function()
 
     }
 
+
+
 	
 	this.scaling = function()
     {
@@ -442,6 +564,8 @@ var Dessin2D = function()
         var w = parseInt(this.svg.attr("width"));
         var h = parseInt(this.svg.attr("height"));
 
+        this.traitSahara.transition().duration(750)
+            .attr("transform", "translate(" + w / 2 + ", " + h / 2 + ")scale("+this.scale+")translate(" + -this.focusPosition[0] + "," + -this.focusPosition[1] + ")");
         this.svg.selectAll("path").transition().duration(750)
             .attr("transform", "translate(" + w / 2 + ", " + h / 2 + ")scale("+this.scale+")translate(" + -this.focusPosition[0] + "," + -this.focusPosition[1] + ")");
          
@@ -540,6 +664,54 @@ var Dessin2D = function()
     this.onMouseUp = function(event)
     {
         this.mouseDown = false;     
+    }
+
+
+
+
+
+    this.createTextureFromSvg = function()
+    {
+
+        var svgImg = document.getElementById("carte2d");
+
+        // transforme le svg en image
+        var xml = new XMLSerializer().serializeToString(svgImg);
+        var data = "data:image/svg+xml;base64," + btoa(xml);
+        
+        var imageTexture = new Image();
+        var clone = this;
+        imageTexture.addEventListener("load", clone.blurImage, false);
+        imageTexture.src = data;
+
+    }
+
+
+
+
+
+    this.blurImage = function()
+    {
+
+        var canvas2d = document.createElement( "canvas" );
+        var ctx = canvas2d.getContext('2d');
+
+        canvas2d.width = tailleCartePourTexture;
+        canvas2d.height = tailleCartePourTexture;
+        canvas2d.id = "canvas2d";
+
+        ctx.drawImage( this, 0, 0, canvas2d.width, canvas2d.height );
+
+        // application du blur
+        varBlur(ctx, function(x, y){ return 6.9; });
+        document.body.appendChild(canvas2d);
+        
+        // creation de la texture THREE
+        var textureCarted3js = new THREE.Texture( canvas2d );
+        textureCarted3js.needsUpdate = true;
+        
+        dessin3d.updateTexture( textureCarted3js );
+
     }
 
 
@@ -661,11 +833,6 @@ var Dessin3D = function()
             }
         }
 
-
-        var fourchetteHauteur = 100;
-        //this.uniformsTerrain[ "lerp" ].value = this.lerp;
- 
-
 		
 
         // MATERIAL
@@ -679,14 +846,14 @@ var Dessin3D = function()
         });
         
 
-        var geometryTerrain = new THREE.PlaneGeometry(width, height, 256, 256 );
+        var geometryTerrain = new THREE.PlaneGeometry(tailleCartePourTexture, tailleCartePourTexture, 256, 256 );
         //geometryTerrain.computeFaceNormals();
         //geometryTerrain.computeVertexNormals();
         //geometryTerrain.computeTangents();
 
 
         var terrain = new THREE.Mesh( geometryTerrain, material );
-        terrain.position.set(0, 0, -fourchetteHauteur);
+        terrain.position.set(0, 0, -100);
         scene.add(terrain);
 
         loaded();
@@ -728,9 +895,17 @@ var Dessin3D = function()
 
     this.loadTexture = function()
     {     
-        var textureCarted3js = THREE.ImageUtils.loadTexture('data/years/'+(2014-currentYear)+'.png', null, function(){
-            d3d.updateTexture( textureCarted3js );
-        });
+        if(currentYear > 2012)  // pas de score en 2012 donc on prend le rang
+        {
+            var textureCarted3js = THREE.ImageUtils.loadTexture('data/years/score'+currentYear+'.png', null, function(){
+                dessin3d.updateTexture( textureCarted3js );
+            });
+        } else {
+            var textureCarted3js = THREE.ImageUtils.loadTexture('data/years/'+currentYear+'.png', null, function(){
+                dessin3d.updateTexture( textureCarted3js );
+            });
+        }
+        loader.style.display = "none";
     }
 
 }
@@ -765,20 +940,28 @@ var Dessin3D = function()
 
 function changementAnnee(sens)
 {
+    if(mode == "3d")
+    {
+        loader.style.display = "block";
+    }
 
-    if(sens > 0 && currentYear < 2)
+    if(sens > 0 && currentYear < limitYear)
     {
         currentYear++;
-    } else if(sens < 0 && currentYear >= 1){
+    } else if(sens < 0 && currentYear > 2012){
         currentYear--;
     }
 
 
     var displayYear = document.getElementById("current_year");
-    displayYear.innerHTML = 2014-currentYear;
+    displayYear.innerHTML = currentYear;
 
     var already = [];
     var classement = d3.select("#liste");
+
+    // Extremites notes
+    var min, max;
+    min = max = getScoreCurrentYear(0);
 
 
     for(var i = 0; i < index.length; i++)
@@ -797,6 +980,7 @@ function changementAnnee(sens)
         var paysD3 = classement.select("#"+index[i].iso);
         var paysD3name = paysD3.select(".name");
         var paysD3position = paysD3.select(".position");
+        var paysdessin3diff = paysD3.select(".diff");
 
 
         // SI PAS DE NOTES
@@ -821,6 +1005,8 @@ function changementAnnee(sens)
 
             var nomPays = "";
             if(langue == "FR"){ nomPays = index[i].nom; } else { nomPays = index[i].name; }
+            var diff = "";
+            if(currentYear == 2014){ diff = index[i].dif2014; }
                 
 
 
@@ -831,6 +1017,12 @@ function changementAnnee(sens)
             
             paysD3name.html(nomPays);
             paysD3position.html(positionPays);
+            paysdessin3diff.html(diff);
+
+            // MIN MAX CLASSEMENT
+            var score = getScoreCurrentYear(i);
+            if(min > score){ min = score; }
+            if(max < score){ max = score; }
 
         } else {
             paysD3.style("display", "none");
@@ -839,12 +1031,12 @@ function changementAnnee(sens)
 
     }
 
-    d2d.redrawSvg();
+    dessin2d.redrawSvg(min, max);
 
     if(mode == "3d")
     {
         loader.style.display = "block";
-        setTimeout( function(){ d3d.loadTexture(); }, 700 ); 
+        setTimeout( function(){ dessin3d.loadTexture(); }, 700 ); 
     }
     
 
@@ -865,7 +1057,7 @@ function reset()
     } else {
 
         action_resetPositionCarte();
-        d2d.reset();
+        dessin2d.reset();
 
     }
 
@@ -885,7 +1077,7 @@ function zoom(sens)
 
     } else {
 
-        d2d.zoom(sens);
+        dessin2d.zoom(sens);
 
     }
 
@@ -910,22 +1102,22 @@ function rotation(range)
 function clicPaysClassement(isoPays)
 {
 
-        for(var i = 0; i < index.length; i++)
+    for(var i = 0; i < index.length; i++)
+    {
+        if(isoPays == index[i].iso)
         {
-            if(isoPays == index[i].iso)
+            
+            if(mode == "3d")
             {
-                
-                if(mode == "3d")
-                {
-                    var positionPays = projectionfor3d(getGeoCoord(index[i].latitude, index[i].longitude));
-                    canvas.moveCamToPosition(positionPays);
-                } else {
-                    //d2d.moveToPosition(getGeoCoord(index[i].latitude, index[i].longitude));
-                    d2d.colorerPays(isoPays, getPositionCurrentYear(i));
-                }
+                var positionPays = projectionfor3d(getGeoCoord(index[i].latitude, index[i].longitude));
+                canvas.moveCamToPosition(positionPays);
+            } else {
+                //dessin2d.moveToPosition(getGeoCoord(index[i].latitude, index[i].longitude));
+                dessin2d.colorerPays(isoPays, getPositionCurrentYear(i));
             }
         }
-    
+    }
+
 
 }
 
@@ -933,7 +1125,7 @@ function clicPaysClassement(isoPays)
 
 function clicPaysCarte(isoPays)
 {
-   
+
     action_focusPaysListe(isoPays);
 
 }
@@ -959,10 +1151,21 @@ function getPositionCurrentYear(i)
 {
 	switch(currentYear)
     {
-            case 0: return parseInt(index[i].an2014);  break;
-            case 1: return parseInt(index[i].an2013);  break;
-            case 2: return parseInt(index[i].an2012);  break;
+        case 2014: return parseInt(index[i].an2014);  break;
+        case 2013: return parseInt(index[i].an2013);  break;
+        case 2012: return parseInt(index[i].an2012);  break;
     }	
+}
+
+
+
+function getScoreCurrentYear(i)
+{
+    switch(currentYear)
+    {
+        case 2014: return parseFloat(index[i].sco2014);  break;
+        case 2013: return parseFloat(index[i].sco2013);  break;
+    }   
 }
 
 
@@ -1012,7 +1215,7 @@ function getGeoCoord(x, y)
         if(sens == "W"){ long *= -1; }
 
         coordonneesCapitale = [ long, lat ];
-        var traductionCoor = d2d.projection(coordonneesCapitale);        
+        var traductionCoor = dessin2d.projection(coordonneesCapitale);        
 
     }
 
@@ -1025,8 +1228,8 @@ function getGeoCoord(x, y)
 function projectionfor3d(array)
 {
 
-    array[0] = array[0]-width/2;
-    array[1] = (array[1]-height/2)*(-1);
+    array[0] = array[0]-tailleCartePourTexture/2;
+    array[1] = (array[1]-tailleCartePourTexture/2)*(-1);
     return array;
 
 }
@@ -1073,7 +1276,7 @@ var Canvas = function()
 
 
         var VIEW_ANGLE = 45,
-            ASPECT = width / height,
+            ASPECT = tailleCartePourTexture / tailleCartePourTexture,
             NEAR = 0.1,
             FAR = 10000;          
 
@@ -1125,11 +1328,11 @@ var Canvas = function()
 
 
         // INTERACTION
-        var clone = this;
-        this.canvas.addEventListener("mousemove", function(event){ clone.onMouseMove(event); }, false);
-        this.canvas.addEventListener("mousedown", function(event){ clone.onMouseDown(event); }, false);
-        this.canvas.addEventListener("mouseup", function(event){ clone.onMouseUp(event); }, false);
-        this.canvas.addEventListener("mouseout", function(event){ clone.onMouseUp(event); }, false); // releve le clic si tu sort du canvas
+        //var clone = this;
+        // this.canvas.addEventListener("mousemove", function(event){ clone.onMouseMove(event); }, false);
+        // this.canvas.addEventListener("mousedown", function(event){ clone.onMouseDown(event); }, false);
+        // this.canvas.addEventListener("mouseup", function(event){ clone.onMouseUp(event); }, false);
+        // this.canvas.addEventListener("mouseout", function(event){ clone.onMouseUp(event); }, false); // releve le clic si tu sort du canvas
 
 
 
@@ -1337,8 +1540,6 @@ var Canvas = function()
     this.mouvementCool = function(event)
     {
 
-        
-
         this.transitionCamera.setup(
             [ this.camera.position.x, this.camera.position.y, this.camera.position.z], 
             [ this.camera.position.x, this.camera.position.y-400, this.rayonCamera ] );        
@@ -1375,7 +1576,7 @@ function onresize()
 
     } else {
 
-        d2d.resize(newWidth, newWidth, newWidth/10, newWidth/2, newWidth/2);     
+        dessin2d.resize(newWidth, newWidth, newWidth/10, newWidth/2, newWidth/2);     
 
     }
 

@@ -212,55 +212,12 @@
 		
 
 
-
-
-
-
-
-
-			<!-- BACKGROUND 
-			<script type="x-shader/x-vertex" id="background_vertexshader">
-		
-				#ifdef GL_ES
-				precision highp float;
-				#endif
-				
-				void main()
-				{
-					gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
-				}
-		
-			</script>
-
-			<script type="x-shader/x-fragment" id="background_fragmentshader">
-	
-				#ifdef GL_ES
-				precision highp float;
-				#endif
-
-
-				float random(vec3 scale,float seed){
-			    	return fract(sin(dot(gl_FragCoord.xyz+seed,scale)) * 43758.5453 + seed);
-				}
-				
-				void main()
-				{
-					// noise
-			    	float n = 0.04 * ( .5 - random( vec3( 1. ), length( gl_FragCoord ) ) );
-
-					gl_FragColor = vec4((20.0/255.0)+n, (50.0/255.0)+n, (100.0/255.0)+n, 1.0);
-				}
-			
-			</script>-->
-
-
 		<script type="text/javascript" src="http://rsf.org/squelettes/lib/js/jquery-1.4.2.min.js"></script>
 		<script type="text/javascript" src="js/d3.js"></script>
 		<script type="text/javascript" src="js/three.js"></script>
 		<script type="text/javascript" src="js/queue.js"></script>
 		<script type="text/javascript" src="js/utils.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
-		<script type="text/javascript" src="js/less-1.6.2.min.js" ></script>
 		<script type="text/javascript" src="js/jquery-ui-1.10.4.custom.min.js"></script>
 		<script type="text/javascript" src="js/action.js"></script>
 

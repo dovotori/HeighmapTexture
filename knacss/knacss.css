@@ -1563,8 +1563,11 @@ li {
 }
 .noWebgl #carte2d,
 .noWebgl #btn_2d,
-.noWebgl #noWebgl {
+{
   display: inline;
+}
+.noWebgl #noWebgl {
+  display: block;
 }
 .noWebgl #carte3d,
 .noWebgl #btn_rotation,
@@ -1647,15 +1650,25 @@ nav .shortText a {
 #noWebgl {
   position: absolute;
   top: 10%;
-  width: 100%;
-  font-size: 1em;
+  width: 500px;
+  left: 50%;
+  margin-left: -250px;
+  font-size: 1.4em;
   text-align: center;
   z-index: 3;
+  color: #555;
+  background-color: rgba(255,255,255,0.8);
+  padding: 40px;
 }
 #noWebgl > * {
   display: block;
   text-align: center;
   margin: 0 auto;
+}
+#noEn
+{
+  color: #222;
+  margin-bottom: 10px;
 }
 #loader {
   position: absolute;
@@ -1663,7 +1676,7 @@ nav .shortText a {
   left: 48%;
   width: 40px;
   height: 40px;
-  z-index: 2;
+  z-index: 4;
 }
 #main {
   position: relative;
@@ -1680,7 +1693,7 @@ nav .shortText a {
   width: 80%;
   text-align: center;
   float: left;
-  z-index: 50;
+  z-index: 0;
 }
 #carte #carte2d,
 #carte #carte3d {
@@ -1689,18 +1702,28 @@ nav .shortText a {
 }
 #classement {
   position: relative;
-  z-index: 100;
+  z-index: 1;
   background-color: rgba(0, 0, 0, 0.2);
   height: 800px;
+  width: 20%;
+  float: left;
 }
 #control_annees {
+  height: 80px;
   margin: 10px 30px;
 }
 #control_annees > * {
   text-align: center;
 }
+.btn_annee{
+  position: relative;
+  width: 33%;
+  float:left;
+  display: block;
+}
 #btn_precedent,
 #btn_suivant {
+  cursor: pointer;
   padding: 25px 0 0 ;
 }
 #liste-container {
@@ -1710,64 +1733,42 @@ nav .shortText a {
   overflow-y: scroll;
 }
 #liste {
-  margin: 10px 60px;
   height: 4000px;
 }
 #liste li {
-  width: 100%;
+  cursor: pointer;
+  margin: 0 2%;
+  width: 80%;
 }
 #liste .position {
-  width: 20%;
+  position: relative;
+  width: 20% !important;
   display: block;
   float: left;
   font-weight: bold;
+  white-space: nowrap;
 }
 #liste .name {
   position: relative;
-  width: 80%;
+  width: 60% !important;
+  display: block;
+  float: left;
   overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-#liste .itemPays {
-  cursor: pointer;
+#liste .diff {
+  position: relative;
+  width: 20% !important;
+  display: block;
+  float: left;
+  overflow: hidden;
+  white-space: nowrap;
+  color: #ddd;
+  font-size: 0.8em;
 }
-/*
-#classement {
-	background-color: rgba(0,0,0,0.2);
-	padding:15px;
+#liste .focusList {
+  background-color: #bbb;
 }
-
-#control_annees {
-	z-index: 100;
-}
-
-
-
-
-#liste
-{
-
-	.position {
-		.w50p;
-		display: block;
-		float:left;
-		font-weight: bold;
-	}
-
-	.name{
-		position: relative;
-		width:150px;	
-		overflow: hidden;
-		text-overflow: ellipsis;
-
-	}
-
-	.itemPays {
-		cursor: pointer;	
-	}
-
-}
-*/
 .encadre {
   background-color: #FBF8D4;
   padding: 50px 130px 30px 30px;
@@ -1777,7 +1778,7 @@ nav .shortText a {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 1000;
+  z-index: 3;
   padding: 30px;
   text-align: center;
   width: 100px;
@@ -1854,4 +1855,37 @@ nav .shortText a {
   left: 100px;
   margin: -10px -10px;
   background: transparent url("../data/pictoCam.png") no-repeat 0 0 scroll;
+}
+@media (max-width: 900px){
+  #classement {
+    position: relative;
+    z-index: 1;
+    display: block;
+    clear: left;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    height: 800px;
+  }
+  #main{
+    max-height: 100%;
+  }
+  #cp, #sources {
+    margin: 8%;
+  }
+}
+@media (max-width: 480px){
+#classement {
+    position: relative;
+    z-index: 1;
+    display: block;
+    clear: left;
+    width: 100%;
+    height: 800px;
+  }
+  #main{
+    max-height: 100%;
+  }
+  #cp, #sources {
+    margin: 8%;
+  }
 }

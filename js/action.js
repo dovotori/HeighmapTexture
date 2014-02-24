@@ -44,17 +44,17 @@ $(function(){
   
 
   var readMoreTrad = [];
- readMoreTrad["fr"] = "Lire la suite";
- readMoreTrad["en"] = "Read more";
- readMoreTrad["es"] = "Leer más";
- readMoreTrad["ru"] = "Дальше";
- readMoreTrad["ar"] = "اقرأ المزيد";
+  readMoreTrad["fr"] = "Lire la suite";
+  readMoreTrad["en"] = "Read more";
+  readMoreTrad["es"] = "Leer más";
+  readMoreTrad["ru"] = "Дальше";
+  readMoreTrad["ar"] = "اقرأ المزيد";
 
- var readMore = "Read more";
+  var readMore = "Read more";
 
- if( readMoreTrad[$("html").attr("lang")] ){
+  if( readMoreTrad[$("html").attr("lang")] ){
     readMore = readMoreTrad[$("html").attr("lang")];  
- }
+  }
 
  
 
@@ -85,12 +85,12 @@ function action_resetPositionCarte()
 function action_focusPaysListe(isoPays)
 {
 
-    action_removeFocusPaysListe();
-    $("#"+isoPays).addClass( "focusList");
+  action_removeFocusPaysListe();
+  $("#"+isoPays).addClass( "focusList");
 
-    $("#liste").animate({
-          scrollTop: $("#"+isoPays).position().top + $("#liste").scrollTop() },
-          1000);
+  $("#liste-container").animate({
+        scrollTop: $("#"+isoPays).position().top + $("#liste-container").scrollTop() },
+        1000);
 
 }
 
@@ -105,9 +105,9 @@ function action_removeFocusPaysListe()
 function action_recentrerPictoCam(x, y)
 {
   $("#picto_cam").animate({
-                left: x+"px",
-                top: y+"px"
-                }, 2000);
+      left: x+"px",
+      top: y+"px"
+      }, 2000);
 }
 
 

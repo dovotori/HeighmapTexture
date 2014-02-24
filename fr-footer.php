@@ -269,7 +269,6 @@
 		<script type="text/javascript" src="js/queue.js"></script>
 		<script type="text/javascript" src="js/utils.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
-		<script type="text/javascript" src="js/less-1.6.2.min.js" ></script>
 		<script type="text/javascript" src="js/jquery-ui-1.10.4.custom.min.js"></script>
 		<script type="text/javascript" src="js/action.js"></script>
 
