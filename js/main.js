@@ -131,7 +131,7 @@ function passage2d()
     {
 		loader.style.display = "block";   // loader apparait
         action_removeFocusPaysListe();    // retire le surlignage en mode 2d du pays dans la liste
-        action_resetPositionCarte();      // le bouton de rotation 3d revient au centre
+        action_resetPositionCarte();      // la carte est recentrée
         
         if(!noWebgl){ canvas.initCam(); }                 // retour de la camera à sa position d'origine
         setTimeout(function(){
@@ -1051,7 +1051,7 @@ function reset()
 
     if(mode == "3d")
     {
-
+        action_resetPositionCarte();      // la carte est recentrée
         canvas.initCam();
 
     } else {
@@ -1324,16 +1324,6 @@ var Canvas = function()
         this.canvas = this.renderer.domElement;
         this.canvas.id = "carte3d";
         document.getElementById(conteneur).appendChild(this.canvas);   
-
-
-
-        // INTERACTION
-        //var clone = this;
-        // this.canvas.addEventListener("mousemove", function(event){ clone.onMouseMove(event); }, false);
-        // this.canvas.addEventListener("mousedown", function(event){ clone.onMouseDown(event); }, false);
-        // this.canvas.addEventListener("mouseup", function(event){ clone.onMouseUp(event); }, false);
-        // this.canvas.addEventListener("mouseout", function(event){ clone.onMouseUp(event); }, false); // releve le clic si tu sort du canvas
-
 
 
 
