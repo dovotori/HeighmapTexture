@@ -23,14 +23,22 @@
 
 				<div id="carte"></div>
 				
-				<div id="classement" class="mod right w20 grid">
-					<div id="control_annees" class="grid3">
-						<div id="btn_precedent"> précédent </div>
-						<h2 id="current_year">2013</h2>
-						<div id="btn_suivant"> suivant </div>
+				<div id="classement" class="mod right w20">
+					<div id="control_annees">
+						<div class="btn_annee" id="btn_precedent">précédent</div>
+						<h2 class="btn_annee" id="current_year">2013</h2>
+						<div class="btn_annee" id="btn_suivant">suivant</div>
 					</div>
+					<table id="liste_legende">
+						<tr class="row"> 
+							<th class="col w20">position</th>
+							<th class="col w20">diff</th>
+							<th class="col w50">pays</th>
+						</tr>
+					</table>
 					<div id="liste-container" >
-						<ul id="liste" class="mod w100 grid"> </ul>
+						<table table cellspacing="0" cellpadding="0" id="liste" class="mod w100 grid">
+						</table>
 					</div>
 				</div>
 
@@ -92,7 +100,6 @@
 				vPosition = newPosition.xyz;
 				
 				gl_Position = projectionMatrix * modelViewMatrix * newPosition;
-				
 
 			}
 
@@ -128,7 +135,6 @@
 
 			void main(void)
 			{
-			
 				
 			    float n = 0.04 * ( .5 - random( vec3( 1. ), length( gl_FragCoord ) ) );
 			    float hauteur = texture2D( displacement, vUv ).z;
@@ -145,9 +151,7 @@
 				float diffuse = max(0.0, dot(normalize(vNormal), light));
 				//gl_FragColor = vec4(vec3(diffuse), 1.0);
 
-			    
 
-			    
 			    
 			    // MER
 				if( hauteur < 0.001 ){
@@ -207,63 +211,17 @@
 				vec4 outColor = texture2D( tWireframe, phase );
 				
 				if (outColor.a == 0.0){ discard; }
-
-				// if (hauteur > 0.001){
-				// 	gl_FragColor *= outColor;
-				// }
-				
 			 
 			}
 
 		</script>
 
 
-		
 
 
 
-
-
-
-
-
-			<!-- BACKGROUND 
-			<script type="x-shader/x-vertex" id="background_vertexshader">
-		
-				#ifdef GL_ES
-				precision highp float;
-				#endif
-				
-				void main()
-				{
-					gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
-				}
-		
-			</script>
-
-			<script type="x-shader/x-fragment" id="background_fragmentshader">
-	
-				#ifdef GL_ES
-				precision highp float;
-				#endif
-
-
-				float random(vec3 scale,float seed){
-			    	return fract(sin(dot(gl_FragCoord.xyz+seed,scale)) * 43758.5453 + seed);
-				}
-				
-				void main()
-				{
-					// noise
-			    	float n = 0.04 * ( .5 - random( vec3( 1. ), length( gl_FragCoord ) ) );
-
-					gl_FragColor = vec4((20.0/255.0)+n, (50.0/255.0)+n, (100.0/255.0)+n, 1.0);
-				}
-			
-			</script>-->
-
-
-		<script type="text/javascript" src="http://rsf.org/squelettes/lib/js/jquery-1.4.2.min.js"></script>
+		<script type="text/javascript" src="http://rsf.org/squelettes/lib/js/jquery-1.4.2.min.js"></script>		
+		<script type="text/javascript" src="js/blur.js"></script>
 		<script type="text/javascript" src="js/d3.js"></script>
 		<script type="text/javascript" src="js/three.js"></script>
 		<script type="text/javascript" src="js/queue.js"></script>

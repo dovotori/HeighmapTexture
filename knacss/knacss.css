@@ -179,6 +179,23 @@ sup {
 sub {
   top: .5ex;
 }
+/* table layout */
+.row {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+}
+.row > *,
+.col {
+  display: table-cell;
+  vertical-align: top;
+}
+
+/* inline-block */
+.inbl {
+  display: inline-block;
+  vertical-align: top;
+}
 /* ----------------------------- */
 /* == hiding content             */
 /* ----------------------------- */
@@ -808,9 +825,9 @@ source https://github.com/stubbornella/oocss/blob/master/core/spacing/space.css
   }
 }
 @media (max-width: 480px) {
-  .grid > * > * {
+  /*.grid > * > * {
     width: 100% !important;
-  }
+  }*/
 }
 /* ---------------------------------- */
 /* ==autogrids                        */
@@ -1257,6 +1274,27 @@ input[type='submit']::-moz-focus-inner {
   }
 }
 @media (max-width: 768px) {
+
+  #classement {
+    position: relative;
+    z-index: 1;
+    display: block;
+    clear: left;
+    width: 100%!important;
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+  #liste-container{ 
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
+  #main{
+    max-height: 100% !important;
+  }
+  #cp, #sources {
+    margin: 8%;
+  }
+
+
   /* quick reset in small resolution and less */
   .w600p,
   .w700p,
@@ -1335,6 +1373,8 @@ input[type='submit']::-moz-focus-inner {
 }
 @media (max-width: 480px) {
   /* quick tiny resolution reset */
+  
+  /*
   .mod,
   .col,
   fieldset {
@@ -1355,8 +1395,9 @@ input[type='submit']::-moz-focus-inner {
   .row {
     display: block !important;
     width: 100% !important;
-  }
+  }*/
   /* layouts for tiny screens */
+  /*
   .tiny-hidden {
     display: none !important;
   }
@@ -1380,6 +1421,7 @@ input[type='submit']::-moz-focus-inner {
     display: table-cell !important;
     vertical-align: top !important;
   }
+  
   th,
   td {
     display: block !important;
@@ -1388,8 +1430,9 @@ input[type='submit']::-moz-focus-inner {
   }
   thead {
     display: none;
-  }
+  }*/
   /* widths for tiny screens */
+  /*
   .tiny-w25 {
     width: 25% !important;
   }
@@ -1414,11 +1457,13 @@ input[type='submit']::-moz-focus-inner {
     margin-left: 0 !important;
     margin-right: 0 !important;
     border: 0;
-  }
+  }*/
   /* margins for tiny screens */
+  /*
   .tiny-ma0 {
     margin: 0 !important;
   }
+  */
 }
 /* flexbox layout 
 Tutorial: http://knacss.com/demos/tutoriel.html#flex */
@@ -1709,22 +1754,41 @@ nav .shortText a {
   float: left;
 }
 #control_annees {
-  height: 80px;
-  margin: 10px 30px;
-}
-#control_annees > * {
-  text-align: center;
+  position: relative;
+  width: 90%;
+  margin-bottom: 80px;
 }
 .btn_annee{
   position: relative;
   width: 33%;
-  float:left;
+  float: left;
   display: block;
+  text-align: center;
 }
-#btn_precedent,
-#btn_suivant {
+#btn_precedent, #btn_suivant {
   cursor: pointer;
-  padding: 25px 0 0 ;
+  padding-top: 24px;
+}
+#liste_legende, #liste-container {
+  position: relative;
+  margin: 0 6%; padding: 0;
+}
+#liste, #liste_legende {
+  position: relative;
+  left: 20px;
+  border: none;
+  border-collapse: collapse;
+}
+#liste_legende tr, #liste tr {
+  margin: 0; padding: 0;
+  }
+#liste_legende tr th, #liste tr td {
+  color:#fff;
+  border: none;
+  outline: none;
+  margin: 0; padding: 0;
+  text-align: left;
+  overflow: hidden;
 }
 #liste-container {
   position: relative;
@@ -1732,47 +1796,37 @@ nav .shortText a {
   height: 80%;
   overflow-y: scroll;
 }
-#liste {
+#liste {  
   height: 4000px;
+  width: 100%;
 }
-#liste li {
-  cursor: pointer;
-  margin: 0 2%;
-  width: 80%;
-}
-#liste .position {
+.position {
   position: relative;
-  width: 20% !important;
-  display: block;
   float: left;
-  font-weight: bold;
-  white-space: nowrap;
+  width: 24%;
 }
-#liste .name {
+.diff {
   position: relative;
-  width: 60% !important;
-  display: block;
   float: left;
+  width: 21%;
+}
+.name {
+  position: relative;
+  float: left;
+  width: 55%; 
   overflow: hidden;
   white-space: nowrap;
-}
-#liste .diff {
-  position: relative;
-  width: 20% !important;
-  display: block;
-  float: left;
-  overflow: hidden;
-  white-space: nowrap;
-  color: #ddd;
-  font-size: 0.8em;
 }
 #liste .focusList {
-  background-color: #bbb;
+  background-color: rgba(200, 200, 200,0.6);
 }
 .encadre {
   background-color: #FBF8D4;
   padding: 50px 130px 30px 30px;
   margin: 10px 0 0;
+}
+.clear{
+  clear: both;
 }
 #control_mode {
   position: absolute;
@@ -1855,37 +1909,4 @@ nav .shortText a {
   left: 100px;
   margin: -10px -10px;
   background: transparent url("../data/pictoCam.png") no-repeat 0 0 scroll;
-}
-@media (max-width: 900px){
-  #classement {
-    position: relative;
-    z-index: 1;
-    display: block;
-    clear: left;
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.2);
-    height: 800px;
-  }
-  #main{
-    max-height: 100%;
-  }
-  #cp, #sources {
-    margin: 8%;
-  }
-}
-@media (max-width: 480px){
-#classement {
-    position: relative;
-    z-index: 1;
-    display: block;
-    clear: left;
-    width: 100%;
-    height: 800px;
-  }
-  #main{
-    max-height: 100%;
-  }
-  #cp, #sources {
-    margin: 8%;
-  }
 }

@@ -51,13 +51,10 @@
 						<li class="mod"><a href="ar-index2014.php" dir="RTL">العربية</a></li>
 						<li class="mod"><a href="fa-index2014.php" dir="RTL">فارسى</a></li>
 						<li class="mod"><a href="ru-index2014.php">По-русски</a></li>
-						
 					</ul>
 				</div>
 			</header>
-
-
-		</section>	
+		</section>
 
 		<section id="cp" class="line center">	
 			<nav id="<?php echo "selected-$selected" ?>" class="grid">

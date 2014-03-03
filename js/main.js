@@ -4,6 +4,15 @@ window.addEventListener("load", setup, false);
 
 
 
+
+/*
+    AJOUTER UNE ANNEE
+    - mettre à jour le fichier index.csv
+    - generer la texture et la place dans data/years/
+*/
+
+
+
 var conteneur = "carte";                // id de la balise qui doit contenir la carte
 var tailleCartePourTexture = 520;       // largeur et hauteur de la carte à 520 pour avoir la totalité de la carte pour créer la texture
 var index;                              // garde en mémoire les infos de index.csv
@@ -15,7 +24,7 @@ var currentYear;                        // année en cours visualiser dans le pr
 var langue;                             // FR pour francais, autre pour anglais                       
 var pathFrontieres;                     // coordonnées des dessins des frontieres, recuperer dans dessin2d et dessiner dans dessin3d
 var mode = "2d";                        // mode 2d / 3d
-var loader;                             // picto chargement
+var loader;                             // picto gif de chargement
 var noWebgl;                            // boolean si le navigateur ou l'ordinateur ne supporte pas WebGL
 
 
@@ -89,9 +98,6 @@ function setup()
 		noWebgl = true;
 		
 	}
-
-
-	
 	
 }
 
@@ -99,11 +105,11 @@ function setup()
 
 
 
-// fonction qui boucle sur elle 
+// fonction qui boucle sur elle meme
 function animate()
 {
 
-    setTimeout(animate, 1000/50);   // règle le "Frame Per Second"
+    setTimeout(animate, 1000/50);   // règle le framerate
     
     if(mode == "3d")
     {
@@ -129,17 +135,17 @@ function passage2d()
 	
     if(mode == "3d" || mode == "noWebgl")
     {
-		loader.style.display = "block";   // loader apparait
-        action_removeFocusPaysListe();    // retire le surlignage en mode 2d du pays dans la liste
-        action_resetPositionCarte();      // la carte est recentrée
+		loader.style.display = "block";        // loader apparait
+        action_removeFocusPaysListe();         // retire le surlignage en mode 2d du pays dans la liste
+        action_resetPositionCarte();           // la carte est recentrée
         
-        if(!noWebgl){ canvas.initCam(); }                 // retour de la camera à sa position d'origine
+        if(!noWebgl){ canvas.initCam(); }      // retour de la camera à sa position d'origine
         setTimeout(function(){
         	mode = "2d";
 		    onresize();
 		    changementAnnee(0);
         	document.body.setAttribute("class", "mode2d");
-        	loader.style.display = "none"; // loader disparait
+        	loader.style.display = "none";     // loader disparait
         }, 3000);       
 
     }
@@ -166,7 +172,7 @@ function passage3d()
 				mode = "3d";
 				changementAnnee(0);
                 dessin2d.resize(tailleCartePourTexture, tailleCartePourTexture, 80, tailleCartePourTexture/2, tailleCartePourTexture/2);
-                //dessin2d.createTextureFromSvg();
+                dessin2d.createTextureFromSvg();
 				dessin3d.loadTexture();
                 canvas.mouvementCool();
 			}, 800);
@@ -291,17 +297,16 @@ var Dessin2D = function()
                     {
 
                         // Remplir la liste du classement
-                        var pays = d3.select("#liste").append("li").attr("class", "itemPays")
+                        var pays = d3.select("#liste").append("tr").attr("class", "itemPays row")
                             .style("position", "absolute")
                             .attr("id", index[i].iso)
                             .on("click", function(){ clicPaysClassement(this.id); })
                             
-                        pays.append("span").attr("class","diff");
-                        pays.append("span").attr("class","position");
-                        pays.append("span").attr("class","name");
+                        pays.append("td").attr("class","position");
+                        pays.append("td").attr("class","diff");
+                        pays.append("td").attr("class","name");
 
                     }
-
                     
                 }
 
@@ -567,9 +572,7 @@ var Dessin2D = function()
         this.traitSahara.transition().duration(750)
             .attr("transform", "translate(" + w / 2 + ", " + h / 2 + ")scale("+this.scale+")translate(" + -this.focusPosition[0] + "," + -this.focusPosition[1] + ")");
         this.svg.selectAll("path").transition().duration(750)
-            .attr("transform", "translate(" + w / 2 + ", " + h / 2 + ")scale("+this.scale+")translate(" + -this.focusPosition[0] + "," + -this.focusPosition[1] + ")");
-         
-           
+            .attr("transform", "translate(" + w / 2 + ", " + h / 2 + ")scale("+this.scale+")translate(" + -this.focusPosition[0] + "," + -this.focusPosition[1] + ")");         
     
     }
 
@@ -588,6 +591,7 @@ var Dessin2D = function()
     
     this.colorerPays = function(iso, position)
     {
+
 		var paysDom = document.getElementById("svg"+iso);
 
         bbox = paysDom.getBBox();
@@ -595,9 +599,6 @@ var Dessin2D = function()
         this.scale = 2;
 
         this.scaling();
-
-
-
 
     }
 
@@ -634,8 +635,7 @@ var Dessin2D = function()
 
             var decalageX = (this.xSouris - this.xSourisOld) * 0.1;
             var decalageY = (this.ySouris - this.ySourisOld) * 0.1;
-
-            
+ 
             //this.scaling();
 
             this.xSourisOld = this.xSouris;
@@ -672,7 +672,7 @@ var Dessin2D = function()
 
     this.createTextureFromSvg = function()
     {
-
+        
         var svgImg = document.getElementById("carte2d");
 
         // transforme le svg en image
@@ -948,13 +948,13 @@ function changementAnnee(sens)
     if(sens > 0 && currentYear < limitYear)
     {
         currentYear++;
-    } else if(sens < 0 && currentYear > 2012){
+    } else if(sens < 0 && currentYear > 2012) {
         currentYear--;
     }
 
-
     var displayYear = document.getElementById("current_year");
     displayYear.innerHTML = currentYear;
+
 
     var already = [];
     var classement = d3.select("#liste");
@@ -967,15 +967,11 @@ function changementAnnee(sens)
     for(var i = 0; i < index.length; i++)
     {
 
-
         var espaceEntreDeux = 20;
         var top = 0;
 
-
 		top = getPositionCurrentYear(i);
         var positionPays = top;
-
-
 
         var paysD3 = classement.select("#"+index[i].iso);
         var paysD3name = paysD3.select(".name");
@@ -1000,15 +996,25 @@ function changementAnnee(sens)
             }
             already.push(top);
 
-
             top *= espaceEntreDeux;
 
             var nomPays = "";
             if(langue == "FR"){ nomPays = index[i].nom; } else { nomPays = index[i].name; }
             var diff = "";
-            if(currentYear == 2014){ diff = index[i].dif2014; }
-                
-
+            
+            if(currentYear == 2012){ 
+                diff = "-"; 
+            } else {
+                currentYear--;
+                var oldPosition = getPositionCurrentYear(i);
+                currentYear++; 
+                diff = oldPosition - positionPays;
+                if(diff == 0 || isNaN(diff) )
+                {
+                    diff = "-";
+                }
+                if(diff > 0){ diff = "+"+diff; }
+            }
 
             paysD3.transition()
                 .duration(700)
@@ -1028,7 +1034,6 @@ function changementAnnee(sens)
             paysD3.style("display", "none");
         }
 
-
     }
 
     dessin2d.redrawSvg(min, max);
@@ -1038,8 +1043,6 @@ function changementAnnee(sens)
         loader.style.display = "block";
         setTimeout( function(){ dessin3d.loadTexture(); }, 700 ); 
     }
-    
-
 
 }
 

@@ -214,6 +214,7 @@
 
 		<script type="text/javascript" src="http://rsf.org/squelettes/lib/js/jquery-1.4.2.min.js"></script>
 		<script type="text/javascript" src="js/d3.js"></script>
+		<script type="text/javascript" src="js/blur.js"></script>
 		<script type="text/javascript" src="js/three.js"></script>
 		<script type="text/javascript" src="js/queue.js"></script>
 		<script type="text/javascript" src="js/utils.js"></script>
