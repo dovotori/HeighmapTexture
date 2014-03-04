@@ -297,14 +297,15 @@ var Dessin2D = function()
                     {
 
                         // Remplir la liste du classement
-                        var pays = d3.select("#liste").append("tr").attr("class", "itemPays row")
-                            .style("position", "absolute")
+                        var pays = d3.select("#liste").append("tr").attr("class", "itemPays")
+                            //.style("position", "absolute")
                             .attr("id", index[i].iso)
                             .on("click", function(){ clicPaysClassement(this.id); })
                             
                         pays.append("td").attr("class","position");
                         pays.append("td").attr("class","diff");
                         pays.append("td").attr("class","name");
+                        pays.append("td").attr("class","note");
 
                     }
                     
@@ -967,7 +968,7 @@ function changementAnnee(sens)
     for(var i = 0; i < index.length; i++)
     {
 
-        var espaceEntreDeux = 20;
+        var espaceEntreDeux = 30;
         var top = 0;
 
 		top = getPositionCurrentYear(i);
@@ -996,7 +997,7 @@ function changementAnnee(sens)
             }
             already.push(top);
 
-            top *= espaceEntreDeux;
+            top = (top-1)*espaceEntreDeux;
 
             var nomPays = "";
             if(langue == "FR"){ nomPays = index[i].nom; } else { nomPays = index[i].name; }
@@ -1011,14 +1012,14 @@ function changementAnnee(sens)
                 diff = oldPosition - positionPays;
                 if(diff == 0 || isNaN(diff) )
                 {
-                    diff = "-";
+                    diff = "0";
                 }
                 if(diff > 0){ diff = "+"+diff; }
             }
 
             paysD3.transition()
                 .duration(700)
-                .style("display", "inline")
+                .style("display", "table")
                 .style("top", top+"px");
             
             paysD3name.html(nomPays);

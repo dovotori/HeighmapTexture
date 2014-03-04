@@ -89,9 +89,9 @@ function action_focusPaysListe(isoPays)
   $("#"+isoPays).addClass( "focusList");
 
 
-  //console.log($("#"+isoPays).position().top + $("#liste-container").scrollTop());
+  //console.log($("#"+isoPays).position().top);
   $("#liste-container").animate({
-        scrollTop: $("#"+isoPays).position().top },
+        scrollTop: $("#"+isoPays).position().top/* + $("#liste-container").scrollTop()*/ },
         1000);
 
 }

@@ -29,17 +29,20 @@
 						<h2 class="btn_annee" id="current_year">2013</h2>
 						<div class="btn_annee" id="btn_suivant">suivant</div>
 					</div>
-					<table id="liste_legende">
-						<tr class="row"> 
-							<th class="col w20">position</th>
-							<th class="col w20">diff</th>
-							<th class="col w50">pays</th>
-						</tr>
+					<table>
+						<thead id="liste_legende">
+							<tr>
+								<th class="position">pos.</th>
+								<th class="diff">diff</th>
+								<th class="name">pays</th>
+								<th class="note">note</th>
+							</tr>
+						</thead>
+						<tbody id="liste-container">
+							<tr id="liste">
+							</tr>
+						</tbody>
 					</table>
-					<div id="liste-container" >
-						<table table cellspacing="0" cellpadding="0" id="liste" class="mod w100 grid">
-						</table>
-					</div>
 				</div>
 
 
