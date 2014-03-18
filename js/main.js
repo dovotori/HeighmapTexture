@@ -907,16 +907,17 @@ var Dessin3D = function()
 
     this.loadTexture = function()
     {     
-        if(currentYear > 2012)  // pas de score en 2012 donc on prend le rang
-        {
-            var textureCarted3js = THREE.ImageUtils.loadTexture('data/years/score'+currentYear+'.png', null, function(){
-                dessin3d.updateTexture( textureCarted3js );
-            });
-        } else {
+        // if(currentYear > 2012)  // pas de score en 2012 donc on prend le rang
+        // {
+        //     var textureCarted3js = THREE.ImageUtils.loadTexture('data/years/score'+currentYear+'.png', null, function(){
+        //         dessin3d.updateTexture( textureCarted3js );
+        //     });
+        // } else {
+            /* heightmap en fonction de la note */
             var textureCarted3js = THREE.ImageUtils.loadTexture('data/years/'+currentYear+'.png', null, function(){
                 dessin3d.updateTexture( textureCarted3js );
             });
-        }
+        //}
         loader.style.display = "none";
     }
 
