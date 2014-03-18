@@ -23,15 +23,15 @@
 
 				<div id="carte"></div>
 				
-				<div id="classement" class="mod right w20">
+				<div id="classement" class="mod right">
 					<div id="control_annees">
 						<div class="btn_annee" id="btn_precedent">précédent</div>
-						<h2 class="btn_annee" id="current_year">2013</h2>
+						<h2 class="btn_annee" id="current_year"></h2>
 						<div class="btn_annee" id="btn_suivant">suivant</div>
 					</div>
 					<table>
 						<thead id="liste_legende">
-							<tr>
+							<tr class="legende itemPays">
 								<th class="position">pos.</th>
 								<th class="diff">diff</th>
 								<th class="name">pays</th>

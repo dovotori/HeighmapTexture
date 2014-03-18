@@ -1273,10 +1273,10 @@ input[type='submit']::-moz-focus-inner {
     margin: 0 !important;
   }
 }
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
 
   #classement {
-    position: relative;
+    position: relative!important;
     z-index: 1;
     display: block;
     clear: left;
@@ -1295,6 +1295,11 @@ input[type='submit']::-moz-focus-inner {
   #cp, #sources {
     margin: 8%;
   }
+}
+
+
+
+@media (max-width: 768px) {
 
 
   /* quick reset in small resolution and less */
@@ -1755,17 +1760,18 @@ nav .shortText a {
   margin: -26% 0;
 }
 #classement {
-  position: relative;
+  position: absolute;
   z-index: 1;
   background-color: rgba(0, 0, 0, 0.2);
   height: 800px;
   width: 20%;
-  float: left;
-}
+  right: 0;
+ }
 #control_annees {
   position: relative;
   width: 90%;
-  margin-bottom: 80px;
+  padding-bottom: 80px;
+  margin: 0 auto;
 }
 .btn_annee{
   position: relative;
@@ -1783,35 +1789,30 @@ nav .shortText a {
 
 /* Mise en page du tableau */
 
-
-
-
 #classement table, #classement table *{
   border:none;
 }
 
 #liste_legende {
- width:100%;
- margin:0;
- padding:0;
- max-width:none;
- overflow-y: scroll;
+  position: relative;
+  width: 100%;
+  margin:0;
+  padding:0;
 }
 
-#liste_legende tr{
+#liste_legende tr {
   display:block;
   border-bottom:1px solid rgba(255,255,255,0.45)!important;
   border-top:1px solid rgba(255,255,255,0.45)!important;
   width:100%!important;
-  
-
+  overflow-y: scroll;
+  background-color: rgba(0,0,0,0.8);
+  z-index: 100;
 }
 
-#liste_legende th + th{
+#liste_legende th + th {
   border-left:1px solid rgba(255,255,255,0.45)!important;
-  }
-
-
+}
 
 #liste-container {
   position:relative;
@@ -1819,17 +1820,15 @@ nav .shortText a {
   height: 600px;
   overflow-y: scroll;
 }
-#liste {  
+
+#liste {
+  position: relative;
   display:block;
   height: 4000px;
   width:100%;
- 
-
 }
 
-
-
-tbody, thead, td {
+tbody, thead, td, th {
   margin:0;
   padding:0;
 }
@@ -1837,7 +1836,6 @@ tbody, thead, td {
 td {
   color:#fff;  
 }
-
 
 .itemPays{
   position: absolute;
@@ -1849,87 +1847,40 @@ td {
   overflow: hidden;
   white-space: nowrap;
   display: block;
-  height:30px;
+  height: 20px;
+  margin-top: 10px;
+  padding: 0 4%;
   float:left;
-  padding:2% 5%;
-  text-align: left
+  text-align: left;
 }
 
-.itemPays td + td {
-  border-left:1px solid rgba(255,255,255,0.45)!important;
+.itemPays:hover {
+  background-color: rgba(255,255,255,0.2)
 }
+
 
 #classement .position {
-  width : 20%!important; 
+  position: relative;
+  width: 14%;
 }
 
 #classement .diff {
-  width : 20%!important;
+  position: relative;
+  width : 14%;
 }
 #classement .name {
-  max-width:40%!important;
-  width:100%;
-}
-
-#classement #liste_legende .name {
-  width:100%!important;
+  position: relative;
+  width:25%;
 }
 
 #classement .note {
-  width : 20%!important;
-  padding-right:30px;  
-}
-/* END Mise en page tableau */
-/*
-#liste_legende, #liste-container {
   position: relative;
-  margin: 0 6%; padding: 0;
+  width : 14%;
 }
-#liste, #liste_legende {
-  position: relative;
-  left: 20px;
-  border: none;
-  border-collapse: collapse;
-}
-#liste_legende tr, #liste tr {
-  margin: 0; padding: 0;
-  }
-#liste_legende tr th, #liste tr td {
-  color:#fff;
-  border: none;
-  outline: none;
-  margin: 0; padding: 0;
-  text-align: left;
-  overflow: hidden;
-}
-#liste-container {
-  position: relative;
-  width: 100%;
-  height: 80%;
-  overflow-y: scroll;
-}
-#liste {  
-  height: 4000px;
-  width: 100%;
-}
-#classement .position {
-  position: relative;
-  float: left;
-  width: 24%!important;
+.itemPays {
+  cursor: pointer;
 }
 
-#classement .diff {
-  position: relative;
-  float: left;
-  width: 21%!important;
-}
-#classement .name {
-  position: relative;
-  float: left;
-  width: 55%!important; 
-  overflow: hidden;
-  white-space: nowrap;
-}*/
 #liste {
   position: relative;
   height: 5600px;

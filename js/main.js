@@ -98,6 +98,7 @@ function setup()
 		noWebgl = true;
 		
 	}
+    action_resetPositionCarte();
 	
 }
 
@@ -266,6 +267,8 @@ var Dessin2D = function()
             .defer(lireJson, "data/world-countries-clean.json")
             .defer(lireCsv, "data/index.csv")
             .awaitAll(this.draw);
+
+
     }
 
 
@@ -285,7 +288,8 @@ var Dessin2D = function()
             .attr("id", function(d){ return "svg"+d.id; })
             .attr("d", function(d){ return dessin2d.path(d); })
             .style("fill", "rgba(200, 200, 200, 1)")
-            .style("stroke-width", "0.4")
+            .style("stroke-width", "0.2")
+            .style("stroke", "#888")
             .each(function(d, i){
 
                 // calcul des frontieres pour la 3d
@@ -364,14 +368,15 @@ var Dessin2D = function()
         {
 
             
-            if(currentYear > 2012)
-            {
-                var score = getScoreCurrentYear(i);
-                var rvb = this.couleurPaysNote(score, min, max);
-            } else {
+            // if(currentYear > 2012)
+            // {
+            //     var score = getScoreCurrentYear(i);
+            //     var rvb = this.couleurPaysNote(score, min, max);
+            // } else {
+                /* /////////// Basé sur la position /////////// */
                 var hauteur = getPositionCurrentYear(i);
                 var rvb = this.couleurPaysRang(hauteur);
-            }
+            //}
 
             var pays = this.svg.select("#svg"+index[i].iso);
         
@@ -594,6 +599,12 @@ var Dessin2D = function()
     {
 
 		var paysDom = document.getElementById("svg"+iso);
+
+        // reset focus style
+        d3.selectAll(".itemPays").attr("class", "itemPays");
+
+        // set focus style
+        d3.select("#"+iso).attr("class", "itemPays focusList");
 
         bbox = paysDom.getBBox();
         this.focusPosition = [bbox.x + bbox.width/2, bbox.y + bbox.height/2];
@@ -978,6 +989,7 @@ function changementAnnee(sens)
         var paysD3name = paysD3.select(".name");
         var paysD3position = paysD3.select(".position");
         var paysdessin3diff = paysD3.select(".diff");
+        var paysdessin3note = paysD3.select(".note");
 
 
         // SI PAS DE NOTES
@@ -997,11 +1009,12 @@ function changementAnnee(sens)
             }
             already.push(top);
 
-            top = (top-1)*espaceEntreDeux;
+            top *= espaceEntreDeux;
 
             var nomPays = "";
             if(langue == "FR"){ nomPays = index[i].nom; } else { nomPays = index[i].name; }
             var diff = "";
+            var note = getScoreCurrentYear(i);
             
             if(currentYear == 2012){ 
                 diff = "-"; 
@@ -1025,6 +1038,7 @@ function changementAnnee(sens)
             paysD3name.html(nomPays);
             paysD3position.html(positionPays);
             paysdessin3diff.html(diff);
+            paysdessin3note.html(note);
 
             // MIN MAX CLASSEMENT
             var score = getScoreCurrentYear(i);
@@ -1116,8 +1130,10 @@ function clicPaysClassement(isoPays)
                 var positionPays = projectionfor3d(getGeoCoord(index[i].latitude, index[i].longitude));
                 canvas.moveCamToPosition(positionPays);
             } else {
+                action_centrePositionCarte();
                 //dessin2d.moveToPosition(getGeoCoord(index[i].latitude, index[i].longitude));
                 dessin2d.colorerPays(isoPays, getPositionCurrentYear(i));
+                focusPaysCarte(isoPays);
             }
         }
     }
@@ -1132,10 +1148,16 @@ function clicPaysCarte(isoPays)
 
     action_focusPaysListe(isoPays);
 
+    focusPaysCarte(isoPays);
+
 }
 
 
-
+function focusPaysCarte(isoPays)
+{
+    d3.selectAll(".land").style("stroke-width", "0.2").style("stroke", "#888");
+    d3.select("#svg"+isoPays).style("stroke-width", "1").style("stroke", "#fff");
+}
 
 
 
@@ -1158,6 +1180,7 @@ function getPositionCurrentYear(i)
         case 2014: return parseInt(index[i].an2014);  break;
         case 2013: return parseInt(index[i].an2013);  break;
         case 2012: return parseInt(index[i].an2012);  break;
+        default: return "-"; break;
     }	
 }
 
@@ -1168,7 +1191,8 @@ function getScoreCurrentYear(i)
     switch(currentYear)
     {
         case 2014: return parseFloat(index[i].sco2014);  break;
-        case 2013: return parseFloat(index[i].sco2013);  break;
+        case 2013: if(index[i].iso == "PER"){ console.log(index[i].name+" // "+index[i].sco2013+" // "+index[i].capitale); } return parseFloat(index[i].sco2013);  break;
+        default: return "-"; break;
     }   
 }
 

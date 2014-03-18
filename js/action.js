@@ -75,10 +75,17 @@ $(function(){
 function action_resetPositionCarte()
 {
   $("#carte").animate({ 
-    top: 0, 
+    top: -(window.innerWidth/20), 
     left: 0}, 400);
 }
 
+
+function action_centrePositionCarte()
+{
+  $("#carte").animate({ 
+    top: -(window.innerWidth/10), 
+    left: 0}, 400);
+}
 
 
 
@@ -91,7 +98,7 @@ function action_focusPaysListe(isoPays)
 
   //console.log($("#"+isoPays).position().top);
   $("#liste-container").animate({
-        scrollTop: $("#"+isoPays).position().top/* + $("#liste-container").scrollTop()*/ },
+        scrollTop: $("#"+isoPays).position().top - 30/* + $("#liste-container").scrollTop()*/ },
         1000);
 
 }
