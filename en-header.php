@@ -64,7 +64,7 @@
 				<li id="asie" class="mod left shortText"><a href="en-asia.php">Asia</a></li>
 				<li id="afrique" class="mod left shortText"><a href="en-africa.php">Africa</a></li>
 				<li id="ameriques" class="mod left shortText"><a href="en-americas.php#">Americas</a></li>
-				<li id="mo" class="mod left"><a href="en-middle-east.php">Noth Africa</br> and Middle-East</a></li>
+				<li id="mo" class="mod left"><a href="en-middle-east.php">North Africa</br> and Middle-East</a></li>
 				<li id="ue" class="mod left"><a href="en-eu.php">EU<br/> and Balkans</a></li>
 				<li id="europe-est" class="mod left"><a href="en-eastern-europe.php">Eastern Europe<br/> and Central Asia</a></li>
 			</ul>

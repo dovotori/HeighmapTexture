@@ -35,7 +35,7 @@
 								<th class="position">rank</th>
 								<th class="diff">diff</th>
 								<th class="name">country</th>
-								<th class="note">mark</th>
+								<th class="note">note</th>
 							</tr>
 						</thead>
 						<tbody id="liste-container">

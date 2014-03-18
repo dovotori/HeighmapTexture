@@ -1861,21 +1861,21 @@ td {
 
 #classement .position {
   position: relative;
-  width: 14%;
+  width: 18%;
 }
 
 #classement .diff {
   position: relative;
-  width : 14%;
+  width : 18%;
 }
 #classement .name {
   position: relative;
-  width:25%;
+  width:40%;
 }
 
 #classement .note {
   position: relative;
-  width : 14%;
+  width : 18%;
 }
 .itemPays {
   cursor: pointer;
