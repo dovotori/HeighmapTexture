@@ -173,7 +173,7 @@ function passage3d()
 				mode = "3d";
 				changementAnnee(0);
                 dessin2d.resize(tailleCartePourTexture, tailleCartePourTexture, 80, tailleCartePourTexture/2, tailleCartePourTexture/2);
-                dessin2d.createTextureFromSvg();
+                //dessin2d.createTextureFromSvg();
 				dessin3d.loadTexture();
                 canvas.mouvementCool();
 			}, 800);
