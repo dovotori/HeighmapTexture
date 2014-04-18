@@ -23,15 +23,26 @@
 
 				<div id="carte"></div>
 				
-				<div id="classement" class="mod right w20 grid">
-					<div id="control_annees" class="grid3">
-						<div id="btn_precedent"> previous </div>
-						<h2 id="current_year">2014</h2>
-						<div id="btn_suivant"> next </div>
+				<div id="classement" class="mod right">
+					<div id="control_annees">
+						<div class="btn_annee" id="btn_precedent">previous</div>
+						<h2 class="btn_annee" id="current_year"></h2>
+						<div class="btn_annee" id="btn_suivant">next</div>
 					</div>
-					<div id="liste-container" >
-						<ul id="liste" class="mod w100 grid"> </ul>
-					</div>
+					<table>
+						<thead id="liste_legende">
+							<tr class="legende itemPays">
+								<th class="position">rank</th>
+								<th class="diff">diff</th>
+								<th class="name">country</th>
+								<th class="note">note</th>
+							</tr>
+						</thead>
+						<tbody id="liste-container">
+							<tr id="liste">
+							</tr>
+						</tbody>
+					</table>
 				</div>
 
 
@@ -254,15 +265,15 @@
 			</script>-->
 
 
-		<script type="text/javascript" src="/squelettes/lib/js/jquery-1.4.2.min.js"></script>
+		<script type="text/javascript" src="http://rsf.org/squelettes/lib/js/jquery-1.4.2.min.js"></script>
 		<script type="text/javascript" src="js/d3.js"></script>
+		<script type="text/javascript" src="js/blur.js"></script>
 		<script type="text/javascript" src="js/three.js"></script>
 		<script type="text/javascript" src="js/queue.js"></script>
 		<script type="text/javascript" src="js/utils.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
 		<script type="text/javascript" src="js/jquery-ui-1.10.4.custom.min.js"></script>
 		<script type="text/javascript" src="js/action.js"></script>
-
 
 	</body>
 </html>
