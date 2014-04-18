@@ -1676,7 +1676,7 @@ nav {
 }
 nav a {
   display: block;
-  background-color: #cecece;
+  background: #e5eff4 url(/data/fond.png) repeat 0 0 scroll;
   color: #101010;
   text-align: center;
   border-radius: 2px;
@@ -1686,7 +1686,8 @@ nav a {
   margin-bottom: 3px;
 }
 nav a:hover {
-  background-color: #bbb;
+  background-color: #358cb3;
+  color:#fff;
 }
 nav .shortText a {
   padding: 10px 0;

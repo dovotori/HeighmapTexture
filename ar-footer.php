@@ -32,7 +32,7 @@
 					<table>
 						<thead id="liste_legende">
 							<tr class="legende itemPays">
-								<th class="position">rank</th>
+								<th class="position"></th>
 								<th class="name">country</th>
 								<th class="diff">diff</th>
 								<th class="note">note</th>

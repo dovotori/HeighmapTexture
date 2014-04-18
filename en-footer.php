@@ -32,7 +32,7 @@
 					<table>
 						<thead id="liste_legende">
 							<tr class="legende itemPays">
-								<th class="position">rank</th>
+								<th class="position"></th>
 								<th class="name">country</th>
 								<th class="diff">diff</th>
 								<th class="note">note</th>
@@ -53,7 +53,8 @@
 		<section id="sources" class="line center">
 			<p>Press contact : presse [a] rsf.org</p>
 			<p><a href="data/carte2014_en.png">Download the map</a></p>
-			<p><a href="data/index2.csv">Download the index</a></p>
+			<p><a href="data/index.csv">Download the index csv file</a></p>
+			<p><a href="data/index2014_en.pdf">Download the pdf file </a></p>
 
 			<h3 class="h5-like">Methodology</h3>
 			 <p><a href="data/2014_wpfi_methodology.pdf">Download pdf (450Kb) </a></p>

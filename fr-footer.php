@@ -54,7 +54,7 @@
 			<p>Contact presse : presse [a] rsf.org</p>
 			
 			<p><a href="data/carte2014_fr.png">Télécharger la carte</a></p>
-			<p><a href="data/index2.csv">Télécharger le tableau en .csv</a></p>
+			<p><a href="data/index.csv">Télécharger le tableau en .csv</a></p>
 			<p> Avec le soutien de <img src="data/Adessium_DEF.png"/>	
 			<h3 class="h5-like">Méthodologie</h3>
 			 <p><a href="data/Methodologie.pdf">Télécharger la méthodologie en pdf (450Kb)</a></p>
