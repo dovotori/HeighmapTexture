@@ -25,16 +25,16 @@
 				
 				<div id="classement" class="mod right">
 					<div id="control_annees">
-						<div class="btn_annee" id="btn_precedent">précédent</div>
+						<div class="btn_annee" id="btn_precedent">&#8592;</div>
 						<h2 class="btn_annee" id="current_year"></h2>
-						<div class="btn_annee" id="btn_suivant">suivant</div>
+						<div class="btn_annee" id="btn_suivant">&#8594;</div>
 					</div>
 					<table>
 						<thead id="liste_legende">
 							<tr class="legende itemPays">
-								<th class="position">pos.</th>
-								<th class="diff">diff</th>
+								<th class="position"></th>
 								<th class="name">pays</th>
+								<th class="diff">diff</th>
 								<th class="note">note</th>
 							</tr>
 						</thead>
@@ -50,25 +50,20 @@
 
 
 
-		<section id="sources" class="line center">
+		<section id="sources" class="line center ">
+			<p>Contact presse : presse [a] rsf.org</p>
 			
-			<h3>Méthodologie</h3>
-			 <p><a href="data/Methodologie.pdf">Télécharger la méthodologie en pdf (450Kb)</a></p>
-			<h3>Sources</h3>
 			<p><a href="data/carte2014_fr.png">Télécharger la carte</a></p>
 			<p><a href="data/index2.csv">Télécharger le tableau en .csv</a></p>
-			<p>Responsable du classement mondial de la liberté de la presse : Antoine Héry - index [a] rsf.org</p>
-			<p>Contact presse : Isabelle Gourmelon - presse [a] rsf.org</p>
-			<p>Data visualisation réalisée par Pierre-Alain Leboucher et Dorian Ratovo</br>
-				à l'aide de <a href="http://d3js.org/">D3.js</a> de Mike Bostock, <a href="http://threejs.org/">THREE.js</a> de Mrdoob
-			</p>
 			<p> Avec le soutien de <img src="data/Adessium_DEF.png"/>	
+			<h3 class="h5-like">Méthodologie</h3>
+			 <p><a href="data/Methodologie.pdf">Télécharger la méthodologie en pdf (450Kb)</a></p>
+			<p class="small">Data visualisation réalisée par Pierre-Alain Leboucher et Dorian Ratovo</br>
+				à l'aide de <a href="http://d3js.org/">D3.js</a> de Mike Bostock, <a href="http://threejs.org/">THREE.js</a> de Mrdoob
+			</p>			
 
-			<h3>Changelog</h3>
-			<ul>
-				<li></li>
-				<li></li>
-			</ul>
+<br/><br/><br/>
+
 		</section>
 
 

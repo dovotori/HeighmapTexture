@@ -1636,8 +1636,8 @@ li {
 /* WEBFONT */
 @font-face {
   font-family: 'BebasNeueRegular';
-  src: url('http://rsf.org/squelettes/fonts/BebasNeue-webfont.eot');
-  src: url('http://rsf.org/squelettes/fonts/BebasNeue-webfont.eot?#iefix') format('embedded-opentype'), url('http://rsf.org/squelettes/fonts/BebasNeue-webfont.woff') format('woff'), url('http://rsf.org/squelettes/fonts/BebasNeue-webfont.ttf') format('truetype'), url('http://rsf.org/squelettes/fonts/BebasNeue-webfont.svg#BebasNeueRegular') format('svg');
+  src: url('/fonts/BebasNeue-webfont.eot');
+  src: url('/fonts/BebasNeue-webfont.eot?#iefix') format('embedded-opentype'), url('/fonts/BebasNeue-webfont.woff') format('woff'), url('/fonts/BebasNeue-webfont.ttf') format('truetype'), url('/fonts/BebasNeue-webfont.svg#BebasNeueRegular') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -1739,13 +1739,13 @@ nav .shortText a {
 }
 #main {
   position: relative;
-  background-color: #282828;
+  background: #358cb3 url(/data/fond.png) repeat 0 0 scroll;
   color: #fff;
-  width: 100%;
+  width: 98%;
   height: 100%;
   max-height: 600px;
   overflow: hidden;
-  margin: 30px 0;
+  margin: 30px auto;
 }
 #carte {
   position: relative;
@@ -1765,12 +1765,13 @@ nav .shortText a {
   background-color: rgba(0, 0, 0, 0.2);
   height: 800px;
   width: 20%;
-  right: 0;
+  right: 10px;
+  top:10px;
  }
 #control_annees {
   position: relative;
   width: 90%;
-  padding-bottom: 80px;
+  padding-bottom: 55px;
   margin: 0 auto;
 }
 .btn_annee{
@@ -1848,7 +1849,7 @@ td {
   white-space: nowrap;
   display: block;
   height: 20px;
-  margin-top: 10px;
+  margin: 6px 0 4px;
   padding: 0 4%;
   float:left;
   text-align: left;
@@ -1861,7 +1862,12 @@ td {
 
 #classement .position {
   position: relative;
-  width: 18%;
+  width: 10%;
+  
+}
+
+.legende th{
+  margin:0;
 }
 
 #classement .diff {
@@ -1870,7 +1876,7 @@ td {
 }
 #classement .name {
   position: relative;
-  width:40%;
+  width:50%;
 }
 
 #classement .note {
@@ -1898,8 +1904,8 @@ td {
 }
 #control_mode {
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 10px;
+  left: 10px;
   z-index: 3;
   padding: 30px;
   text-align: center;

@@ -248,7 +248,7 @@ var Dessin2D = function()
 
         this.svgFond = this.svg.append("svg:rect").attr("x", 0).attr("y", 0)
             .attr("width", tailleCartePourTexture).attr("height", tailleCartePourTexture)
-            .style("fill", "rgba(0, 0, 0, 0)"); 
+            .style("fill", "rgba(100, 0, 0, 0)"); 
 
 
 
@@ -307,8 +307,8 @@ var Dessin2D = function()
                             .on("click", function(){ clicPaysClassement(this.id); })
                             
                         pays.append("td").attr("class","position");
-                        pays.append("td").attr("class","diff");
                         pays.append("td").attr("class","name");
+                        pays.append("td").attr("class","diff");
                         pays.append("td").attr("class","note");
 
                     }
@@ -411,7 +411,7 @@ var Dessin2D = function()
 
         } else {
 
-            var color1 = [ 200, 255, 200 ];
+            var color1 = [ 0, 0, 0 ];
             var color2 = [ 253, 227, 6   ];
             var color3 = [ 241, 151, 3   ];
             var color4 = [ 218, 0  , 46  ];
@@ -464,7 +464,7 @@ var Dessin2D = function()
 	{
 		var hauteurMax = index.length;
 		var red, green, blue;
-        var color1 = [200,255,200];
+        var color1 = [250,255,250];
         var color2 = [253,227,6  ];
         var color3 = [241,151,3  ];
         var color4 = [218,0  ,46 ];
@@ -1585,17 +1585,20 @@ window.addEventListener("resize", onresize, false);
 function onresize()
 {
 
-    var newWidth = window.innerWidth;
+    var newWidth = window.innerWidth - 40;
     var newHeight = window.innerHeight;
+
+    var size = Math.max(newWidth, newHeight);
+
 
     if(mode == "3d")
     {
 
-        canvas.onResize(newWidth, newWidth);
+        canvas.onResize(size, size);
 
     } else {
 
-        dessin2d.resize(newWidth, newWidth, newWidth/10, newWidth/2, newWidth/2);     
+        dessin2d.resize(size, size, size/8, size/2, size/1.8);     
 
     }
 

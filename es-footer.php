@@ -52,13 +52,17 @@
 
 		<section id="sources" class="line center">
 			
-			<h3>Methodology</h3>
-			 <p><a href="data/2014_wpfi_methodology.pdf">Download pdf (450Kb) </a></p>
-			<h3>Sources</h3>
 			<p><a href="data/carte2014_en.png">Download the map</a></p>
 			<p><a href="data/index2.csv">Download the index</a></p>
-			<p>Data visualisation by Pierre-Alain Leboucher and Dorian Ratovo</br>
+			
+
+			<h3 class="h5-like">Methodology</h3>
+			 <p><a href="data/2014_wpfi_methodology.pdf">Download pdf (450Kb) </a></p>
+			
+			<p class="small">Data visualisation by Pierre-Alain Leboucher and Dorian Ratovo</br>
 				with <a href="http://d3js.org/">D3.js</a> by Mike Bostock, and <a href="http://threejs.org/">THREE.js</a> by Mrdoob</p>
+		
+				<br/><br/><br/>
 		</section>
 
 
