@@ -48,6 +48,7 @@
 							<li class="mod"><a href="es-index2014.php">Español</a></li>
 							<li class="mod"><a href="ru-index2014.php">По-русски</a></li>
 							<li class="mod"><a href="fa-index2014.php" dir="RTL">فارسى</a></li>
+							<li class="mod"><a href="tr-index2014.php">Türkçe</a></li>
 						</ul>
 					</div>
 				</div>

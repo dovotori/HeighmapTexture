@@ -51,6 +51,8 @@
 						<li class="mod"><a href="en-index2014.php">English</a></li>
 						<li class="mod"><a href="fa-index2014.php" dir="RTL">فارسى</a></li>
 						<li class="mod"><a href="ar-index2014.php" dir="RTL">العربية</a></li>
+						<li class="mod"><a href="tr-index2014.php">Türkçe</a></li>
+						
 					</ul>
 				</div>
 			</header>

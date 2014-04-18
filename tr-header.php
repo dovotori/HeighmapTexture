@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 	<head>
 
 		<title>Reporters Without Borders</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
-		<link rel="stylesheet" type="text/css" href="knacss/knacss.css" />
+		<link rel="stylesheet" type="text/css" href="knacss/knacss.css"	/>
 
 		<!-- GOOGLE ANALYTICS -->
 		<script type="text/javascript">
@@ -29,20 +29,20 @@
 
 
 
-	<body class="mode2d">
+	<body class="mode2d lang-tr">
 		
 		<br/>
 		
 		<section id="cp" class="line center grid">
 			<header class="mod grid3-1">
 				<h1 class="mod">
-					<a href="en-index2014.php">World press <br/>freedom index 2014</a>
+					<a href="tr-index2014.php">RSF 2014 Dünya Basın </br>Özgürlüğü Sıralaması</a>
 				</h1>
 
 				<div class="grid">
 
 					<a href="http://rsf.org">
-						<img class="w150p" src="http://fr.rsf.org/squelettes/img/en/logo-en.png" alt="logo RSF"/>
+						<img class="w150p" src="/squelettes/img/en/logo-en.png" alt="logo RSF"/>
 					</a>
 
 					<ul id="langues" class="grid3">
@@ -60,13 +60,13 @@
 		</section>	
 
 		<section id="cp" class="line center">	
-			<nav id="<?php echo "selected-$selected" ?>" class="grid">
+		<!-- 	<nav id="<?php echo "selected-$selected" ?>" class="grid">
 			<ul class="grid6">
 				<li id="asie" class="mod left shortText"><a href="en-asia.php">Asia</a></li>
 				<li id="afrique" class="mod left shortText"><a href="en-africa.php">Africa</a></li>
 				<li id="ameriques" class="mod left shortText"><a href="en-americas.php#">Americas</a></li>
-				<li id="mo" class="mod left"><a href="en-middle-east.php">North Africa</br> and Middle-East</a></li>
+				<li id="mo" class="mod left"><a href="en-middle-east.php">Noth Africa</br> and Middle-East</a></li>
 				<li id="ue" class="mod left"><a href="en-eu.php">EU<br/> and Balkans</a></li>
 				<li id="europe-est" class="mod left"><a href="en-eastern-europe.php">Eastern Europe<br/> and Central Asia</a></li>
 			</ul>
-		</nav>	
+		</nav>	 -->
