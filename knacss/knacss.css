@@ -16,6 +16,7 @@ html,
 body {
   margin: 0;
   padding: 0;
+  color:#0c1b23;
 }
 ul,
 ol {
@@ -1432,7 +1433,7 @@ input[type='submit']::-moz-focus-inner {
   th,
   td {
     display: block !important;
-    width: auto !important;
+    width: auto;
     text-align: left !important;
   }
 
@@ -1476,6 +1477,10 @@ input[type='submit']::-moz-focus-inner {
 
   th{
     display: table-cell!important;  
+  }
+
+  .itemPays td{
+    display: block!important;  
   }
   
 }
@@ -1674,9 +1679,10 @@ i {
 nav {
   padding: 20px 0;
 }
+
 nav a {
   display: block;
-  background: #e5eff4 url(/data/fond.png) repeat 0 0 scroll;
+  background: none;
   color: #101010;
   text-align: center;
   border-radius: 2px;
@@ -1684,10 +1690,16 @@ nav a {
   line-height: 0.95;
   padding: 4px 0;
   margin-bottom: 3px;
+  color:#0c1b23;
+  border-left:1px solid #0c1b23;
+}
+nav li:first-child a{
+  border:none;
 }
 nav a:hover {
-  background-color: #358cb3;
-  color:#fff;
+  background: #0c1b23 url(/data/fond.png) repeat-x 0 top scroll;
+ color:#fff; 
+ border:none;
 }
 nav .shortText a {
   padding: 10px 0;
@@ -1740,7 +1752,7 @@ nav .shortText a {
 }
 #main {
   position: relative;
-  background: #358cb3 url(/data/fond.png) repeat 0 0 scroll;
+  background: #358cb3 url(/data/fond.png) repeat-x 0 bottom scroll;
   color: #fff;
   width: 98%;
   height: 100%;
