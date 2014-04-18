@@ -1,6 +1,8 @@
 <?php include "tr-header.php" ?>
 <h5>Türkiye 180 Ülke İçinde 154. Sırada Kaldı</h5>
-<p id="intro" >Uluslar arası Sınır Tanımayan Gazeteciler (RSF) örgütü, 2014 Dünya Basın Özgürlüğü Sıralaması’nda Türkiye’yi, 180 ülke içerisinde 154. Sırada gösterdi.</p>
+<p id="intro" >
+	<img class="left" src="/data/couvIndex-en.png" alt="couverture classement 2014"/>
+	Uluslar arası Sınır Tanımayan Gazeteciler (RSF) örgütü, 2014 Dünya Basın Özgürlüğü Sıralaması’nda Türkiye’yi, 180 ülke içerisinde 154. Sırada gösterdi.</p>
 <div id="more">
 	<p>Basın özgürlüğünü savunan Paris merkezli uluslar arası örgüt, bugün yayınladığı İndeks’inde Türkiye’yi, 2013 sonunda 60 civarında medya çalışanını cezaevinde tutan, Gezi eylemleriyle 153 habercinin polis şiddetine uğradığı ve editoryal bağımsızlığın ağır saldırı altında olduğu bir ülke olarak tanıttı.</p>
 	<p>Basın özgürlüğü durumu en iyi ülkeler Finlandiya (1), Hollanda (2) ve Norveç (3), sıralamanın ilk üç sırasında yer alırken Suriye (177), Türkmenistan (178), Kuzey Kore (179) ve Eritre (180) son sıraları paylaştılar.</p>

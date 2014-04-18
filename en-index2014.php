@@ -3,6 +3,7 @@
 
 <h2 style="text-align: left;" align="center">Biggest rises and falls in the 2014 World Press Freedom Index</h2>
 <p id="intro">
+	<img class="left" src="/data/couvIndex-en.png" alt="couverture classement 2014"/>
 The 2014 World Press Freedom Index spotlights the negative impact of conflicts on freedom of information and its protagonists. The ranking of some countries has also been affected by a tendency to interpret national security needs in an overly broad and abusive manner to the detriment of the right to inform and be informed. This trend constitutes a growing threat worldwide and is even endangering freedom of information in countries regarded as democracies.
 Finland tops the index for the fourth year running, closely followed by Netherlands and Norway, like last year. At the other end of the index, the last three positions are again held by Turkmenistan, North Korea and Eritrea, three countries where freedom of information is non-existent. Despite occasional turbulence in the past year, these countries continue to be news and information black holes and living hells for the journalists who inhabit them.
 This year’s index covers 180 countries, one more than last year. The new entry, Belize, has been assigned an enviable position (29th). Cases of violence against journalists are rare in Belize but there were some problems: defamation suits involving demands for large amounts in damages, national security restrictions on implementation of the Freedom of Information Act and sometimes unfair management of broadcast frequencies.

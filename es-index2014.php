@@ -4,7 +4,9 @@
 <?php include "es-header.php" ?>
 
 <h1 style="text-align: left;" align="center">Las grandes evoluciones en la edición 2014 de la Clasificación Mundial de la Libertad de Prensa</h1>
-<p id="intro">La edición 2014 de la "Clasificación Mundial de la Libertad de Prensa” revela el impacto negativo de los conflictos armados en la libertad de información y en sus actores. La posición de algunos países también se vio afectada porque estos han hecho una interpretación demasiado amplia y abusiva del concepto de “protección de la seguridad nacional”, a costa del derecho de informar y de ser informado. Esta tendencia constituye una amenaza creciente a escala global, peligrosa para la libertad de información hasta el corazón mismo del “Estado de Derecho”.</p>
+<p id="intro">
+	<img class="left" src="/data/couvIndex-en.png" alt="couverture classement 2014"/>
+	La edición 2014 de la "Clasificación Mundial de la Libertad de Prensa” revela el impacto negativo de los conflictos armados en la libertad de información y en sus actores. La posición de algunos países también se vio afectada porque estos han hecho una interpretación demasiado amplia y abusiva del concepto de “protección de la seguridad nacional”, a costa del derecho de informar y de ser informado. Esta tendencia constituye una amenaza creciente a escala global, peligrosa para la libertad de información hasta el corazón mismo del “Estado de Derecho”.</p>
 <div id="more">
 <p>
 Finlandia conserva su lugar como el mejor de la clase, ocupa por cuarto año consecutivo el primer sitio de la clasificación. Al igual que en la última edición, le pisan los talones los Países Bajos y Noruega. En el extremo opuesto, al final de la clasificación, se encuentra el “trío infernal”, que de nuevo reúne a Turkmenistán, Corea del Norte y Eritrea, países donde la libertad de prensa simplemente no existe. A pesar de que en 2013 se vieron atravesados por algunas turbulencias, estos países siguen siendo hoyos negros de la información y verdaderos infiernos para los periodistas.
