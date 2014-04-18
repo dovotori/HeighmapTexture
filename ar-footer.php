@@ -25,16 +25,16 @@
 				
 				<div id="classement" class="mod right">
 					<div id="control_annees">
-						<div class="btn_annee" id="btn_precedent">previous</div>
+						<div class="btn_annee" id="btn_precedent">&#8592;</div>
 						<h2 class="btn_annee" id="current_year"></h2>
-						<div class="btn_annee" id="btn_suivant">next</div>
+						<div class="btn_annee" id="btn_suivant">&#8594;</div>
 					</div>
 					<table>
 						<thead id="liste_legende">
 							<tr class="legende itemPays">
 								<th class="position">rank</th>
-								<th class="diff">diff</th>
 								<th class="name">country</th>
+								<th class="diff">diff</th>
 								<th class="note">note</th>
 							</tr>
 						</thead>
